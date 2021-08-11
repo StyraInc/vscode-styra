@@ -1,0 +1,113 @@
+{
+  "name": "vscode-styra",
+  "displayName": "vscode-styra",
+  "description": "A VSCode extension for the Styra CLI",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.58.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:styra.log.replay"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "styra.log.replay",
+        "title": "Styra: Decision Log Replay"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Styra DAS Configuration",
+      "properties": {
+        "styra.path": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "title": "Styra CLI Path",
+          "description": "Path to the Styra CLI executable",
+          "default": null
+        },
+        "styra.organization_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "title": "Organization ID",
+          "description": "The ID of the Styra DAS organization",
+          "default": null
+        },
+        "styra.url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "title": "Styra DAS URL",
+          "description": "The URL of the Styra DAS instance",
+          "default": null
+        },
+        "styra.token": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "title": "Styra DAS API Token",
+          "description": "The API token for the Styra DAS instance",
+          "default": null
+        },
+        "styra.username": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "title": "Styra DAS Username",
+          "description": "The username for the Styra DAS instance",
+          "default": null
+        },
+        "styra.password": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "title": "Styra DAS Password",
+          "description": "The password for the Styra DAS instance",
+          "default": null
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^9.0.12",
+    "@types/glob": "^7.1.3",
+    "@types/mocha": "^8.2.2",
+    "@types/node": "14.x",
+    "@types/node-fetch": "^2.5.12",
+    "@types/vscode": "^1.58.0",
+    "@typescript-eslint/eslint-plugin": "^4.26.0",
+    "@typescript-eslint/parser": "^4.26.0",
+    "eslint": "^7.27.0",
+    "glob": "^7.1.7",
+    "mocha": "^8.4.0",
+    "typescript": "^4.3.2",
+    "vscode-test": "^1.5.2"
+  },
+  "dependencies": {
+    "command-exists": "^1.2.9",
+    "fs-extra": "^10.0.0",
+    "move-file": "^2.1.0",
+    "node-fetch": "^2.6.1"
+  }
+}
