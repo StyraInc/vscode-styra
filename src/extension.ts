@@ -23,8 +23,9 @@ export function activate(context: vscode.ExtensionContext) {
   );
 }
 
-function runLogReplay() {
+async function runLogReplay() {
   console.log("this is a call to the logReplay function");
+
   const stryaPath = vscode.workspace
     .getConfiguration("styra")
     .get<string>("path");
@@ -32,6 +33,7 @@ function runLogReplay() {
   const existsInUserSettings =
     stryaPath !== undefined && stryaPath !== null && existsSync(stryaPath);
 
+  // if the Styra CLI is not installed, prompt the user to install it
   if (!(existsOnPath || existsInUserSettings)) {
     console.log("Styra CLI is is not installed");
     promptForInstall();
@@ -39,6 +41,35 @@ function runLogReplay() {
   } else {
     console.log("Styra CLI is installed");
   }
+
+  const dasURL = vscode.workspace.getConfiguration("styra").get<string>("url");
+  const token = vscode.workspace.getConfiguration("styra").get<string>("token");
+  const request = new Request(`${dasURL}/v1/systems?compact=true`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const response = await fetch(request);
+  response.json().then((json) => {
+    console.log(json.result);
+    const systems = json.result;
+    const systemNames = systems.map((system: any) => system.name);
+    const selected = vscode.window
+      .showQuickPick(systemNames)
+      .then((systemName) => {
+        if (systemName === undefined) {
+          return;
+        } else {
+          runLogReplayForSystem(systemName);
+        }
+      });
+  });
+}
+
+function runLogReplayForSystem(systemName: string) {
+  console.log(`running log replay for system: ${systemName}`);
 }
 
 function promptForInstall() {
