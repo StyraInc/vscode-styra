@@ -2,13 +2,14 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 import { existsSync } from "fs";
-import * as https from "https";
 import * as fs from "fs";
 import * as os from "os";
 import * as fse from "fs-extra";
 import { default as fetch, Request, RequestInit, Response } from "node-fetch";
+import cp = require("child_process");
 const commandExistsSync = require("command-exists").sync;
 const moveFile = require("move-file");
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -62,14 +63,31 @@ async function runLogReplay() {
         if (systemName === undefined) {
           return;
         } else {
-          runLogReplayForSystem(systemName);
+          const systemId = systems.find(
+            (system: any) => system.name === systemName
+          ).id;
+          runLogReplayForSystem(systemId);
         }
       });
   });
 }
 
-function runLogReplayForSystem(systemName: string) {
-  console.log(`running log replay for system: ${systemName}`);
+function runLogReplayForSystem(systemId: string) {
+  console.log(`running log replay for system: ${systemId}`);
+  // run the styra command with the systemId and the policy from the active vscode window
+  const styraPath = vscode.workspace
+    .getConfiguration("styra")
+    .get<string>("path");
+  const policiesDir = vscode.window.activeTextEditor!.document.uri.fsPath;
+  const styraCommand = "styra";
+  const styraArgs = `validate logreplay --system ${systemId} --policies ${policiesDir}`;
+  console.log("the running command would be:" + styraCommand + " " + styraArgs);
+  // const styra = cp.spawn(styraCommand, [styraArgs], {
+  //   stdio: "inherit",
+  // });
+  // styra.on("close", (code) => {
+  //   console.log(`styra exited with code: ${code}`);
+  // });
 }
 
 function promptForInstall() {
