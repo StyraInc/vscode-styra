@@ -41,6 +41,7 @@ async function runLogReplay() {
     return;
   } else {
     console.log("Styra CLI is installed");
+    configureStyra();
   }
 
   const dasURL = vscode.workspace.getConfiguration("styra").get<string>("url");
@@ -164,10 +165,42 @@ async function installStyra() {
       ? moveFile(tempFileLocation, "/usr/local/bin/styra")
       : moveFile(tempFileLocation, "/usr/local/bin/styra");
     vscode.window.showInformationMessage("Styra CLI installed.");
+    configureStyra();
   });
   writeStream.on("error", (error) => {
     console.log("error writing to file");
     console.log(error);
+  });
+}
+
+function configureStyra() {
+  fs.exists(os.homedir + "/.styra/config", (exists) => {
+    if (!exists) {
+      console.log("Configuring the Styra CLI");
+      const dasURL = vscode.workspace
+        .getConfiguration("styra")
+        .get<string>("url");
+      const token = vscode.workspace
+        .getConfiguration("styra")
+        .get<string>("token");
+      if (!dasURL) {
+        vscode.window.showErrorMessage("Please set the Styra DAS URL");
+        return;
+      }
+      if (!token) {
+        vscode.window.showErrorMessage("Please set the Strya DAS API token");
+        return;
+      }
+      run(
+        "styra",
+        ["configure", "--url", dasURL, "--access-token", token],
+        "",
+        (error: string, result: any) => {
+          console.log(result);
+          vscode.window.showInformationMessage("Styra CLI configured.");
+        }
+      );
+    }
   });
 }
 
