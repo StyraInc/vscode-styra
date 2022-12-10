@@ -1,0 +1,38 @@
+// cSpell Settings
+{
+    // Version of the setting file.  Always 0.2
+    "version": "0.2",
+    // language - current active spelling language
+    "language": "en",
+    // words - list of words to be always considered correct
+    "words": [
+        "logreplay",
+        "styra"
+    ],
+    "patterns": [
+        {
+            "name": "importJS1",
+            "pattern": "^\\s*import .* from '.*'$"
+        },
+        {
+            "name": "importJS2",
+            "pattern": "^\\s*import '.*'$"
+        }
+   ],
+    "ignoreRegExpList": [
+        "importJS1",
+        "importJS2"
+    ],
+    // flagWords - list of words to be always considered incorrect
+    // This is useful for offensive words and common spelling errors.
+    // For example "hte" should be "the"
+    "flagWords": [
+        "hte"
+    ],
+    "ignorePaths": [
+        "node_modules/**",
+        "**/*.d.ts"
+    ],
+    "ignoreWords": [
+    ]
+}
