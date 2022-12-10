@@ -2,6 +2,7 @@
   "name": "vscode-styra",
   "displayName": "vscode-styra",
   "description": "A VSCode extension for the Styra CLI",
+  "publisher": "styra",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.71.0"
