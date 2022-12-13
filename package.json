@@ -2,9 +2,10 @@
   "name": "vscode-styra",
   "displayName": "vscode-styra",
   "description": "A VSCode extension for the Styra CLI",
+  "publisher": "styra",
   "version": "0.0.1",
   "engines": {
-    "vscode": "^1.58.0"
+    "vscode": "^1.71.0"
   },
   "categories": [
     "Other"
@@ -95,7 +96,7 @@
     "@types/mocha": "^8.2.2",
     "@types/node": "14.x",
     "@types/node-fetch": "^2.5.12",
-    "@types/vscode": "^1.58.0",
+    "@types/vscode": "^1.71.0",
     "@typescript-eslint/eslint-plugin": "^4.26.0",
     "@typescript-eslint/parser": "^4.26.0",
     "eslint": "^7.27.0",
