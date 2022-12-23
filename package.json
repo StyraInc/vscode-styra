@@ -91,6 +91,7 @@
     "test": "node ./out/test/runTest.js"
   },
   "devDependencies": {
+    "@types/command-exists": "^1.2.0",
     "@types/fs-extra": "^9.0.12",
     "@types/glob": "^7.1.3",
     "@types/mocha": "^8.2.2",

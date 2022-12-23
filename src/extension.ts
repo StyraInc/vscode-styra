@@ -6,7 +6,7 @@ import * as os from "os";
 import * as fse from "fs-extra";
 import { default as fetch, Request } from "node-fetch";
 import cp = require("child_process");
-const commandExistsSync = require("command-exists").sync;
+import { sync as commandExistsSync } from "command-exists";
 import moveFile = require("move-file");
 
 // this method is called when your extension is activated
