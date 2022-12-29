@@ -6,9 +6,11 @@ import * as os from "os";
 import * as fse from "fs-extra";
 import { default as fetch, Request } from "node-fetch";
 import cp = require("child_process");
-import { CONFIG_FILE_PATH, StyraConfig } from "./lib/styra-config";
 import { sync as commandExistsSync } from "command-exists";
 import moveFile = require("move-file");
+
+import { CONFIG_FILE_PATH, StyraConfig } from "./lib/styra-config";
+import { System } from "./lib/types";
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -60,17 +62,19 @@ async function runLogReplay() {
   });
   const response = await fetch(request);
   response.json().then((json) => {
-    const systems = json.result;
+    const systems = json.result as System[];
     if (systems?.length > 0) {
-      const systemNames = systems.map((system: any) => "   " + system.name);
+      const systemNames = systems.map((system) => "   " + system.name);
       systemNames.unshift("Select System:");
       vscode.window.showQuickPick(systemNames).then((systemName) => {
         if (systemName === undefined || systemName === "Select System:") {
           return;
         } else {
+          // guaranteed to find one since we picked from the list so eslint exception OK!
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           const systemId = systems.find(
-            (system: any) => system.name === systemName.trim()
-          ).id;
+            (system) => system.name === systemName.trim()
+          )!.id;
           runLogReplayForSystem(systemId);
         }
       });
