@@ -60,30 +60,42 @@ async function runLogReplay() {
   });
   const response = await fetch(request);
   response.json().then((json) => {
-    console.log(json.result);
     const systems = json.result;
-    const systemNames = systems.map((system: any) => "   " + system.name);
-    systemNames.unshift("Select System:");
-    vscode.window.showQuickPick(systemNames).then((systemName) => {
-      if (systemName === undefined || systemName === "Select System:") {
-        return;
-      } else {
-        const systemId = systems.find(
-          (system: any) => system.name === systemName.trim()
-        ).id;
-        runLogReplayForSystem(systemId); // TODO: do something with result?
-      }
-    });
+    if (systems?.length > 0) {
+      const systemNames = systems.map((system: any) => "   " + system.name);
+      systemNames.unshift("Select System:");
+      vscode.window.showQuickPick(systemNames).then((systemName) => {
+        if (systemName === undefined || systemName === "Select System:") {
+          return;
+        } else {
+          const systemId = systems.find(
+            (system: any) => system.name === systemName.trim()
+          ).id;
+          runLogReplayForSystem(systemId);
+        }
+      });
+    } else if (systems) {
+    vscode.window.showWarningMessage(
+      `Failed to read from ${configData.url}: unauthorized (check your token permissions)`);
+    } else {
+    vscode.window.showWarningMessage(
+      `Failed to read from ${configData.url}: invalid token`);
+    }
+  }).catch((reason) => {
+    // non-existent (or hibernated) system will trigger this path
+    vscode.window.showWarningMessage(
+      `Failed to read from ${configData.url}: ${reason.message}`);
   });
 }
 
 async function runLogReplayForSystem(systemId: string) {
   console.log(`running log replay for system: ${systemId}`);
   // run the styra command with the systemId and the policy from the active vscode window
-  const policiesDir = vscode.window.activeTextEditor!.document.uri.fsPath;
+  // TODO: handle no-open-editor more gracefully.
+  const policiesFile = vscode.window.activeTextEditor!.document.uri.fsPath;
   parse(
     "opa",
-    policiesDir,
+    policiesFile,
     (pkg: string, _imports: string[]) => {
       const styraCommand = "styra";
       const styraArgs = [
@@ -92,7 +104,7 @@ async function runLogReplayForSystem(systemId: string) {
         "--system",
         systemId,
         "--policies",
-        `${pkg}=${policiesDir}`,
+        `${pkg}=${policiesFile}`,
         "-o",
         "json",
       ];
@@ -111,7 +123,9 @@ async function runLogReplayForSystem(systemId: string) {
       });
     },
     (error: string) => {
-      console.log(error);
+      const errorObj = JSON.parse(error);
+      vscode.window.showErrorMessage(
+        `parsing ${policiesFile.split('/').at(-1)} failed: ${errorObj.errors?.[0]?.message ?? '??'}`);
     }
   );
 }
