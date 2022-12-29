@@ -9,6 +9,9 @@ import cp = require("child_process");
 import { sync as commandExistsSync } from "command-exists";
 import moveFile = require("move-file");
 
+import { CONFIG_FILE_PATH, StyraConfig } from "./lib/styra-config";
+import { System } from "./lib/types";
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext): void {
@@ -39,45 +42,64 @@ async function runLogReplay() {
     promptForInstall();
     return;
   } else {
-    console.log("Styra CLI is installed");
-    configureStyra();
+    console.log("Styra CLI is already installed");
   }
+  console.log("calling config");
+  await configureStyra();
+  console.log("back from config");
 
-  const dasURL = vscode.workspace.getConfiguration("styra").get<string>("url");
-  const token = vscode.workspace.getConfiguration("styra").get<string>("token");
-  const request = new Request(`${dasURL}/v1/systems?compact=true`, {
+  console.log("calling readConfig");
+  const configData = await StyraConfig.read();
+  console.log(`back from config: url = ${configData.url}`);
+  const request = new Request(`${configData.url}/v1/systems?compact=true`, {
     method: "GET",
     headers: {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      Authorization: `Bearer ${configData.token}`,
     },
   });
   const response = await fetch(request);
   response.json().then((json) => {
-    console.log(json.result);
-    const systems = json.result;
-    const systemNames = systems.map((system: any) => "   " + system.name);
-    systemNames.unshift("Select System:");
-    vscode.window.showQuickPick(systemNames).then((systemName) => {
-      if (systemName === undefined || systemName === "Select System:") {
-        return;
-      } else {
-        const systemId = systems.find(
-          (system: any) => system.name === systemName.trim()
-        ).id;
-        runLogReplayForSystem(systemId); // TODO: do something with result?
-      }
-    });
+    const systems = json.result as System[];
+    if (systems?.length > 0) {
+      const systemNames = systems.map((system) => "   " + system.name);
+      systemNames.unshift("Select System:");
+      vscode.window.showQuickPick(systemNames).then((systemName) => {
+        if (systemName === undefined || systemName === "Select System:") {
+          return;
+        } else {
+          // guaranteed to find one since we picked from the list so eslint exception OK!
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          const systemId = systems.find(
+            (system) => system.name === systemName.trim()
+          )!.id;
+          runLogReplayForSystem(systemId);
+        }
+      });
+    } else if (systems) {
+    vscode.window.showWarningMessage(
+      `Failed to read from ${configData.url}: unauthorized (check your token permissions)`);
+    } else {
+    vscode.window.showWarningMessage(
+      `Failed to read from ${configData.url}: invalid token`);
+    }
+  }).catch((reason) => {
+    // non-existent (or hibernated) system will trigger this path
+    vscode.window.showWarningMessage(
+      `Failed to read from ${configData.url}: ${reason.message}`);
   });
 }
 
 async function runLogReplayForSystem(systemId: string) {
   console.log(`running log replay for system: ${systemId}`);
   // run the styra command with the systemId and the policy from the active vscode window
-  const policiesDir = vscode.window.activeTextEditor!.document.uri.fsPath;
+  // TODO: handle no-open-editor more gracefully.
+  const policiesFile = vscode.window.activeTextEditor!.document.uri.fsPath;
   parse(
     "opa",
-    policiesDir,
+    policiesFile,
     (pkg: string, _imports: string[]) => {
       const styraCommand = "styra";
       const styraArgs = [
@@ -86,7 +108,7 @@ async function runLogReplayForSystem(systemId: string) {
         "--system",
         systemId,
         "--policies",
-        `${pkg}=${policiesDir}`,
+        `${pkg}=${policiesFile}`,
         "-o",
         "json",
       ];
@@ -105,7 +127,9 @@ async function runLogReplayForSystem(systemId: string) {
       });
     },
     (error: string) => {
-      console.log(error);
+      const errorObj = JSON.parse(error);
+      vscode.window.showErrorMessage(
+        `parsing ${policiesFile.split('/').at(-1)} failed: ${errorObj.errors?.[0]?.message ?? '??'}`);
     }
   );
 }
@@ -159,7 +183,6 @@ async function installStyra() {
       ? moveFile(tempFileLocation, "/usr/local/bin/styra")
       : moveFile(tempFileLocation, "/usr/local/bin/styra");
     vscode.window.showInformationMessage("Styra CLI installed.");
-    configureStyra();
   });
   writeStream.on("error", (error) => {
     console.log("error writing to file");
@@ -167,35 +190,33 @@ async function installStyra() {
   });
 }
 
-function configureStyra() {
-  fs.exists(os.homedir + "/.styra/config", (exists) => {
-    if (!exists) {
-      console.log("Configuring the Styra CLI");
-      const dasURL = vscode.workspace
-        .getConfiguration("styra")
-        .get<string>("url");
-      const token = vscode.workspace
-        .getConfiguration("styra")
-        .get<string>("token");
-      if (!dasURL) {
-        vscode.window.showErrorMessage("Please set the Styra DAS URL");
-        return;
-      }
-      if (!token) {
-        vscode.window.showErrorMessage("Please set the Strya DAS API token");
-        return;
-      }
-      run(
-        "styra",
-        ["configure", "--url", dasURL, "--access-token", token],
-        "",
-        (error: string, result: any) => {
-          console.log(result);
-          vscode.window.showInformationMessage("Styra CLI configured.");
-        }
-      );
+async function configureStyra() {
+  if (fs.existsSync(CONFIG_FILE_PATH)) {
+    console.log("Styra CLI already configured");
+    vscode.window.showInformationMessage(`Using existing Styra CLI configuration (${CONFIG_FILE_PATH})`);
+  } else {
+    const dasURL = await vscode.window.showInputBox({ title: "Styra DAS URL" });
+    if (!dasURL || !dasURL.trim()) {
+      vscode.window.showWarningMessage('Config cancelled due to no input');
+      return;
     }
-  });
+    const token = await vscode.window.showInputBox({ title: "Styra DAS API token" });
+    if (!token || !token.trim()) {
+      vscode.window.showWarningMessage('Config cancelled due to no input');
+      return;
+    }
+    console.log("Configuring the Styra CLI");
+    vscode.window.showInformationMessage("Configuring Styra CLI.");
+    run(
+      "styra",
+      ["configure", "--url", dasURL, "--access-token", token],
+      "",
+      (error: string, result: any) => {
+        console.log(result);
+        vscode.window.showInformationMessage("Styra CLI configured.");
+      }
+    );
+  }
 }
 
 function parse(
