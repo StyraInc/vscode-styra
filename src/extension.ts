@@ -1,18 +1,17 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
-import { existsSync } from "fs";
 import * as fs from "fs";
 import * as os from "os";
 import * as fse from "fs-extra";
-import { default as fetch, Request, RequestInit, Response } from "node-fetch";
+import { default as fetch, Request } from "node-fetch";
 import cp = require("child_process");
-const commandExistsSync = require("command-exists").sync;
-const moveFile = require("move-file");
+import { sync as commandExistsSync } from "command-exists";
+import moveFile = require("move-file");
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+export function activate(context: vscode.ExtensionContext): void {
   // Use the console to output diagnostic information (console.log) and errors (console.error)
   // This line of code will only be executed once when your extension is activated
   console.log('Congratulations, your extension "vscode-styra" is now active!');
@@ -27,16 +26,16 @@ export function activate(context: vscode.ExtensionContext) {
 async function runLogReplay() {
   console.log("this is a call to the logReplay function");
 
-  const stryaPath = vscode.workspace
+  const styraPath = vscode.workspace
     .getConfiguration("styra")
     .get<string>("path");
   const existsOnPath = commandExistsSync("styra");
   const existsInUserSettings =
-    stryaPath !== undefined && stryaPath !== null && existsSync(stryaPath);
+    styraPath !== undefined && styraPath !== null && fs.existsSync(styraPath);
 
   // if the Styra CLI is not installed, prompt the user to install it
   if (!(existsOnPath || existsInUserSettings)) {
-    console.log("Styra CLI is is not installed");
+    console.log("Styra CLI is not installed");
     promptForInstall();
     return;
   } else {
@@ -59,32 +58,27 @@ async function runLogReplay() {
     const systems = json.result;
     const systemNames = systems.map((system: any) => "   " + system.name);
     systemNames.unshift("Select System:");
-    const selected = vscode.window
-      .showQuickPick(systemNames)
-      .then((systemName) => {
-        if (systemName === undefined || systemName === "Select System:") {
-          return;
-        } else {
-          const systemId = systems.find(
-            (system: any) => system.name === systemName.trim()
-          ).id;
-          const result = runLogReplayForSystem(systemId);
-        }
-      });
+    vscode.window.showQuickPick(systemNames).then((systemName) => {
+      if (systemName === undefined || systemName === "Select System:") {
+        return;
+      } else {
+        const systemId = systems.find(
+          (system: any) => system.name === systemName.trim()
+        ).id;
+        runLogReplayForSystem(systemId); // TODO: do something with result?
+      }
+    });
   });
 }
 
 async function runLogReplayForSystem(systemId: string) {
   console.log(`running log replay for system: ${systemId}`);
   // run the styra command with the systemId and the policy from the active vscode window
-  const styraPath = vscode.workspace
-    .getConfiguration("styra")
-    .get<string>("path");
   const policiesDir = vscode.window.activeTextEditor!.document.uri.fsPath;
   parse(
     "opa",
     policiesDir,
-    (pkg: string, imports: string[]) => {
+    (pkg: string, _imports: string[]) => {
       const styraCommand = "styra";
       const styraArgs = [
         "validate",
@@ -218,8 +212,8 @@ function parse(
       if (error !== "") {
         onerror(error);
       } else {
-        let pkg = getPackage(result);
-        let imports = getImports(result);
+        const pkg = getPackage(result);
+        const imports = getImports(result);
         cb(pkg, imports);
       }
     }
@@ -262,7 +256,7 @@ function runWithStatus(
 ) {
   console.log("spawn:", path, "args:", args.toString());
 
-  let proc = cp.spawn(path, args);
+  const proc = cp.spawn(path, args);
 
   proc.stdin.write(stdin);
   proc.stdin.end();
@@ -277,7 +271,7 @@ function runWithStatus(
     stderr += data;
   });
 
-  proc.on("exit", (code, signal) => {
+  proc.on("exit", (code, _signal) => {
     console.log("code:", code);
     console.log("stdout:", stdout);
     console.log("stderr:", stderr);
@@ -292,7 +286,7 @@ function getPackage(parsed: any): string {
 function getImports(parsed: any): string[] {
   if (parsed.imports !== undefined) {
     return parsed.imports.map((x: any) => {
-      let str = getPathString(x.path.value);
+      const str = getPathString(x.path.value);
       if (!x.alias) {
         return str;
       }
