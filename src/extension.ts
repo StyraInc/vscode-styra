@@ -31,14 +31,16 @@ async function runLogReplay() {
   const existsOnPath = commandExistsSync("styra");
   const existsInUserSettings =
     styraPath !== undefined && styraPath !== null && fs.existsSync(styraPath);
+  const isInstalled = existsOnPath || existsInUserSettings;
 
-  // if the Styra CLI is not installed, prompt the user to install it
-  if (!(existsOnPath || existsInUserSettings)) {
-    console.log("Styra CLI is not installed");
-    await StyraInstall.promptForInstall();
-  } else {
+  if (isInstalled) {
     console.log("Styra CLI is already installed");
+  } else {
+    console.log("Styra CLI is not installed");
+    const continueRun = await StyraInstall.promptForInstall();
+    if (!continueRun) { return; }
   }
+
   console.log("calling config");
   await configureStyra();
   console.log("back from config");

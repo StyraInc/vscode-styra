@@ -6,7 +6,7 @@ import { default as fetch } from "node-fetch";
 import moveFile = require("move-file");
 
 export class StyraInstall {
-  static async promptForInstall(): Promise<void> {
+  static async promptForInstall(): Promise<boolean> {
     const selection = await vscode.window.showInformationMessage(
       "Styra CLI is not installed. Would you like to install it now?",
       "Install",
@@ -14,19 +14,22 @@ export class StyraInstall {
     );
 
     if (selection === "Install") {
-      console.log("installStyra START");
-      await this.installStyra();
-      console.log("installStyra DONE");
+      vscode.window.showInformationMessage("Installing Styra CLI. This may take a few minutes...");
+      try {
+        await this.installStyra();
+        vscode.window.showInformationMessage("Styra CLI installed.");
+        return true;
+      } catch (err) {
+        vscode.window.showErrorMessage(`Styra CLI installation failed: ${err}`);
+        return false;
+      }
     } else {
       console.log("cancelling Styra CLI install");
+      return false;
     }
   }
 
   static async installStyra(): Promise<void> {
-    vscode.window.showInformationMessage(
-      "Installing Styra CLI. This may take a few minutes..."
-    );
-
     const targetOS = process.platform;
     // TODO: add arm architecture
     const url =
@@ -40,14 +43,10 @@ export class StyraInstall {
     const binaryFile = targetOS === "win32" ? "styra.exe" : "styra";
     const tempFileLocation = os.homedir() + "/" + binaryFile;
 
-    try {
-      await this.getBinary(url, tempFileLocation);
-      fs.chmodSync(tempFileLocation, "755");
-      moveFile(tempFileLocation, exeFile);
-      vscode.window.showInformationMessage("Styra CLI installed.");
-    } catch (err) {
-      vscode.window.showErrorMessage(`Styra CLI installation failed: ${err}`);
-    }
+    await this.getBinary(url, tempFileLocation);
+    // throw new Error('dummy err'); // TODO: do not commit this!
+    fs.chmodSync(tempFileLocation, "755");
+    moveFile(tempFileLocation, exeFile);
   }
 
   static async getBinary(url: string, tempFileLocation: string): Promise<void> {
