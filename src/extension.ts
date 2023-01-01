@@ -1,16 +1,12 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 import * as fs from "fs";
-import * as os from "os";
-import * as fse from "fs-extra";
 import { default as fetch, Request } from "node-fetch";
 import cp = require("child_process");
 import { sync as commandExistsSync } from "command-exists";
-import moveFile = require("move-file");
 
 import { CONFIG_FILE_PATH, StyraConfig } from "./lib/styra-config";
 import { System } from "./lib/types";
+import { StyraInstall } from "./lib/styra-install";
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -35,15 +31,16 @@ async function runLogReplay() {
   const existsOnPath = commandExistsSync("styra");
   const existsInUserSettings =
     styraPath !== undefined && styraPath !== null && fs.existsSync(styraPath);
+  const isInstalled = existsOnPath || existsInUserSettings;
 
-  // if the Styra CLI is not installed, prompt the user to install it
-  if (!(existsOnPath || existsInUserSettings)) {
-    console.log("Styra CLI is not installed");
-    promptForInstall();
-    return;
-  } else {
+  if (isInstalled) {
     console.log("Styra CLI is already installed");
+  } else {
+    console.log("Styra CLI is not installed");
+    const continueRun = await StyraInstall.promptForInstall();
+    if (!continueRun) { return; }
   }
+
   console.log("calling config");
   await configureStyra();
   console.log("back from config");
@@ -134,61 +131,6 @@ async function runLogReplayForSystem(systemId: string) {
   );
 }
 
-function promptForInstall() {
-  vscode.window
-    .showInformationMessage(
-      "Styra CLI is not installed. Would you like to install it now?",
-      "Install",
-      "Cancel"
-    )
-    .then((selection) => {
-      if (selection === "Install") {
-        console.log("installing Styra CLI");
-        installStyra();
-      } else {
-        console.log("cancelling Styra CLI install");
-      }
-    });
-}
-
-async function installStyra() {
-  vscode.window.showInformationMessage(
-    "Installing Styra CLI. This may take a few minutes."
-  );
-
-  const targetOS = process.platform;
-  // Setup url based on the targetOS
-  const url =
-    targetOS === "win32"
-      ? `https://docs.styra.com/v1/docs/bin/windows/amd64/styra.exe`
-      : targetOS === "darwin"
-      ? `https://docs.styra.com/v1/docs/bin/darwin/amd64/styra`
-      : `https://docs.styra.com/v1/docs/bin/linux/amd64/styra`;
-  const binaryFile =
-    targetOS === "win32"
-      ? "styra.exe"
-      : targetOS === "darwin"
-      ? "styra"
-      : "styra";
-  const tempFileLocation = os.homedir() + "/" + binaryFile;
-  const response = await fetch(url);
-  const writeStream = fse.createWriteStream(tempFileLocation);
-  response.body.pipe(writeStream);
-  writeStream.on("finish", () => {
-    console.log("Styra CLI installed");
-    fs.chmodSync(tempFileLocation, "755");
-    targetOS === "win32"
-      ? moveFile(tempFileLocation, "C:\\Program Files\\styra\\styra.exe")
-      : targetOS === "darwin"
-      ? moveFile(tempFileLocation, "/usr/local/bin/styra")
-      : moveFile(tempFileLocation, "/usr/local/bin/styra");
-    vscode.window.showInformationMessage("Styra CLI installed.");
-  });
-  writeStream.on("error", (error) => {
-    console.log("error writing to file");
-    console.log(error);
-  });
-}
 
 async function configureStyra() {
   if (fs.existsSync(CONFIG_FILE_PATH)) {
