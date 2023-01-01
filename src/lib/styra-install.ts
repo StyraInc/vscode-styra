@@ -31,18 +31,22 @@ export class StyraInstall {
 
   static async installStyra(): Promise<void> {
     const targetOS = process.platform;
-    // TODO: add arm architecture
-    const url =
-      targetOS === "win32"
-        ? `https://docs.styra.com/v1/docs/bin/windows/amd64/styra.exe`
-        : targetOS === "darwin"
-        ? `https://docs.styra.com/v1/docs/bin/darwin/amd64/styra`
-        : `https://docs.styra.com/v1/docs/bin/linux/amd64/styra`;
+    const targetArch = process.arch;
+
     const exeFile = targetOS === "win32" ? "C:\\Program Files\\styra\\styra.exe" : "/usr/local/bin/styra";
     // const exeFile = targetOS === "win32" ? "C:\\Program Files\\styra\\styra.exe" : "/Users/msorens/styra-test"; // TODO: do not commit this!
     const binaryFile = targetOS === "win32" ? "styra.exe" : "styra";
     const tempFileLocation = os.homedir() + "/" + binaryFile;
 
+    const url =
+      targetOS === "win32"
+        ? `https://docs.styra.com/v1/docs/bin/windows/amd64/styra.exe`
+        : targetOS !== "darwin"
+          ? `https://docs.styra.com/v1/docs/bin/linux/amd64/styra`
+          : targetArch === "arm64"
+            ? `https://docs.styra.com/v1/docs/bin/darwin/arm64/styra`
+            : `https://docs.styra.com/v1/docs/bin/darwin/amd64/styra`; // otherwise target "x64"
+ 
     await this.getBinary(url, tempFileLocation);
     // throw new Error('dummy err'); // TODO: do not commit this!
     fs.chmodSync(tempFileLocation, "755");
