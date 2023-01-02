@@ -1,12 +1,12 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
 import { default as fetch, Request } from "node-fetch";
-import cp = require("child_process");
 import { sync as commandExistsSync } from "command-exists";
 
-import { CONFIG_FILE_PATH, StyraConfig } from "./lib/styra-config";
+import { StyraConfig, STYRA_CLI_CMD } from "./lib/styra-config";
 import { System } from "./lib/types";
 import { StyraInstall } from "./lib/styra-install";
+import { CommandRunner } from "./lib/command-runner";
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -41,13 +41,10 @@ async function runLogReplay() {
     if (!continueRun) { return; }
   }
 
-  console.log("calling config");
-  await configureStyra();
-  console.log("back from config");
+  const continueRun = await StyraConfig.configure();
+  if (!continueRun) { return; }
 
-  console.log("calling readConfig");
   const configData = await StyraConfig.read();
-  console.log(`back from config: url = ${configData.url}`);
   const request = new Request(`${configData.url}/v1/systems?compact=true`, {
     method: "GET",
     headers: {
@@ -94,11 +91,11 @@ async function runLogReplayForSystem(systemId: string) {
   // run the styra command with the systemId and the policy from the active vscode window
   // TODO: handle no-open-editor more gracefully.
   const policiesFile = vscode.window.activeTextEditor!.document.uri.fsPath;
+  const runner = new CommandRunner();
   parse(
     "opa",
     policiesFile,
-    (pkg: string, _imports: string[]) => {
-      const styraCommand = "styra";
+    async (pkg: string, _imports: string[]) => {
       const styraArgs = [
         "validate",
         "logreplay",
@@ -110,10 +107,9 @@ async function runLogReplayForSystem(systemId: string) {
         "json",
       ];
       console.log(
-        "the running command would be:" + styraCommand + " " + styraArgs
+        "the running command would be:" + STYRA_CLI_CMD + " " + styraArgs
       );
-      run(styraCommand, styraArgs, "", (error: string, result: any) => {
-        console.log("This is the callback from the styra cli run.");
+      const result = JSON.parse(await runner.run(STYRA_CLI_CMD, styraArgs));
         console.log(result);
         const samples = result.samples.length;
         const resultChanged = result.stats.results_changed;
@@ -121,7 +117,6 @@ async function runLogReplayForSystem(systemId: string) {
         vscode.window.showInformationMessage(
           `${samples} samples / ${resultChanged} changed / ${entriesEvaluated} replayed `
         );
-      });
     },
     (error: string) => {
       const errorObj = JSON.parse(error);
@@ -132,114 +127,22 @@ async function runLogReplayForSystem(systemId: string) {
 }
 
 
-async function configureStyra() {
-  if (fs.existsSync(CONFIG_FILE_PATH)) {
-    console.log("Styra CLI already configured");
-    vscode.window.showInformationMessage(`Using existing Styra CLI configuration (${CONFIG_FILE_PATH})`);
-  } else {
-    const dasURL = await vscode.window.showInputBox({ title: "Styra DAS URL" });
-    if (!dasURL || !dasURL.trim()) {
-      vscode.window.showWarningMessage('Config cancelled due to no input');
-      return;
-    }
-    const token = await vscode.window.showInputBox({ title: "Styra DAS API token" });
-    if (!token || !token.trim()) {
-      vscode.window.showWarningMessage('Config cancelled due to no input');
-      return;
-    }
-    console.log("Configuring the Styra CLI");
-    vscode.window.showInformationMessage("Configuring Styra CLI.");
-    run(
-      "styra",
-      ["configure", "--url", dasURL, "--access-token", token],
-      "",
-      (error: string, result: any) => {
-        console.log(result);
-        vscode.window.showInformationMessage("Styra CLI configured.");
-      }
-    );
-  }
-}
-
-function parse(
+async function parse(
   opaPath: string,
   path: string,
   cb: (pkg: string, imports: string[]) => void,
   onerror: (output: string) => void
 ) {
-  run(
-    opaPath,
-    ["parse", path, "--format", "json"],
-    "",
-    (error: string, result: any) => {
-      if (error !== "") {
-        onerror(error);
-      } else {
+  try {
+    const result = JSON.parse(await new CommandRunner()
+      .run(opaPath, ["parse", path, "--format", "json"]));
         const pkg = getPackage(result);
         const imports = getImports(result);
         cb(pkg, imports);
-      }
-    }
-  );
-}
 
-// run executes the OPA binary at path with args and stdin.  The callback is
-// invoked with an error message on failure or JSON object on success.
-function run(
-  path: string,
-  args: string[],
-  stdin: string,
-  cb: (error: string, result: any) => void
-) {
-  runWithStatus(
-    path,
-    args,
-    stdin,
-    (code: number, stderr: string, stdout: string) => {
-      if (code !== 0) {
-        if (stdout !== "") {
-          cb(stdout, "");
-        } else {
-          cb(stderr, "");
-        }
-      } else {
-        cb("", JSON.parse(stdout));
-      }
-    }
-  );
-}
-
-// runWithStatus executes the OPA binary at path with args and stdin. The
-// callback is invoked with the exit status, stderr, and stdout buffers.
-function runWithStatus(
-  path: string,
-  args: string[],
-  stdin: string,
-  cb: (code: number, stderr: string, stdout: string) => void
-) {
-  console.log("spawn:", path, "args:", args.toString());
-
-  const proc = cp.spawn(path, args);
-
-  proc.stdin.write(stdin);
-  proc.stdin.end();
-  let stdout = "";
-  let stderr = "";
-
-  proc.stdout.on("data", (data) => {
-    stdout += data;
-  });
-
-  proc.stderr.on("data", (data) => {
-    stderr += data;
-  });
-
-  proc.on("exit", (code, _signal) => {
-    console.log("code:", code);
-    console.log("stdout:", stdout);
-    console.log("stderr:", stderr);
-    cb(code!, stderr, stdout);
-  });
+  } catch (err) {
+        onerror(err as string);
+  }
 }
 
 function getPackage(parsed: any): string {

@@ -6,6 +6,7 @@ import { default as fetch } from "node-fetch";
 import moveFile = require("move-file");
 
 export class StyraInstall {
+  
   static async promptForInstall(): Promise<boolean> {
     const selection = await vscode.window.showInformationMessage(
       "Styra CLI is not installed. Would you like to install it now?",
@@ -29,7 +30,7 @@ export class StyraInstall {
     }
   }
 
-  static async installStyra(): Promise<void> {
+  private static async installStyra(): Promise<void> {
     const targetOS = process.platform;
     const targetArch = process.arch;
 
@@ -53,7 +54,7 @@ export class StyraInstall {
     moveFile(tempFileLocation, exeFile);
   }
 
-  static async getBinary(url: string, tempFileLocation: string): Promise<void> {
+  private static async getBinary(url: string, tempFileLocation: string): Promise<void> {
     // adapted from https://stackoverflow.com/a/69290915
     const response = await fetch(url);
     console.log(`starting write ${tempFileLocation}`);
