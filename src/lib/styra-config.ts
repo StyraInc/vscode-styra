@@ -8,10 +8,11 @@ export type ConfigData = {
   token: string;
 };
 
-export const CONFIG_FILE_PATH = `${os.homedir}/.styra/config`;
+const CONFIG_FILE_PATH = `${os.homedir}/.styra/config`;
+export const STYRA_CLI_CMD = 'styra';
 
 export class StyraConfig {
-
+  
   static async read(): Promise<ConfigData> {
     const configData = <ConfigData>{};
     return await fs.promises.readFile(CONFIG_FILE_PATH, "utf8").then((data) => {
@@ -29,7 +30,7 @@ export class StyraConfig {
     });
   }
 
-  static async configure(): Promise<void> {
+  static async configure(): Promise<boolean> {
     const runner = new CommandRunner();
 
     if (fs.existsSync(CONFIG_FILE_PATH)) {
@@ -39,30 +40,32 @@ export class StyraConfig {
       );
     } else {
       const dasURL = await vscode.window.showInputBox({
-        title: "Styra DAS URL",
+        title: "Enter Styra DAS URL",
       });
       if (!dasURL || !dasURL.trim()) {
         vscode.window.showWarningMessage("Config cancelled due to no input");
-        return;
+        return false;
       }
       const token = await vscode.window.showInputBox({
-        title: "Styra DAS API token",
+        title: "Enter Styra DAS API token",
       });
       if (!token || !token.trim()) {
         vscode.window.showWarningMessage("Config cancelled due to no input");
-        return;
+        return false;
       }
-      console.log("Configuring the Styra CLI");
       vscode.window.showInformationMessage("Configuring Styra CLI.");
-      runner.run(
-        "styra",
-        ["configure", "--url", dasURL, "--access-token", token],
-        "",
-        (error: string, result: any) => {
-          console.log(result);
-          vscode.window.showInformationMessage("Styra CLI configured.");
-        }
-      );
+      try {
+        await runner.run(STYRA_CLI_CMD, // no output upon success
+          ["configure", "--url", dasURL, "--access-token", token]);
+        vscode.window.showInformationMessage("Styra CLI configured.");
+        console.log("configure complete");
+      } catch (err) {
+        // invalid URL or TOKEN will trigger this
+        vscode.window.showErrorMessage(`Styra CLI configure failed: ${err}`);
+        console.log("configure failed!");
+        return false;
+      }
     }
+    return true;
   }
 }

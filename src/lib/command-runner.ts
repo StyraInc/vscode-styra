@@ -1,62 +1,38 @@
-import cp = require("child_process");
+import { spawn } from "child_process";
 
 export class CommandRunner {
-  // executes the command at path with args and stdin.  The callback is
-  // invoked with an error message on failure or JSON object on success.
-  run(
-    path: string,
-    args: string[],
-    stdin: string,
-    cb: (error: string, result: any) => void
-  ): void {
-    this.runWithStatus(
-      path,
-      args,
-      stdin,
-      (code: number, stderr: string, stdout: string) => {
-        if (code !== 0) {
-          if (stdout !== "") {
-            cb(stdout, "");
-          } else {
-            cb(stderr, "");
-          }
-        } else {
-          cb("", JSON.parse(stdout));
-        }
-      }
-    );
-  }
 
-  // runWithStatus executes the OPA binary at path with args and stdin. The
-  // callback is invoked with the exit status, stderr, and stdout buffers.
-  runWithStatus(
+  // executes the command at path with args and stdin.
+  // Upon success returns the command's output.
+  // Upon failure returns the stderr output in an exception.
+  async run(
     path: string,
     args: string[],
-    stdin: string,
-    cb: (code: number, stderr: string, stdout: string) => void
-  ): void {
+    stdin = ""
+  ): Promise<string> {
     console.log("spawn:", path, "args:", args.toString());
 
-    const proc = cp.spawn(path, args);
-
+    // adapted from https://stackoverflow.com/a/58571306
+    const proc = spawn(path, args);
     proc.stdin.write(stdin);
     proc.stdin.end();
-    let stdout = "";
-    let stderr = "";
 
-    proc.stdout.on("data", (data) => {
-      stdout += data;
+    let data = "";
+    for await (const chunk of proc.stdout) {
+      console.log("stdout chunk: " + chunk);
+      data += chunk;
+    }
+    let error = "";
+    for await (const chunk of proc.stderr) {
+      console.error("stderr chunk: " + chunk);
+      error += chunk;
+    }
+    const exitCode = await new Promise((resolve, _reject) => {
+      proc.on("close", resolve);
     });
-
-    proc.stderr.on("data", (data) => {
-      stderr += data;
-    });
-
-    proc.on("exit", (code, _signal) => {
-      console.log("code:", code);
-      console.log("stdout:", stdout);
-      console.log("stderr:", stderr);
-      cb(code!, stderr, stdout);
-    });
+    if (exitCode) {
+      throw new Error(error);
+    }
+    return data;
   }
 }

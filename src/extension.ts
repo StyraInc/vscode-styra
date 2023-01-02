@@ -3,7 +3,7 @@ import * as fs from "fs";
 import { default as fetch, Request } from "node-fetch";
 import { sync as commandExistsSync } from "command-exists";
 
-import { StyraConfig } from "./lib/styra-config";
+import { StyraConfig, STYRA_CLI_CMD } from "./lib/styra-config";
 import { System } from "./lib/types";
 import { StyraInstall } from "./lib/styra-install";
 import { CommandRunner } from "./lib/command-runner";
@@ -41,13 +41,10 @@ async function runLogReplay() {
     if (!continueRun) { return; }
   }
 
-  console.log("calling config");
-  await StyraConfig.configure();
-  console.log("back from config");
+  const continueRun = await StyraConfig.configure();
+  if (!continueRun) { return; }
 
-  console.log("calling readConfig");
   const configData = await StyraConfig.read();
-  console.log(`back from config: url = ${configData.url}`);
   const request = new Request(`${configData.url}/v1/systems?compact=true`, {
     method: "GET",
     headers: {
@@ -98,8 +95,7 @@ async function runLogReplayForSystem(systemId: string) {
   parse(
     "opa",
     policiesFile,
-    (pkg: string, _imports: string[]) => {
-      const styraCommand = "styra";
+    async (pkg: string, _imports: string[]) => {
       const styraArgs = [
         "validate",
         "logreplay",
@@ -111,10 +107,9 @@ async function runLogReplayForSystem(systemId: string) {
         "json",
       ];
       console.log(
-        "the running command would be:" + styraCommand + " " + styraArgs
+        "the running command would be:" + STYRA_CLI_CMD + " " + styraArgs
       );
-      runner.run(styraCommand, styraArgs, "", (error: string, result: any) => {
-        console.log("This is the callback from the styra cli run.");
+      const result = JSON.parse(await runner.run(STYRA_CLI_CMD, styraArgs));
         console.log(result);
         const samples = result.samples.length;
         const resultChanged = result.stats.results_changed;
@@ -122,7 +117,6 @@ async function runLogReplayForSystem(systemId: string) {
         vscode.window.showInformationMessage(
           `${samples} samples / ${resultChanged} changed / ${entriesEvaluated} replayed `
         );
-      });
     },
     (error: string) => {
       const errorObj = JSON.parse(error);
@@ -133,26 +127,22 @@ async function runLogReplayForSystem(systemId: string) {
 }
 
 
-function parse(
+async function parse(
   opaPath: string,
   path: string,
   cb: (pkg: string, imports: string[]) => void,
   onerror: (output: string) => void
 ) {
-  new CommandRunner().run(
-    opaPath,
-    ["parse", path, "--format", "json"],
-    "",
-    (error: string, result: any) => {
-      if (error !== "") {
-        onerror(error);
-      } else {
+  try {
+    const result = JSON.parse(await new CommandRunner()
+      .run(opaPath, ["parse", path, "--format", "json"]));
         const pkg = getPackage(result);
         const imports = getImports(result);
         cb(pkg, imports);
-      }
-    }
-  );
+
+  } catch (err) {
+        onerror(err as string);
+  }
 }
 
 function getPackage(parsed: any): string {
