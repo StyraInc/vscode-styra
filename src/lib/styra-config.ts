@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import * as fs from "fs";
 import * as os from "os";
 import { CommandRunner } from "./command-runner";
+import { STYRA_CLI_CMD } from "./styra-install";
 
 export type ConfigData = {
   url: string;
@@ -9,7 +10,6 @@ export type ConfigData = {
 };
 
 const CONFIG_FILE_PATH = `${os.homedir}/.styra/config`;
-export const STYRA_CLI_CMD = 'styra';
 
 export class StyraConfig {
   
