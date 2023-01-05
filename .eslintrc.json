@@ -15,12 +15,12 @@
     ],
     "rules": {
         "@typescript-eslint/naming-convention": "warn",
-        "@typescript-eslint/semi": "warn",
-        "curly": "warn",
-        "eqeqeq": "warn",
-        "no-throw-literal": "warn",
+        "semi": "error",
+        "curly": "error",
+        "eqeqeq": ["error", "smart"],
+        "no-throw-literal": "error",
         "@typescript-eslint/no-unused-vars": [
-            "warn",
+            "error",
             {
                 "argsIgnorePattern": "^_",
                 "varsIgnorePattern": "^_"
