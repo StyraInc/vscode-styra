@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { spawn } from "child_process";
-import { log } from "./output";
+import { info } from "./outputPane";
 
 export class CommandRunner {
 
@@ -12,7 +12,7 @@ export class CommandRunner {
     args: string[],
     stdin = ""
   ): Promise<string> {
-    log(`spawn: ${path}, args: [${args.toString()}]`);
+    info(`spawn: ${path}, args: [${args.toString()}]`);
 
     // adapted from https://stackoverflow.com/a/58571306
     const proc = spawn(path, args);
@@ -29,7 +29,7 @@ export class CommandRunner {
       error += chunk;
     }
     const exitCode = await new Promise((resolve, _reject) => {
-      log(`spawn(${path}) completed successfully`);
+      info(`spawn(${path}) completed successfully`);
       proc.on("close", resolve);
     });
     if (exitCode) {

@@ -11,7 +11,7 @@ import { StyraConfig } from "../lib/styra-config";
 import { System } from "../lib/types";
 import { StyraInstall, STYRA_CLI_CMD } from "../lib/styra-install";
 import { CommandRunner } from "../lib/command-runner";
-import { log, logUser } from "../lib/output";
+import { info, infoFromUserAction } from "../lib/outputPane";
 
 export class LogReplay {
 
@@ -40,7 +40,7 @@ export class LogReplay {
         Authorization: `Bearer ${configData.token}`,
       },
     });
-    log('Fetching DAS systems list...');
+    info('Fetching DAS systems list...');
     const response = await fetch(request);
     response
       .json()
@@ -51,7 +51,7 @@ export class LogReplay {
           systemNames.unshift("Select System:");
           vscode.window.showQuickPick(systemNames).then((systemName) => {
             if (systemName === undefined || systemName === "Select System:") {
-              logUser('log-replay cancelled due to no selection');
+              infoFromUserAction('log-replay cancelled due to no selection');
               return;
             } else {
               // guaranteed to find one since we picked from the list so eslint exception OK!
