@@ -6,7 +6,7 @@ import { default as fetch } from "node-fetch";
 import moveFile = require("move-file");
 import { sync as commandExistsSync } from "command-exists";
 
-import { log, logUser, teeError, teeInfo } from "../extension";
+import { log, logUser, teeError, teeInfo } from "./output";
 
 // export const STYRA_CLI_CMD = 'styra2'; // TODO: for testing; do not commit!
 export const STYRA_CLI_CMD = 'styra';

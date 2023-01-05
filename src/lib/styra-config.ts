@@ -3,7 +3,7 @@ import * as fs from "fs";
 import * as os from "os";
 import { CommandRunner } from "./command-runner";
 import { STYRA_CLI_CMD } from "./styra-install";
-import { log, logUser, teeError } from "../extension";
+import { log, logUser, teeError } from "./output";
 
 export type ConfigData = {
   url: string;

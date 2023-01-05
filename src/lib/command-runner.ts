@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { spawn } from "child_process";
-import { log } from "../extension";
+import { log } from "./output";
 
 export class CommandRunner {
 

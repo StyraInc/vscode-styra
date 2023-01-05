@@ -11,7 +11,7 @@ import { StyraConfig } from "../lib/styra-config";
 import { System } from "../lib/types";
 import { StyraInstall, STYRA_CLI_CMD } from "../lib/styra-install";
 import { CommandRunner } from "../lib/command-runner";
-import { log, logUser } from "../extension";
+import { log, logUser } from "../lib/output";
 
 export class LogReplay {
 
