@@ -3,6 +3,7 @@ import * as fs from "fs";
 import * as os from "os";
 import { CommandRunner } from "./command-runner";
 import { STYRA_CLI_CMD } from "./styra-install";
+import { log, logUser, teeError } from "../extension";
 
 export type ConfigData = {
   url: string;
@@ -34,35 +35,31 @@ export class StyraConfig {
     const runner = new CommandRunner();
 
     if (fs.existsSync(CONFIG_FILE_PATH)) {
-      console.log("Styra CLI already configured");
-      vscode.window.showInformationMessage(
-        `Using existing Styra CLI configuration (${CONFIG_FILE_PATH})`
-      );
+      log(`Using existing Styra CLI configuration (${CONFIG_FILE_PATH})`);
     } else {
       const dasURL = await vscode.window.showInputBox({
         title: "Enter Styra DAS URL",
       });
       if (!dasURL || !dasURL.trim()) {
-        vscode.window.showWarningMessage("Config cancelled due to no input");
+        logUser("Configuration cancelled due to no input");
         return false;
       }
       const token = await vscode.window.showInputBox({
         title: "Enter Styra DAS API token",
       });
       if (!token || !token.trim()) {
-        vscode.window.showWarningMessage("Config cancelled due to no input");
+        logUser("Configuration cancelled due to no input");
         return false;
       }
-      vscode.window.showInformationMessage("Configuring Styra CLI.");
+      log("Configuring Styra CLI...");
       try {
         await runner.run(STYRA_CLI_CMD, // no output upon success
           ["configure", "--url", dasURL, "--access-token", token]);
         vscode.window.showInformationMessage("Styra CLI configured.");
-        console.log("configure complete");
+        log("Configuration complete");
       } catch (err) {
         // invalid URL or TOKEN will trigger this
-        vscode.window.showErrorMessage(`Styra CLI configure failed: ${err}`);
-        console.log("configure failed!");
+        teeError(`Configuration failed: ${err}`);
         return false;
       }
     }

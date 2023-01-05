@@ -6,6 +6,8 @@ import { default as fetch } from "node-fetch";
 import moveFile = require("move-file");
 import { sync as commandExistsSync } from "command-exists";
 
+import { log, logUser, teeError, teeInfo } from "../extension";
+
 // export const STYRA_CLI_CMD = 'styra2'; // TODO: for testing; do not commit!
 export const STYRA_CLI_CMD = 'styra';
 
@@ -18,7 +20,9 @@ export class StyraInstall {
     const existsOnPath = commandExistsSync(STYRA_CLI_CMD);
     const existsInUserSettings =
       styraPath !== undefined && styraPath !== null && fs.existsSync(styraPath);
-    return existsOnPath || existsInUserSettings;
+    const isInstalled = existsOnPath || existsInUserSettings;
+    log(isInstalled ? "Styra CLI is already installed" : "Styra CLI is not installed");
+    return isInstalled;
   }
 
   static async promptForInstall(): Promise<boolean> {
@@ -29,17 +33,17 @@ export class StyraInstall {
     );
 
     if (selection === "Install") {
-      vscode.window.showInformationMessage("Installing Styra CLI. This may take a few minutes...");
+      teeInfo("Installing Styra CLI. This may take a few minutes...");
       try {
         await this.installStyra();
-        vscode.window.showInformationMessage("Styra CLI installed.");
+        teeInfo("Styra CLI installed.");
         return true;
       } catch (err) {
-        vscode.window.showErrorMessage(`Styra CLI installation failed: ${err}`);
+        teeError(`Styra CLI installation failed: ${err}`);
         return false;
       }
     } else {
-      console.log("cancelling Styra CLI install");
+      logUser("Installation cancelled");
       return false;
     }
   }
@@ -47,6 +51,7 @@ export class StyraInstall {
   private static async installStyra(): Promise<void> {
     const targetOS = process.platform;
     const targetArch = process.arch;
+    log(`platform = ${targetOS}, architecture = ${targetArch}`);
 
     const binaryFile = targetOS === "win32" ? STYRA_CLI_CMD + ".exe" : STYRA_CLI_CMD;
     const exeFile = targetOS === "win32" ? "C:\\Program Files\\styra\\" + binaryFile : "/usr/local/bin/" + binaryFile;
@@ -62,6 +67,7 @@ export class StyraInstall {
             : `https://docs.styra.com/v1/docs/bin/darwin/amd64/styra`; // otherwise target "x64"
  
     await this.getBinary(url, tempFileLocation);
+    log(`Install location: ${exeFile}`);
     // throw new Error('dummy err'); // TODO: do not commit this!
     fs.chmodSync(tempFileLocation, "755");
     moveFile(tempFileLocation, exeFile);
