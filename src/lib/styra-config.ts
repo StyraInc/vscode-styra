@@ -60,7 +60,7 @@ export class StyraConfig {
     }
     info('Configuring Styra CLI...');
     try {
-      await runner.run(
+      await runner.runShellCmd(
         STYRA_CLI_CMD, // no output upon success
         ['configure', '--url', dasURL, '--access-token', token]
       );

@@ -6,7 +6,7 @@ export class CommandRunner {
   // executes the command at path with args and stdin.
   // Upon success returns the command's output.
   // Upon failure returns the stderr output in an exception.
-  async run(
+  async runShellCmd(
     path: string,
     args: string[],
     stdin = ''

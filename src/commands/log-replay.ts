@@ -99,7 +99,7 @@ export class LogReplay implements ICommand {
         console.log(
           'the running command would be:' + STYRA_CLI_CMD + ' ' + styraArgs
         );
-        const result = JSON.parse(await runner.run(STYRA_CLI_CMD, styraArgs));
+        const result = JSON.parse(await runner.runShellCmd(STYRA_CLI_CMD, styraArgs));
         console.log(result);
         const samples = result.samples.length;
         const resultChanged = result.stats.results_changed;
@@ -127,7 +127,7 @@ export class LogReplay implements ICommand {
   ): Promise<void> {
     try {
       const result = JSON.parse(
-        await new CommandRunner().run(opaPath, [
+        await new CommandRunner().runShellCmd(opaPath, [
           'parse',
           path,
           '--format',
