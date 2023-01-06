@@ -1,6 +1,6 @@
-import * as vscode from "vscode";
-import { spawn } from "child_process";
-import { info } from "./outputPane";
+import * as vscode from 'vscode';
+import { spawn } from 'child_process';
+import { info } from './outputPane';
 
 export class CommandRunner {
 
@@ -10,7 +10,7 @@ export class CommandRunner {
   async run(
     path: string,
     args: string[],
-    stdin = ""
+    stdin = ''
   ): Promise<string> {
     info(`spawn: ${path}, args: [${args.toString()}]`);
 
@@ -19,18 +19,18 @@ export class CommandRunner {
     proc.stdin.write(stdin);
     proc.stdin.end();
 
-    let data = "";
+    let data = '';
     for await (const chunk of proc.stdout) {
-      console.log("stdout chunk: " + chunk);
+      console.log('stdout chunk: ' + chunk);
       data += chunk;
     }
-    let error = "";
+    let error = '';
     for await (const chunk of proc.stderr) {
       error += chunk;
     }
     const exitCode = await new Promise((resolve, _reject) => {
       info(`spawn(${path}) completed successfully`);
-      proc.on("close", resolve);
+      proc.on('close', resolve);
     });
     if (exitCode) {
       vscode.window.showErrorMessage(error);

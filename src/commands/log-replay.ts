@@ -4,19 +4,19 @@
 
 // TODO: should we care about this cmd, remove the above eslint overrides and resolve the issues.
 
-import * as vscode from "vscode";
-import { default as fetch, Request } from "node-fetch";
+import * as vscode from 'vscode';
+import { default as fetch, Request } from 'node-fetch';
 
-import { StyraConfig } from "../lib/styra-config";
-import { System } from "../lib/types";
-import { StyraInstall, STYRA_CLI_CMD } from "../lib/styra-install";
-import { CommandRunner } from "../lib/command-runner";
-import { info, infoFromUserAction } from "../lib/outputPane";
+import { StyraConfig } from '../lib/styra-config';
+import { System } from '../lib/types';
+import { StyraInstall, STYRA_CLI_CMD } from '../lib/styra-install';
+import { CommandRunner } from '../lib/command-runner';
+import { info, infoFromUserAction } from '../lib/outputPane';
 
 export class LogReplay {
 
   async runLogReplay(): Promise<void> {
-    console.log("this is a call to the logReplay function");
+    console.log('this is a call to the logReplay function');
 
     if (!StyraInstall.isInstalled()) {
       const continueRun = await StyraInstall.promptForInstall();
@@ -32,10 +32,10 @@ export class LogReplay {
 
     const configData = await StyraConfig.read();
     const request = new Request(`${configData.url}/v1/systems?compact=true`, {
-      method: "GET",
+      method: 'GET',
       headers: {
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         // eslint-disable-next-line @typescript-eslint/naming-convention
         Authorization: `Bearer ${configData.token}`,
       },
@@ -47,10 +47,10 @@ export class LogReplay {
       .then((json) => {
         const systems = json.result as System[];
         if (systems?.length > 0) {
-          const systemNames = systems.map((system) => "   " + system.name);
-          systemNames.unshift("Select System:");
+          const systemNames = systems.map((system) => '   ' + system.name);
+          systemNames.unshift('Select System:');
           vscode.window.showQuickPick(systemNames).then((systemName) => {
-            if (systemName === undefined || systemName === "Select System:") {
+            if (systemName === undefined || systemName === 'Select System:') {
               infoFromUserAction('log-replay cancelled due to no selection');
               return;
             } else {
@@ -87,21 +87,21 @@ export class LogReplay {
     const policiesFile = vscode.window.activeTextEditor!.document.uri.fsPath;
     const runner = new CommandRunner();
     this.parse(
-      "opa",
+      'opa',
       policiesFile,
       async (pkg: string, _imports: string[]) => {
         const styraArgs = [
-          "validate",
-          "logreplay",
-          "--system",
+          'validate',
+          'logreplay',
+          '--system',
           systemId,
-          "--policies",
+          '--policies',
           `${pkg}=${policiesFile}`,
-          "-o",
-          "json",
+          '-o',
+          'json',
         ];
         console.log(
-          "the running command would be:" + STYRA_CLI_CMD + " " + styraArgs
+          'the running command would be:' + STYRA_CLI_CMD + ' ' + styraArgs
         );
         const result = JSON.parse(await runner.run(STYRA_CLI_CMD, styraArgs));
         console.log(result);
@@ -115,8 +115,8 @@ export class LogReplay {
       (error: string) => {
         const errorObj = JSON.parse(error);
         vscode.window.showErrorMessage(
-          `parsing ${policiesFile.split("/").at(-1)} failed: ${
-            errorObj.errors?.[0]?.message ?? "??"
+          `parsing ${policiesFile.split('/').at(-1)} failed: ${
+            errorObj.errors?.[0]?.message ?? '??'
           }`
         );
       }
@@ -132,10 +132,10 @@ export class LogReplay {
     try {
       const result = JSON.parse(
         await new CommandRunner().run(opaPath, [
-          "parse",
+          'parse',
           path,
-          "--format",
-          "json",
+          '--format',
+          'json',
         ])
       );
       const pkg = this.getPackage(result);
@@ -147,7 +147,7 @@ export class LogReplay {
   }
 
   getPackage(parsed: any): string {
-    return this.getPathString(parsed["package"].path.slice(1));
+    return this.getPathString(parsed['package'].path.slice(1));
   }
 
   getImports(parsed: any): string[] {
@@ -157,7 +157,7 @@ export class LogReplay {
         if (!x.alias) {
           return str;
         }
-        return str + " as " + x.alias;
+        return str + ' as ' + x.alias;
       });
     }
     return [];
@@ -171,12 +171,12 @@ export class LogReplay {
         if (i === 0) {
           return x.value;
         } else {
-          if (x.value.match("^[a-zA-Z_][a-zA-Z_0-9]*$")) {
-            return "." + x.value;
+          if (x.value.match('^[a-zA-Z_][a-zA-Z_0-9]*$')) {
+            return '.' + x.value;
           }
           return '["' + x.value + '"]';
         }
       })
-      .join("");
+      .join('');
   }
 }

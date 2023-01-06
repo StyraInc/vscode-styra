@@ -1,6 +1,6 @@
-import * as vscode from "vscode";
-import { LogReplay } from "./commands/log-replay";
-import { info, outputChannel } from "./lib/outputPane";
+import * as vscode from 'vscode';
+import { LogReplay } from './commands/log-replay';
+import { info, outputChannel } from './lib/outputPane';
 
 
 // this method is called when your extension is activated
@@ -11,7 +11,7 @@ export function activate(context: vscode.ExtensionContext): void {
   info('Styra extension active!');
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("styra.log.replay", () => {
+    vscode.commands.registerCommand('styra.log.replay', () => {
       new LogReplay().runLogReplay();
     })
   );
