@@ -1,6 +1,6 @@
-import * as vscode from "vscode";
+import * as vscode from 'vscode';
 
-export const outputChannel = vscode.window.createOutputChannel("Styra");
+export const outputChannel = vscode.window.createOutputChannel('Styra');
 
 export function info(msg: string): void {
   outputChannel.appendLine(msg);
