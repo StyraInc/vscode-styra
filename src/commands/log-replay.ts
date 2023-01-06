@@ -11,12 +11,12 @@ import { StyraConfig } from '../lib/styra-config';
 import { ICommand, System } from '../lib/types';
 import { StyraInstall, STYRA_CLI_CMD } from '../lib/styra-install';
 import { CommandRunner } from '../lib/command-runner';
-import { info, infoFromUserAction } from '../lib/outputPane';
+import { info, infoFromUserAction, infoNewCmd  } from '../lib/outputPane';
 
 export class LogReplay implements ICommand {
 
   async run(): Promise<void> {
-    console.log('this is a call to the logReplay function');
+    infoNewCmd('Log Replay');
 
     if (!StyraInstall.isInstalled()) {
       const continueRun = await StyraInstall.promptForInstall();
