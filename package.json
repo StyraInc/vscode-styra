@@ -17,6 +17,10 @@
       {
         "command": "styra.log.replay",
         "title": "Styra: Decision Log Replay"
+      },
+      {
+        "command": "styra.link.init",
+        "title": "Styra Link: Initialize"
       }
     ],
     "configuration": {

@@ -8,14 +8,14 @@ import * as vscode from 'vscode';
 import { default as fetch, Request } from 'node-fetch';
 
 import { StyraConfig } from '../lib/styra-config';
-import { System } from '../lib/types';
+import { ICommand, System } from '../lib/types';
 import { StyraInstall, STYRA_CLI_CMD } from '../lib/styra-install';
 import { CommandRunner } from '../lib/command-runner';
 import { info, infoFromUserAction } from '../lib/outputPane';
 
-export class LogReplay {
+export class LogReplay implements ICommand {
 
-  async runLogReplay(): Promise<void> {
+  async run(): Promise<void> {
     console.log('this is a call to the logReplay function');
 
     if (!StyraInstall.isInstalled()) {
