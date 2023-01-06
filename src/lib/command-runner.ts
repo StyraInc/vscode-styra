@@ -1,6 +1,5 @@
-import * as vscode from 'vscode';
 import { spawn } from 'child_process';
-import { info } from './outputPane';
+import { info, teeError } from './outputPane';
 
 export class CommandRunner {
 
@@ -33,7 +32,7 @@ export class CommandRunner {
       proc.on('close', resolve);
     });
     if (exitCode) {
-      vscode.window.showErrorMessage(error);
+      teeError(error);
       throw new Error(error);
     }
     return data;

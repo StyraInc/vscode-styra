@@ -18,15 +18,11 @@ export class LogReplay implements ICommand {
   async run(): Promise<void> {
     infoNewCmd('Log Replay');
 
-    if (!StyraInstall.isInstalled()) {
-      const continueRun = await StyraInstall.promptForInstall();
-      if (!continueRun) {
-        return;
-      }
+    if (!await StyraInstall.checkCliInstallation()) {
+      return;
     }
 
-    const continueRun = await StyraConfig.configure();
-    if (!continueRun) {
+    if (!await StyraConfig.checkCliConfiguration()) {
       return;
     }
 
