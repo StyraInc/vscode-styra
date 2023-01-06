@@ -10,9 +10,7 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [
-    "onCommand:styra.log.replay"
-  ],
+  "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
