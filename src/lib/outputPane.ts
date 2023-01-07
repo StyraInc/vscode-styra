@@ -6,6 +6,14 @@ export function info(msg: string): void {
   outputChannel.appendLine(msg);
 }
 
+export function infoNewCmd(cmd: string): void {
+  info('');
+  info('------------------------------------------------------');
+  // TODO: use https://www.npmjs.com/package/vscode-read-manifest to read commands
+  info(`Running Command: ${cmd}`);
+  info('------------------------------------------------------');
+}
+
 export function infoFromUserAction(msg: string): void {
   info(`[USER]: ${msg}`);
 }

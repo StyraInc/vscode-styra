@@ -1,18 +1,15 @@
-import * as vscode from 'vscode';
 import { spawn } from 'child_process';
-import { info } from './outputPane';
+import shellEscape = require('shell-escape');
+import { info, teeError } from './outputPane';
+
 
 export class CommandRunner {
 
   // executes the command at path with args and stdin.
   // Upon success returns the command's output.
   // Upon failure returns the stderr output in an exception.
-  async run(
-    path: string,
-    args: string[],
-    stdin = ''
-  ): Promise<string> {
-    info(`spawn: ${path}, args: [${args.toString()}]`);
+  async runShellCmd( path: string, args: string[], stdin = ''): Promise<string> {
+    info(`Spawning child process:\n${path} ${shellEscape(args)}`);
 
     // adapted from https://stackoverflow.com/a/58571306
     const proc = spawn(path, args);
@@ -33,7 +30,7 @@ export class CommandRunner {
       proc.on('close', resolve);
     });
     if (exitCode) {
-      vscode.window.showErrorMessage(error);
+      teeError(error);
       throw new Error(error);
     }
     return data;

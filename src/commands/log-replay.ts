@@ -7,26 +7,22 @@
 import * as vscode from 'vscode';
 import { default as fetch, Request } from 'node-fetch';
 
-import { StyraConfig } from '../lib/styra-config';
-import { System } from '../lib/types';
-import { StyraInstall, STYRA_CLI_CMD } from '../lib/styra-install';
+import { ICommand, System } from '../lib/types';
+import { info, infoFromUserAction, infoNewCmd  } from '../lib/outputPane';
+import { STYRA_CLI_CMD, StyraInstall } from '../lib/styra-install';
 import { CommandRunner } from '../lib/command-runner';
-import { info, infoFromUserAction } from '../lib/outputPane';
+import { StyraConfig } from '../lib/styra-config';
 
-export class LogReplay {
+export class LogReplay implements ICommand {
 
-  async runLogReplay(): Promise<void> {
-    console.log('this is a call to the logReplay function');
+  async run(): Promise<void> {
+    infoNewCmd('Log Replay');
 
-    if (!StyraInstall.isInstalled()) {
-      const continueRun = await StyraInstall.promptForInstall();
-      if (!continueRun) {
-        return;
-      }
+    if (!await StyraInstall.checkCliInstallation()) {
+      return;
     }
 
-    const continueRun = await StyraConfig.configure();
-    if (!continueRun) {
+    if (!await StyraConfig.checkCliConfiguration()) {
       return;
     }
 
@@ -103,7 +99,7 @@ export class LogReplay {
         console.log(
           'the running command would be:' + STYRA_CLI_CMD + ' ' + styraArgs
         );
-        const result = JSON.parse(await runner.run(STYRA_CLI_CMD, styraArgs));
+        const result = JSON.parse(await runner.runShellCmd(STYRA_CLI_CMD, styraArgs));
         console.log(result);
         const samples = result.samples.length;
         const resultChanged = result.stats.results_changed;
@@ -131,7 +127,7 @@ export class LogReplay {
   ): Promise<void> {
     try {
       const result = JSON.parse(
-        await new CommandRunner().run(opaPath, [
+        await new CommandRunner().runShellCmd(opaPath, [
           'parse',
           path,
           '--format',
