@@ -1,8 +1,9 @@
 import * as vscode from 'vscode';
-import { LogReplay } from './commands/log-replay';
-import { LinkInit } from './commands/link-init';
+
 import { info, outputChannel } from './lib/outputPane';
 import { ICommand } from './lib/types';
+import { LinkInit } from './commands/link-init';
+import { LogReplay } from './commands/log-replay';
 
 // extension entry point
 export function activate(context: vscode.ExtensionContext): void {

@@ -1,7 +1,7 @@
-import * as vscode from 'vscode';
 import * as fs from 'fs';
-import * as os from 'os';
 import * as fse from 'fs-extra';
+import * as os from 'os';
+import * as vscode from 'vscode';
 import { default as fetch } from 'node-fetch';
 import moveFile = require('move-file');
 import { sync as commandExistsSync } from 'command-exists';

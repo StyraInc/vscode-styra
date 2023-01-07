@@ -7,11 +7,11 @@
 import * as vscode from 'vscode';
 import { default as fetch, Request } from 'node-fetch';
 
-import { StyraConfig } from '../lib/styra-config';
 import { ICommand, System } from '../lib/types';
-import { StyraInstall, STYRA_CLI_CMD } from '../lib/styra-install';
-import { CommandRunner } from '../lib/command-runner';
 import { info, infoFromUserAction, infoNewCmd  } from '../lib/outputPane';
+import { STYRA_CLI_CMD, StyraInstall } from '../lib/styra-install';
+import { CommandRunner } from '../lib/command-runner';
+import { StyraConfig } from '../lib/styra-config';
 
 export class LogReplay implements ICommand {
 

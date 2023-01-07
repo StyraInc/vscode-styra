@@ -1,11 +1,11 @@
 import { QuickPickItem } from 'vscode';
-import { MultiStepInput } from '../external/multi-step-input';
-import { CommandRunner } from '../lib/command-runner';
 
 import { infoNewCmd, teeInfo } from '../lib/outputPane';
-import { StyraConfig } from '../lib/styra-config';
-import { StyraInstall, STYRA_CLI_CMD } from '../lib/styra-install';
+import { STYRA_CLI_CMD, StyraInstall } from '../lib/styra-install';
+import { CommandRunner } from '../lib/command-runner';
 import { ICommand } from '../lib/types';
+import { MultiStepInput } from '../external/multi-step-input';
+import { StyraConfig } from '../lib/styra-config';
 
 interface State {
   folder: string;

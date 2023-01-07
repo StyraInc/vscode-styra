@@ -1,9 +1,10 @@
-import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as os from 'os';
+import * as vscode from 'vscode';
+
+import { info, infoFromUserAction } from './outputPane';
 import { CommandRunner } from './command-runner';
 import { STYRA_CLI_CMD } from './styra-install';
-import { info, infoFromUserAction } from './outputPane';
 
 export type ConfigData = {
   url: string;
