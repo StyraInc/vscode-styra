@@ -31,10 +31,12 @@ export class LinkGitConfig implements ICommand {
   async run(): Promise<void> {
     infoNewCmd('Link Config Git');
 
+    if (!StyraInstall.checkWorkspace()) {
+      return;
+    }
     if (!(await StyraInstall.checkCliInstallation())) {
       return;
     }
-
     if (!(await StyraConfig.checkCliConfiguration())) {
       return;
     }

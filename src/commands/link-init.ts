@@ -28,10 +28,12 @@ export class LinkInit implements ICommand {
 
     infoNewCmd('Link Init');
 
+    if (!StyraInstall.checkWorkspace()) {
+      return;
+    }
     if (!(await StyraInstall.checkCliInstallation())) {
       return;
     }
-
     if (!(await StyraConfig.checkCliConfiguration())) {
       return;
     }
