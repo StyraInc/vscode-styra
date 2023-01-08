@@ -14,14 +14,9 @@
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
-      {
-        "command": "styra.log.replay",
-        "title": "Styra: Decision Log Replay"
-      },
-      {
-        "command": "styra.link.init",
-        "title": "Styra Link: Initialize"
-      }
+      { "command": "styra.log.replay", "title": "Styra: Decision Log Replay" },
+      { "command": "styra.link.init", "title": "Styra Link: Initialize" },
+      { "command": "styra.link.git-config", "title": "Styra Link: Config Git" }
     ],
     "configuration": {
       "type": "object",
