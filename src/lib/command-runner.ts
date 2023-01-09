@@ -1,6 +1,8 @@
+import * as vscode from 'vscode';
 import { spawn } from 'child_process';
 import shellEscape = require('shell-escape');
 import { info, teeError } from './outputPane';
+import { StyraInstall } from './styra-install';
 
 
 export class CommandRunner {
@@ -9,10 +11,19 @@ export class CommandRunner {
   // Upon success returns the command's output.
   // Upon failure returns the stderr output in an exception.
   async runShellCmd( path: string, args: string[], stdin = ''): Promise<string> {
-    info(`Spawning child process:\n${path} ${shellEscape(args)}`);
+    if (!StyraInstall.checkWorkspace()) {
+      teeError('Something is wrong! Did you forget to run checkWorkspace in your command?');
+      return '';
+    }
+    // above check guarantees workspaceFolder exists so lint override OK
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const cwd = vscode.workspace.workspaceFolders![0].uri.toString().substring('file://'.length);
+    info('Spawning child process:');
+    info(`    project path: ${cwd}`);
+    info(`    ${path} ${shellEscape(args)}`);
 
     // adapted from https://stackoverflow.com/a/58571306
-    const proc = spawn(path, args);
+    const proc = spawn(path, args, { cwd });
     proc.stdin.write(stdin);
     proc.stdin.end();
 
@@ -26,7 +37,7 @@ export class CommandRunner {
       error += chunk;
     }
     const exitCode = await new Promise((resolve, _reject) => {
-      info(`spawn(${path}) completed successfully`);
+      info(`child process (${path}) complete`);
       proc.on('close', resolve);
     });
     if (exitCode) {
