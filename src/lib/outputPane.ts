@@ -3,7 +3,11 @@ import * as vscode from 'vscode';
 export const outputChannel = vscode.window.createOutputChannel('Styra');
 
 export function info(msg: string): void {
-  outputChannel.appendLine(msg);
+  if (msg.endsWith('\n') && msg.length > 1) {
+    outputChannel.append(msg); // remove superfluous newline
+  } else {
+    outputChannel.appendLine(msg);
+  }
 }
 
 export function infoNewCmd(cmd: string): void {

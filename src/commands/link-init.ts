@@ -40,20 +40,24 @@ export class LinkInit implements ICommand {
 
     const state = await this.collectInputs();
     teeInfo(`Linking to ${state.systemName}...`);
-    await new CommandRunner().runShellCmd(STYRA_CLI_CMD, [
-      'link',
-      'init',
-      state.isNewSystem ? '--create' : '--existing',
-      '--name',
-      state.systemName,
-      '--path',
-      state.folder,
-      '--type',
-      state.systemType.label,
-      '--skip-git',
-    ]);
-    teeInfo('Link complete');
-    info('\n*** Be sure to run "Styra Link: Config Git" next');
+    try {
+      await new CommandRunner().runShellCmd(STYRA_CLI_CMD, [
+        'link',
+        'init',
+        state.isNewSystem ? '--create' : '--existing',
+        '--name',
+        state.systemName,
+        '--path',
+        state.folder,
+        '--type',
+        state.systemType.label,
+        '--skip-git',
+      ]);
+      teeInfo('link init complete');
+      info('\n*** Be sure to run "Styra Link: Config Git" next');
+    } catch (err) {
+      info('link init failed'); // err already displayed so not emitting again here
+    }
   }
 
   // adapted from vscode-extension-samples/quickinput-sample/src/multiStepInput.ts

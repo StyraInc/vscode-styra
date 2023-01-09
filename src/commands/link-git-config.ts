@@ -1,5 +1,5 @@
 import { generatePickList, shouldResume, validateNoop } from './utility';
-import { infoNewCmd, teeInfo } from '../lib/outputPane';
+import { info, infoNewCmd, teeInfo } from '../lib/outputPane';
 import { STYRA_CLI_CMD, StyraInstall } from '../lib/styra-install';
 import { CommandRunner } from '../lib/command-runner';
 import { ICommand } from '../lib/types';
@@ -42,17 +42,20 @@ export class LinkGitConfig implements ICommand {
     }
 
     const state = await this.collectInputs();
-    // teeInfo(`Linking to ${state.systemName}...`);
-    await new CommandRunner().runShellCmd(STYRA_CLI_CMD, [
-      'link',
-      'config',
-      'git',
-      state.url,
-      `--${state.syncStyleType.label}`,
-      state.syncStyleValue,
-      state.forceGitOverwrite ? '--force' : '',
-    ]);
-    teeInfo('Link complete');
+    try {
+      await new CommandRunner().runShellCmd(STYRA_CLI_CMD, [
+        'link',
+        'config',
+        'git',
+        state.url,
+        `--${state.syncStyleType.label}`,
+        state.syncStyleValue,
+        state.forceGitOverwrite ? '--force' : '',
+      ]);
+      teeInfo('Link config git complete');
+    } catch (err) {
+      info('link config git failed'); // err already displayed so not emitting again here
+    }
   }
 
   // adapted from vscode-extension-samples/quickinput-sample/src/multiStepInput.ts
