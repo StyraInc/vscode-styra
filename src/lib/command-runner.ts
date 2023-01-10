@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { spawn } from 'child_process';
 import shellEscape = require('shell-escape');
+
 import { info, teeError } from './outputPane';
 import { StyraInstall } from './styra-install';
 
@@ -22,11 +23,12 @@ export class CommandRunner {
     info(`    project path: ${cwd}`);
     info(`    ${path} ${shellEscape(args)}`);
 
-    // adapted from https://stackoverflow.com/a/58571306
+    // https://nodejs.org/api/child_process.html#child_processspawncommand-args-options 
     const proc = spawn(path, args, { cwd });
     proc.stdin.write(stdinData.endsWith('\n') ? stdinData : stdinData + '\n');
     proc.stdin.end();
 
+    // adapted from https://stackoverflow.com/a/58571306
     let data = '';
     for await (const chunk of proc.stdout) {
       console.log('stdout chunk: ' + chunk);

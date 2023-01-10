@@ -1,17 +1,19 @@
-import { generatePickList, shouldResume, validateNoop } from './utility';
-import { info, infoNewCmd, teeInfo } from '../lib/outputPane';
+import { QuickPickItem } from 'vscode';
+
+import { info, infoInput, infoNewCmd, teeInfo } from '../lib/outputPane';
 import { STYRA_CLI_CMD, StyraInstall } from '../lib/styra-install';
 import { CommandRunner } from '../lib/command-runner';
 import { ICommand } from '../lib/types';
 import { MultiStepInput } from '../external/multi-step-input';
-import { QuickPickItem } from 'vscode';
 import { StyraConfig } from '../lib/styra-config';
 
+import { generatePickList, shouldResume, validateNoop } from './utility';
+
 interface State {
-  forceGitOverwrite: boolean;
+  forceGitOverwrite: QuickPickItem;
   keyFilePath: string;
   keyPassphrase: string;
-  secret: string;
+  pwdOrToken: string;
   syncStyleType: QuickPickItem;
   syncStyleValue: string;
   url: string;
@@ -26,7 +28,7 @@ const SSH_PREFIX = 'git@';
 export class LinkGitConfig implements ICommand {
   title = 'Styra Link Config Git';
   stepDelta = 0;
-  maxSteps = 5;
+  maxSteps = 6;
 
   async run(): Promise<void> {
     infoNewCmd('Link Config Git');
@@ -42,22 +44,30 @@ export class LinkGitConfig implements ICommand {
     }
 
     const state = await this.collectInputs();
-    // TODO this is set up for username/pwd(or token); also do SSH
+    let variantArgs = [] as string[];
+    let secret = '';
+    if (state.username) {
+      variantArgs = ['--username', state.username];
+      secret = state.pwdOrToken;
+    } else {
+      variantArgs = ['--key-file', state.keyFilePath];
+      secret = state.keyPassphrase;
+    }
     const styraArgs = [
       'link',
       'config',
       'git',
+      // "https://github.com/msorens/_ms-demo-compliance-repo.git", // TODO: to save typing
+      // 'git@github.com:msorens/_ms-demo-compliance-repo.git', // TODO: to save typing
       state.url,
       // '--debug', TODO: Wire up a VSCode setting to toggle this
       `--${state.syncStyleType.label}`,
       state.syncStyleValue,
-      state.forceGitOverwrite ? '--force' : '',
-      '--username',
-      state.username,
+      state.forceGitOverwrite.label === 'yes' ? '--force' : '',
       '--password-stdin',
-    ];
+    ].concat(variantArgs);
     try {
-      const result = await new CommandRunner().runShellCmd(STYRA_CLI_CMD, styraArgs, state.secret);
+      const result = await new CommandRunner().runShellCmd(STYRA_CLI_CMD, styraArgs, secret);
       info(result);
       teeInfo('Link config git complete');
     } catch (err) {
@@ -73,8 +83,8 @@ export class LinkGitConfig implements ICommand {
   }
 
   async inputURL(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
-    state.url = await input.showInputBox({
-      ignoreFocusOut: true,
+   state.url = await input.showInputBox({
+      ignoreFocusOut: true, // TODO bug: not working!
       title: this.title,
       step: 1,
       totalSteps: this.maxSteps,
@@ -99,17 +109,22 @@ export class LinkGitConfig implements ICommand {
       validate: validateNoop,
       shouldResume: shouldResume,
     });
-    return (input: MultiStepInput) => this.inputSecret(input, state);
+    return (input: MultiStepInput) => this.inputPwdOrToken(input, state);
   }
 
-  async inputSecret(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
-    state.secret = await input.showInputBox({
+  async inputPwdOrToken(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
+    infoInput(`If you are using 2FA (two-factor authentication) on your Git login you must use a token rather than a password
+    Reference: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
+    Alternately, you can use SSH for authentication by backing up to the first input (the URL) in the input dialog
+    and enter a URL beginning with "git@"`);
+
+    state.pwdOrToken = await input.showInputBox({
       ignoreFocusOut: true,
       title: this.title,
       step: 3,
       totalSteps: this.maxSteps,
-      value: state.secret ?? '',
-      prompt: 'Enter Git secret (access token or password)',
+      value: state.pwdOrToken ?? '',
+      prompt: 'Enter Git access token or password',
       validate: validateNoop,
       shouldResume: shouldResume,
     });
@@ -117,12 +132,15 @@ export class LinkGitConfig implements ICommand {
   }
 
   async inputKeyFilePath(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
+    infoInput(`The private key file path path is typically /Users/YOU/.ssh/id_ALGORITHM
+    Reference: https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent`);
     state.keyFilePath = await input.showInputBox({
       ignoreFocusOut: true,
       title: this.title,
       step: 2,
       totalSteps: this.maxSteps,
       value: state.keyFilePath ?? '',
+      placeHolder: 'e.g. /Users/YOU/.ssh/id_ALGORITHM', // TODO bug: not working!
       prompt: 'Enter SSH private key file path',
       validate: validateNoop,
       shouldResume: shouldResume,
@@ -131,6 +149,7 @@ export class LinkGitConfig implements ICommand {
   }
 
   async inputKeyPassphrase(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
+    infoInput('The private key passphrase is required only if your private key file is passphrase protected');
     state.keyPassphrase = await input.showInputBox({
       ignoreFocusOut: true,
       title: this.title,
@@ -145,6 +164,7 @@ export class LinkGitConfig implements ICommand {
   }
 
   async pickSyncStyle(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
+    infoInput('In the next step you specify the target of your selection here');
     state.syncStyleType = await input.showQuickPick({
       ignoreFocusOut: true,
       title: this.title,
@@ -158,7 +178,7 @@ export class LinkGitConfig implements ICommand {
     return (input: MultiStepInput) => this.inputSyncStyleValue(input, state);
   }
 
-  async inputSyncStyleValue(input: MultiStepInput, state: Partial<State>): Promise<void> {
+  async inputSyncStyleValue(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
     const syncType = state.syncStyleType?.label;
     state.syncStyleValue = await input.showInputBox({
       ignoreFocusOut: true,
@@ -171,6 +191,21 @@ export class LinkGitConfig implements ICommand {
           : syncType === 'tag' ? 'Enter Git tag'
           : 'Enter Git commit hash (or HEAD)', // syncType === 'commit'
       validate: validateNoop,
+      shouldResume: shouldResume,
+    });
+    return (input: MultiStepInput) => this.pickForceOverwrite(input, state);
+  }
+
+  // TODO: make this a VSCode setting instead of a step
+  async pickForceOverwrite(input: MultiStepInput, state: Partial<State>): Promise<void> {
+    state.forceGitOverwrite = await input.showQuickPick({
+      ignoreFocusOut: true,
+      title: this.title,
+      step: 6,
+      totalSteps: this.maxSteps,
+      placeholder: 'Would you like to force an overwrite of Git settings if they already exist?',
+      items: generatePickList(['yes', 'no']),
+      activeItem: state.forceGitOverwrite,
       shouldResume: shouldResume,
     });
   }

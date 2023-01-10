@@ -1,12 +1,14 @@
 import { QuickPickItem } from 'vscode';
 
-import { generatePickList, shouldResume, validateNoop } from './utility';
+import { MultiStepInput } from '../external/multi-step-input';
+
 import { info, infoNewCmd, teeInfo } from '../lib/outputPane';
 import { STYRA_CLI_CMD, StyraInstall } from '../lib/styra-install';
 import { CommandRunner } from '../lib/command-runner';
 import { ICommand } from '../lib/types';
-import { MultiStepInput } from '../external/multi-step-input';
 import { StyraConfig } from '../lib/styra-config';
+
+import { generatePickList, shouldResume, validateNoop } from './utility';
 
 interface State {
   folder: string;
