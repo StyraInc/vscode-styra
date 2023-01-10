@@ -42,16 +42,23 @@ export class LinkGitConfig implements ICommand {
     }
 
     const state = await this.collectInputs();
+    // TODO this is set up for username/pwd(or token); also do SSH
+    const styraArgs = [
+      'link',
+      'config',
+      'git',
+      state.url,
+      // '--debug', TODO: Wire up a VSCode setting to toggle this
+      `--${state.syncStyleType.label}`,
+      state.syncStyleValue,
+      state.forceGitOverwrite ? '--force' : '',
+      '--username',
+      state.username,
+      '--password-stdin',
+    ];
     try {
-      await new CommandRunner().runShellCmd(STYRA_CLI_CMD, [
-        'link',
-        'config',
-        'git',
-        state.url,
-        `--${state.syncStyleType.label}`,
-        state.syncStyleValue,
-        state.forceGitOverwrite ? '--force' : '',
-      ]);
+      const result = await new CommandRunner().runShellCmd(STYRA_CLI_CMD, styraArgs, state.secret);
+      info(result);
       teeInfo('Link config git complete');
     } catch (err) {
       info('link config git failed'); // err already displayed so not emitting again here
@@ -65,15 +72,13 @@ export class LinkGitConfig implements ICommand {
     return state as State;
   }
 
-  async inputURL(
-    input: MultiStepInput,
-    state: Partial<State>
-  ): Promise<StepType> {
+  async inputURL(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
     state.url = await input.showInputBox({
+      ignoreFocusOut: true,
       title: this.title,
       step: 1,
       totalSteps: this.maxSteps,
-      value: state.url || '',
+      value: state.url ?? '',
       prompt: 'Enter remote Git URL',
       validate: this.validateProtocol,
       shouldResume: shouldResume,
@@ -83,15 +88,13 @@ export class LinkGitConfig implements ICommand {
       : (input: MultiStepInput) => this.inputKeyFilePath(input, state);
   }
 
-  async inputUserName(
-    input: MultiStepInput,
-    state: Partial<State>
-  ): Promise<StepType> {
+  async inputUserName(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
     state.username = await input.showInputBox({
+      ignoreFocusOut: true,
       title: this.title,
       step: 2,
       totalSteps: this.maxSteps,
-      value: state.username || '',
+      value: state.username ?? '',
       prompt: 'Enter Git user name',
       validate: validateNoop,
       shouldResume: shouldResume,
@@ -99,15 +102,13 @@ export class LinkGitConfig implements ICommand {
     return (input: MultiStepInput) => this.inputSecret(input, state);
   }
 
-  async inputSecret(
-    input: MultiStepInput,
-    state: Partial<State>
-  ): Promise<StepType> {
+  async inputSecret(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
     state.secret = await input.showInputBox({
+      ignoreFocusOut: true,
       title: this.title,
       step: 3,
       totalSteps: this.maxSteps,
-      value: state.secret || '',
+      value: state.secret ?? '',
       prompt: 'Enter Git secret (access token or password)',
       validate: validateNoop,
       shouldResume: shouldResume,
@@ -115,15 +116,13 @@ export class LinkGitConfig implements ICommand {
     return (input: MultiStepInput) => this.pickSyncStyle(input, state);
   }
 
-  async inputKeyFilePath(
-    input: MultiStepInput,
-    state: Partial<State>
-  ): Promise<StepType> {
+  async inputKeyFilePath(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
     state.keyFilePath = await input.showInputBox({
+      ignoreFocusOut: true,
       title: this.title,
       step: 2,
       totalSteps: this.maxSteps,
-      value: state.keyFilePath || '',
+      value: state.keyFilePath ?? '',
       prompt: 'Enter SSH private key file path',
       validate: validateNoop,
       shouldResume: shouldResume,
@@ -131,15 +130,13 @@ export class LinkGitConfig implements ICommand {
     return (input: MultiStepInput) => this.inputKeyPassphrase(input, state);
   }
 
-  async inputKeyPassphrase(
-    input: MultiStepInput,
-    state: Partial<State>
-  ): Promise<StepType> {
+  async inputKeyPassphrase(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
     state.keyPassphrase = await input.showInputBox({
+      ignoreFocusOut: true,
       title: this.title,
       step: 3,
       totalSteps: this.maxSteps,
-      value: state.keyPassphrase || '',
+      value: state.keyPassphrase ?? '',
       prompt: 'Enter SSH private key passphrase',
       validate: validateNoop,
       shouldResume: shouldResume,
@@ -147,11 +144,9 @@ export class LinkGitConfig implements ICommand {
     return (input: MultiStepInput) => this.pickSyncStyle(input, state);
   }
 
-  async pickSyncStyle(
-    input: MultiStepInput,
-    state: Partial<State>
-  ): Promise<StepType> {
+  async pickSyncStyle(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
     state.syncStyleType = await input.showQuickPick({
+      ignoreFocusOut: true,
       title: this.title,
       step: 4,
       totalSteps: this.maxSteps,
@@ -163,16 +158,14 @@ export class LinkGitConfig implements ICommand {
     return (input: MultiStepInput) => this.inputSyncStyleValue(input, state);
   }
 
-  async inputSyncStyleValue(
-    input: MultiStepInput,
-    state: Partial<State>
-  ): Promise<void> {
+  async inputSyncStyleValue(input: MultiStepInput, state: Partial<State>): Promise<void> {
     const syncType = state.syncStyleType?.label;
     state.syncStyleValue = await input.showInputBox({
+      ignoreFocusOut: true,
       title: this.title,
       step: 5,
       totalSteps: this.maxSteps,
-      value: state.syncStyleValue || '',
+      value: state.syncStyleValue ?? '',
       prompt:
         syncType === 'branch' ? 'Enter Git branch (e.g. main)'
           : syncType === 'tag' ? 'Enter Git tag'

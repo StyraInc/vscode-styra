@@ -10,7 +10,7 @@ export class CommandRunner {
   // executes the command at path with args and stdin.
   // Upon success returns the command's output.
   // Upon failure returns the stderr output in an exception.
-  async runShellCmd( path: string, args: string[], stdin = ''): Promise<string> {
+  async runShellCmd( path: string, args: string[], stdinData = ''): Promise<string> {
     if (!StyraInstall.checkWorkspace()) {
       teeError('Something is wrong! Did you forget to run checkWorkspace in your command?');
       return '';
@@ -24,7 +24,7 @@ export class CommandRunner {
 
     // adapted from https://stackoverflow.com/a/58571306
     const proc = spawn(path, args, { cwd });
-    proc.stdin.write(stdin);
+    proc.stdin.write(stdinData.endsWith('\n') ? stdinData : stdinData + '\n');
     proc.stdin.end();
 
     let data = '';
@@ -41,6 +41,7 @@ export class CommandRunner {
       proc.on('close', resolve);
     });
     if (exitCode) {
+      info(data);
       teeError(error);
       throw new Error(error);
     }
