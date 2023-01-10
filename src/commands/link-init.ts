@@ -8,7 +8,7 @@ import { CommandRunner } from '../lib/command-runner';
 import { ICommand } from '../lib/types';
 import { StyraConfig } from '../lib/styra-config';
 
-import { generatePickList, shouldResume, validateNoop } from './utility';
+import { generatePickList, shouldResume, validateNonEmpty } from './utility';
 
 interface State {
   folder: string;
@@ -113,7 +113,7 @@ Existing│      ┌───────────────┐            
       prompt: state.isNewSystem
         ? 'Choose a unique name for the DAS System'
         : 'Enter the name of an existing DAS System',
-      validate: validateNoop,
+      validate: validateNonEmpty,
       shouldResume: shouldResume,
     });
     return state.isNewSystem
@@ -141,7 +141,7 @@ Existing│      ┌───────────────┐            
       totalSteps: this.maxSteps - this.stepDelta,
       value: state.folder ?? '',
       prompt: 'Where should policies be stored in the project?',
-      validate: validateNoop, // TODO
+      validate: validateNonEmpty, // TODO
       shouldResume: shouldResume,
     });
   }

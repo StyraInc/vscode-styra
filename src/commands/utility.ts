@@ -14,3 +14,7 @@ export function shouldResume(): Promise<boolean> {
 export async function validateNoop(_value: string): Promise<string | undefined> {
   return undefined;
 }
+
+export async function validateNonEmpty(value: string): Promise<string | undefined> {
+  return value.length > 0 ? undefined : 'must be non-empty';
+}

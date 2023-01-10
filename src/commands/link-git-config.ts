@@ -7,7 +7,7 @@ import { ICommand } from '../lib/types';
 import { MultiStepInput } from '../external/multi-step-input';
 import { StyraConfig } from '../lib/styra-config';
 
-import { generatePickList, shouldResume, validateNoop } from './utility';
+import { generatePickList, shouldResume, validateNonEmpty, validateNoop } from './utility';
 
 interface State {
   forceGitOverwrite: QuickPickItem;
@@ -133,7 +133,7 @@ export class LinkGitConfig implements ICommand {
       totalSteps: this.maxSteps,
       value: state.username ?? '',
       prompt: 'Enter Git user name',
-      validate: validateNoop,
+      validate: validateNonEmpty,
       shouldResume: shouldResume,
     });
     return (input: MultiStepInput) => this.inputPwdOrToken(input, state);
@@ -152,7 +152,7 @@ export class LinkGitConfig implements ICommand {
       totalSteps: this.maxSteps,
       value: state.pwdOrToken ?? '',
       prompt: 'Enter Git access token or password',
-      validate: validateNoop,
+      validate: validateNonEmpty,
       shouldResume: shouldResume,
     });
     return (input: MultiStepInput) => this.pickSyncStyle(input, state);
@@ -169,7 +169,7 @@ export class LinkGitConfig implements ICommand {
       value: state.keyFilePath ?? '',
       placeHolder: 'e.g. /Users/YOU/.ssh/id_ALGORITHM', // TODO bug: not working!
       prompt: 'Enter SSH private key file path',
-      validate: validateNoop,
+      validate: validateNonEmpty,
       shouldResume: shouldResume,
     });
     return (input: MultiStepInput) => this.inputKeyPassphrase(input, state);
@@ -217,7 +217,7 @@ export class LinkGitConfig implements ICommand {
         syncType === 'branch' ? 'Enter Git branch (e.g. main)'
           : syncType === 'tag' ? 'Enter Git tag'
           : 'Enter Git commit hash (or HEAD)', // syncType === 'commit'
-      validate: validateNoop,
+      validate: validateNonEmpty,
       shouldResume: shouldResume,
     });
     return (input: MultiStepInput) => this.pickForceOverwrite(input, state);
