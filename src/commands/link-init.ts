@@ -2,7 +2,7 @@ import { QuickPickItem } from 'vscode';
 
 import { MultiStepInput } from '../external/multi-step-input';
 
-import { info, infoNewCmd, teeInfo } from '../lib/outputPane';
+import { info, infoInput, infoNewCmd, teeInfo } from '../lib/outputPane';
 import { STYRA_CLI_CMD, StyraInstall } from '../lib/styra-install';
 import { CommandRunner } from '../lib/command-runner';
 import { ICommand } from '../lib/types';
@@ -64,6 +64,20 @@ export class LinkInit implements ICommand {
 
   // adapted from vscode-extension-samples/quickinput-sample/src/multiStepInput.ts
   async collectInputs(): Promise<State> {
+    // For complex editing, just copy the lines here and paste into https://asciiflow.com/#/
+    infoInput(`Here is the flow of Styra Link Init that you just started:
+                ┌──────────┐      ┌─────────────┐
+        ┌──────►│ New name ├─────►│ System type ├──┐
+     New│       └──────────┘      └─────────────┘  │
+        │                                          │
+    ┌───┴────┐                                     │   ┌────────┐
+    │ System │                                     ├──►│ Folder │
+    └───┬────┘                                     │   └────────┘
+        │                                          │
+Existing│      ┌───────────────┐                   │
+        └─────►│ Existing name ├───────────────────┘
+               └───────────────┘
+    `);
     const state = {} as Partial<State>;
     await MultiStepInput.run((input) =>
       this.pickNewOrExistingSystem(input, state)

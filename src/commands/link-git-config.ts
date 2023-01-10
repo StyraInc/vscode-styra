@@ -77,6 +77,33 @@ export class LinkGitConfig implements ICommand {
 
   // adapted from vscode-extension-samples/quickinput-sample/src/multiStepInput.ts
   async collectInputs(): Promise<State> {
+    // For complex editing, just copy the lines here and paste into https://asciiflow.com/#/
+    infoInput(`Here is the flow of Styra Link Config Git that you just started:
+                     ───
+                     2FA         ┌──────────┐
+                     ┌──────────►│ Password ├──────────┐
+                     │           └──────────┘          │
+                ┌────┴─────┐                           │
+   ┌───────────►┤ Username │                           │
+   │            └────┬─────┘                           │          ┌────────┐
+   │                 │           ┌──────────┐          │   ┌─────►│ Commit ├──┐
+   │TLS              └──────────►│ Token    ├──────────┤   │      └────────┘  │
+   │https://         2FA         └──────────┘          │   │                  │
+   │                                                   ▼   │                  │
+┌──┴──┐                                            ┌───────┴──┐   ┌────────┐  │      ┌─────────────┐
+│ URL │                                            │Sync Style├──►│ Branch ├──┼─────►│Git overwrite│
+└──┬──┘                                            └───────┬──┘   └────────┘  │      └─────────────┘
+   │                                                   ▲   │                  │
+   │SSL                           No passphrase        │   │                  │
+   │git@             ┌─────────────────────────────────┤   │      ┌────────┐  │
+   │                 │                                 │   └─────►│ Tag    ├──┘
+   │            ┌────┴────────┐                        │          └────────┘
+   └───────────►┤Key file path │                        │
+                └────┬────────┘                        │
+                     │           ┌──────────────┐      │
+                     └──────────►│Key passphrase├──────┘
+                                 └──────────────┘
+    `);
     const state = {} as Partial<State>;
     await MultiStepInput.run((input) => this.inputURL(input, state));
     return state as State;
