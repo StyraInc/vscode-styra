@@ -7,7 +7,7 @@ import { ICommand } from '../lib/types';
 import { MultiStepInput } from '../external/multi-step-input';
 import { StyraConfig } from '../lib/styra-config';
 
-import { generatePickList, shouldResume, validateNonEmpty, validateNoop } from './utility';
+import { generatePickList, shouldResume, StepType, validateNonEmpty, validateNoop } from './utility';
 
 interface State {
   forceGitOverwrite: QuickPickItem;
@@ -20,14 +20,11 @@ interface State {
   username: string;
 }
 
-type StepType = (input: MultiStepInput) => Promise<StepType | void>;
-
 const TLS_PREFIX = 'https://';
 const SSH_PREFIX = 'git@';
 
 export class LinkGitConfig implements ICommand {
   title = 'Styra Link Config Git';
-  stepDelta = 0;
   maxSteps = 6;
 
   async run(): Promise<void> {

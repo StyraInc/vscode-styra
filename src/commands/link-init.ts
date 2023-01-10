@@ -8,7 +8,7 @@ import { CommandRunner } from '../lib/command-runner';
 import { ICommand } from '../lib/types';
 import { StyraConfig } from '../lib/styra-config';
 
-import { generatePickList, shouldResume, validateNonEmpty } from './utility';
+import { generatePickList, shouldResume, StepType, validateNonEmpty } from './utility';
 
 interface State {
   folder: string;
@@ -18,7 +18,6 @@ interface State {
   systemType: QuickPickItem;
 }
 
-type StepType = (input: MultiStepInput) => Promise<StepType | void>;
 
 export class LinkInit implements ICommand {
 
@@ -42,8 +41,7 @@ export class LinkInit implements ICommand {
 
     const state = await this.collectInputs();
     teeInfo(`Linking to ${state.systemName}...`);
-    try {
-      await new CommandRunner().runShellCmd(STYRA_CLI_CMD, [
+    const styraArgs = [
         'link',
         'init',
         state.isNewSystem ? '--create' : '--existing',
@@ -53,8 +51,11 @@ export class LinkInit implements ICommand {
         state.folder,
         '--type',
         state.systemType.label,
-        '--skip-git',
-      ]);
+        '--skip-git'
+    ];
+    try {
+      const result = await new CommandRunner().runShellCmd(STYRA_CLI_CMD, styraArgs);
+      info(result);
       teeInfo('link init complete');
       info('\n*** Be sure to run "Styra Link: Config Git" next');
     } catch (err) {

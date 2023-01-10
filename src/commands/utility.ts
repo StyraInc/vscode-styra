@@ -1,5 +1,9 @@
 import { QuickPickItem } from 'vscode';
 
+import { MultiStepInput } from '../external/multi-step-input';
+
+export type StepType = (input: MultiStepInput) => Promise<StepType | void>;
+
 export function generatePickList(items: string[]): QuickPickItem[] {
   return items.map((label) => ({ label }));
 }
