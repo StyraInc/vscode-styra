@@ -13,6 +13,15 @@ export const STYRA_CLI_CMD = 'styra';
 
 export class StyraInstall {
 
+  static checkWorkspace(): boolean {
+
+    const inWorkspace = !!vscode.workspace.workspaceFolders;
+    if (!inWorkspace) {
+      teeError('Styra Link commands must be run with a VSCode project open');
+    }
+    return inWorkspace;
+  }
+
   static isInstalled(): boolean {
     const styraPath = vscode.workspace
       .getConfiguration('styra')

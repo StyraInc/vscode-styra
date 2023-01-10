@@ -1,6 +1,9 @@
+import * as vscode from 'vscode';
 import { spawn } from 'child_process';
 import shellEscape = require('shell-escape');
+
 import { info, teeError } from './outputPane';
+import { StyraInstall } from './styra-install';
 
 
 export class CommandRunner {
@@ -8,14 +11,24 @@ export class CommandRunner {
   // executes the command at path with args and stdin.
   // Upon success returns the command's output.
   // Upon failure returns the stderr output in an exception.
-  async runShellCmd( path: string, args: string[], stdin = ''): Promise<string> {
-    info(`Spawning child process:\n${path} ${shellEscape(args)}`);
+  async runShellCmd( path: string, args: string[], stdinData = ''): Promise<string> {
+    if (!StyraInstall.checkWorkspace()) {
+      teeError('Something is wrong! Did you forget to run checkWorkspace in your command?');
+      return '';
+    }
+    // above check guarantees workspaceFolder exists so lint override OK
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const cwd = vscode.workspace.workspaceFolders![0].uri.toString().substring('file://'.length);
+    info('Spawning child process:');
+    info(`    project path: ${cwd}`);
+    info(`    ${path} ${shellEscape(args)}`);
 
-    // adapted from https://stackoverflow.com/a/58571306
-    const proc = spawn(path, args);
-    proc.stdin.write(stdin);
+    // https://nodejs.org/api/child_process.html#child_processspawncommand-args-options 
+    const proc = spawn(path, args, { cwd });
+    proc.stdin.write(stdinData.endsWith('\n') ? stdinData : stdinData + '\n');
     proc.stdin.end();
 
+    // adapted from https://stackoverflow.com/a/58571306
     let data = '';
     for await (const chunk of proc.stdout) {
       console.log('stdout chunk: ' + chunk);
@@ -26,10 +39,11 @@ export class CommandRunner {
       error += chunk;
     }
     const exitCode = await new Promise((resolve, _reject) => {
-      info(`spawn(${path}) completed successfully`);
+      info(`child process (${path}) complete`);
       proc.on('close', resolve);
     });
     if (exitCode) {
+      info(data);
       teeError(error);
       throw new Error(error);
     }
