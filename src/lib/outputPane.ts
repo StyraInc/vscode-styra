@@ -4,7 +4,7 @@ export const outputChannel = vscode.window.createOutputChannel('Styra');
 
 // the workhorse that interacts with outputChanel
 export function info(msg: string): void {
-  if (msg.endsWith('\n') && msg.length > 1) {
+  if (msg.endsWith('\n')) {
     outputChannel.append(msg); // remove superfluous newline
   } else {
     outputChannel.appendLine(msg);
