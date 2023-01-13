@@ -107,6 +107,7 @@ Existing│      ┌───────────────┐            
 
   async inputSystemName(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
     state.systemName = await input.showInputBox({
+      ignoreFocusOut: true,
       title: this.title,
       step: 2,
       totalSteps: this.maxSteps - this.stepDelta,
@@ -137,6 +138,7 @@ Existing│      ┌───────────────┐            
 
   async inputFolder(input: MultiStepInput, state: Partial<State>): Promise<void> {
     state.folder = await input.showInputBox({
+      ignoreFocusOut: true,
       title: this.title,
       step: this.maxSteps - this.stepDelta,
       totalSteps: this.maxSteps - this.stepDelta,

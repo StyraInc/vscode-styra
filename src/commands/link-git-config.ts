@@ -164,7 +164,7 @@ export class LinkGitConfig implements ICommand {
       step: 2,
       totalSteps: this.maxSteps,
       value: state.keyFilePath ?? '',
-      placeHolder: 'e.g. /Users/YOU/.ssh/id_ALGORITHM', // TODO bug: not working!
+      placeholder: 'e.g. /Users/YOU/.ssh/id_ALGORITHM', // TODO bug: not working!
       prompt: 'Enter SSH private key file path',
       validate: validateNonEmpty,
       shouldResume: shouldResume,
