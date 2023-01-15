@@ -19,7 +19,7 @@ export class CommandRunner {
     // above check guarantees workspaceFolder exists so lint override OK
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const cwd = vscode.workspace.workspaceFolders![0].uri.toString().substring('file://'.length);
-    info('Spawning child process:');
+    info('\nSpawning child process:');
     info(`    project path: ${cwd}`);
     info(`    ${path} ${shellEscape(args)}`);
 
