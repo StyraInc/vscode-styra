@@ -1,12 +1,11 @@
 const { defaults } = require('jest-config');
 
-/** @type {import('jest').Config} */
-const config = {
+/** @type {import('ts-jest').JestConfigWithTsJest} */
+module.exports = {
+  preset: 'ts-jest',
+  testEnvironment: 'node',
   resetMocks: true,
   // roots: ['src'],
   setupFiles: ['./src/test-jest/vscode-mock.ts'],
   testPathIgnorePatterns: [...defaults.testPathIgnorePatterns, 'src/test/suite', 'out/test/suite', '.js'],
 };
-
-// eslint-disable-next-line no-undef
-module.exports = config;
