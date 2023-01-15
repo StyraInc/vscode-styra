@@ -1,11 +1,17 @@
 {
   "name": "vscode-styra",
   "displayName": "vscode-styra",
+  "icon": "styra_icon-blue.png",
   "description": "A VSCode extension for the Styra CLI",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/styraInc/vscode-styra/"
+  },
   "publisher": "styra",
   "version": "0.0.1",
+  "private": true,
   "engines": {
-    "vscode": "^1.71.0"
+    "vscode": "^1.74.0"
   },
   "categories": [
     "Other"
@@ -80,6 +86,7 @@
     }
   },
   "scripts": {
+    "package": "vsce package --pre-release",
     "check-licenses": "./packaging/validate-license.sh",
     "compile": "tsc -p ./",
     "lint": "eslint src --ext ts",
