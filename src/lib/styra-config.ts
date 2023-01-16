@@ -1,9 +1,9 @@
 import * as fs from 'fs';
 import * as os from 'os';
-import * as vscode from 'vscode';
 
 import { info, infoFromUserAction } from './outputPane';
 import { CommandRunner } from './command-runner';
+import { IDE } from './vscode-api';
 import { STYRA_CLI_CMD } from './styra-install';
 
 export type ConfigData = {
@@ -41,7 +41,7 @@ export class StyraConfig {
     }
 
     info('Styra CLI is not configured');
-    const dasURL = await vscode.window.showInputBox({
+    const dasURL = await IDE.showInputBox({
       title: 'Styra CLI Configuration (1/2)',
       placeHolder: 'Base URL to Styra DAS Tenant',
       // prompt: "further details can go here..."
@@ -50,7 +50,7 @@ export class StyraConfig {
       infoFromUserAction('Configuration cancelled due to no input');
       return false;
     }
-    const token = await vscode.window.showInputBox({
+    const token = await IDE.showInputBox({
       title: 'Styra CLI Configuration (2/2)',
       placeHolder: 'API token for Styra DAS Tenant',
       // prompt: "further details can go here..."
@@ -65,7 +65,7 @@ export class StyraConfig {
         STYRA_CLI_CMD, // no output upon success
         ['configure', '--url', dasURL, '--access-token', token]
       );
-      vscode.window.showInformationMessage('Styra CLI configured.');
+      IDE.showInformationMessage('Styra CLI configured.');
       info('Configuration complete');
     } catch (err) {
       // invalid URL or TOKEN will trigger this

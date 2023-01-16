@@ -12,7 +12,12 @@ jest.mock('vscode',
       Disposable: jest.fn(),
       window: {
         showInformationMessage: jest.fn(),
+        showErrorMessage: jest.fn(),
         createOutputChannel: jest.fn().mockImplementation(() => new Channel())
+      },
+      workspace: {
+        getConfiguration: jest.fn(),
+        workspaceFolders: ['my_root'],
       },
       commands: {
         executeCommand: jest.fn()

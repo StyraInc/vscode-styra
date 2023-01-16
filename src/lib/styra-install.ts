@@ -1,12 +1,12 @@
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as os from 'os';
-import * as vscode from 'vscode';
 import { default as fetch } from 'node-fetch';
 import moveFile = require('move-file');
 import { sync as commandExistsSync } from 'command-exists';
 
 import { info, infoFromUserAction, teeError, teeInfo } from './outputPane';
+import { IDE } from './vscode-api';
 
 // export const STYRA_CLI_CMD = 'styra2'; // TODO: for testing; do not commit!
 export const STYRA_CLI_CMD = 'styra';
@@ -15,7 +15,7 @@ export class StyraInstall {
 
   static checkWorkspace(): boolean {
 
-    const inWorkspace = !!vscode.workspace.workspaceFolders;
+    const inWorkspace = !!IDE.workspaceFolders();
     if (!inWorkspace) {
       teeError('Styra Link commands must be run with a VSCode project open');
     }
@@ -23,9 +23,7 @@ export class StyraInstall {
   }
 
   static isInstalled(): boolean {
-    const styraPath = vscode.workspace
-      .getConfiguration('styra')
-      .get<string>('path');
+    const styraPath = IDE.getConfigValue('styra', 'path');
     const existsOnPath = commandExistsSync(STYRA_CLI_CMD);
     const existsInUserSettings =
       styraPath !== undefined && styraPath !== null && fs.existsSync(styraPath);
@@ -39,7 +37,7 @@ export class StyraInstall {
     }
     info('Styra CLI is not installed');
 
-    const selection = await vscode.window.showInformationMessage(
+    const selection = await IDE.showInformationMessage(
       'Styra CLI is not installed. Would you like to install it now?',
       'Install',
       'Cancel'
@@ -61,7 +59,7 @@ export class StyraInstall {
     }
   }
 
-  private static async installStyra(): Promise<void> {
+  static async installStyra(): Promise<void> {
     const targetOS = process.platform;
     const targetArch = process.arch;
     info(`    Platform: ${targetOS}`);
