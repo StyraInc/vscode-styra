@@ -102,7 +102,9 @@
     "lint:fix": "eslint --fix src --ext ts",
     "pretest": "npm run compile && npm run lint",
     "test-vscode": "node ./out/test/runTest.js",
-    "test-jest": "jest",
+    "test": "jest",
+    "test:verbose": "jest --verbose",
+    "test:watch": "jest --watch",
     "vscode:prepublish": "npm run compile",
     "watch": "tsc -watch -p ./"
   },
