@@ -57,7 +57,7 @@ export class LinkGitConfig implements ICommand {
       // "https://github.com/msorens/_ms-demo-compliance-repo.git", // TODO: to save typing
       // 'git@github.com:msorens/_ms-demo-compliance-repo.git', // TODO: to save typing
       state.url,
-      // '--debug', TODO: Wire up a VSCode setting to toggle this
+      // '--debug', // TODO: Wire up a VSCode setting to toggle this
       `--${state.syncStyleType.label}`,
       state.syncStyleValue,
       state.forceGitOverwrite.label === 'yes' ? '--force' : '',

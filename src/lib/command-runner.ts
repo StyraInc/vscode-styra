@@ -1,8 +1,8 @@
-import * as vscode from 'vscode';
 import { spawn } from 'child_process';
 import shellEscape = require('shell-escape');
 
 import { info, teeError } from './outputPane';
+import { IDE } from './vscode-api';
 import { StyraInstall } from './styra-install';
 
 
@@ -18,8 +18,8 @@ export class CommandRunner {
     }
     // above check guarantees workspaceFolder exists so lint override OK
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const cwd = vscode.workspace.workspaceFolders![0].uri.toString().substring('file://'.length);
-    info('Spawning child process:');
+    const cwd = IDE.workspaceFolders()![0].uri.toString().substring('file://'.length);
+    info('\nSpawning child process:');
     info(`    project path: ${cwd}`);
     info(`    ${path} ${shellEscape(args)}`);
 

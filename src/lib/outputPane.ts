@@ -1,10 +1,10 @@
-import * as vscode from 'vscode';
+import { IDE } from './vscode-api';
 
-export const outputChannel = vscode.window.createOutputChannel('Styra');
+export const outputChannel = IDE.createOutputChannel('Styra');
 
 // the workhorse that interacts with outputChanel
 export function info(msg: string): void {
-  if (msg.endsWith('\n') && msg.length > 1) {
+  if (msg.endsWith('\n')) {
     outputChannel.append(msg); // remove superfluous newline
   } else {
     outputChannel.appendLine(msg);
@@ -33,15 +33,15 @@ export function infoFromUserAction(msg: string): void {
 
 export function teeInfo(msg: string): void {
   info(msg);
-  vscode.window.showInformationMessage(msg);
+  IDE.showInformationMessage(msg);
 }
 
 export function teeWarning(msg: string): void {
   info(`WARNING: ${msg}`);
-  vscode.window.showWarningMessage(msg);
+  IDE.showWarningMessage(msg);
 }
 
 export function teeError(msg: string): void {
   info(`ERROR: ${msg}`);
-  vscode.window.showErrorMessage(msg);
+  IDE.showErrorMessage(msg);
 }
