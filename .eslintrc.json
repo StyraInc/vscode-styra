@@ -15,17 +15,23 @@
         "plugin:@typescript-eslint/recommended"
     ],
     "rules": {
-        "@typescript-eslint/naming-convention": "warn",
-        "semi": "error",
-        "quotes": [ "error", "single", { "avoidEscape": true } ],
         "curly": "error",
+        "eol-last": [ "error", "always" ],
         "eqeqeq": ["error", "smart"],
+        "indent": [
+            "warn", 2, { "MemberExpression": "off", "SwitchCase": 1 }
+        ],
+        "no-console": "warn",
+        "no-duplicate-imports": "error",
         "no-throw-literal": "error",
+        "quotes": [ "error", "single", { "avoidEscape": true } ],
+        "semi": "error",
         "sort-imports-es6-autofix/sort-imports-es6": [ "error", {
             "ignoreCase": true,
             "ignoreMemberSort": false,
             "memberSyntaxSortOrder": [ "none", "single", "all", "multiple" ]
             }],
+        "@typescript-eslint/naming-convention": "warn",
         "@typescript-eslint/no-unused-vars": [
             "error",
             {
