@@ -21,16 +21,20 @@
   "contributes": {
     "commands": [
       {
-        "command": "styra.log.replay",
-        "title": "Styra: Decision Log Replay"
-      },
-      {
         "command": "styra.link.init",
         "title": "Styra Link: Initialize"
       },
       {
         "command": "styra.link.git-config",
         "title": "Styra Link: Config Git"
+      },
+      {
+        "command": "styra.link.test",
+        "title": "Styra Link: Test"
+      },
+      {
+        "command": "styra.log.replay",
+        "title": "Styra: Decision Log Replay"
       }
     ],
     "configuration": {

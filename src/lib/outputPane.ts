@@ -20,6 +20,14 @@ export function infoNewCmd(cmd: string): void {
   info('------------------------------------------------------');
 }
 
+export function infoCmdSucceeded(cmd: string): void {
+      teeInfo(`====> ${cmd} complete`);
+}
+
+export function infoCmdFailed(cmd: string): void {
+      info(`====> ${cmd} failed`); // err already displayed so not emitting (with tee) again here
+}
+
 // Use this to provide supplemental description for an input box or pick box.
 export function infoInput(msg: string): void {
   info('');
