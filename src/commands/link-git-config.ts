@@ -31,7 +31,7 @@ export class LinkGitConfig implements ICommand {
   async run(): Promise<void> {
 
     const notifier = new CommandNotifier('Link Config Git');
-    notifier.infoNewCmd();
+    notifier.markStart();
 
     if (!StyraInstall.checkWorkspace()) {
       return;
@@ -69,9 +69,9 @@ export class LinkGitConfig implements ICommand {
     try {
       const result = await new CommandRunner().runShellCmd(STYRA_CLI_CMD, styraArgs, secret);
       info(result);
-      notifier.infoCmdSucceeded();
+      notifier.markHappyFinish();
     } catch (err) {
-      notifier.infoCmdFailed();
+      notifier.markSadFinish();
     }
   }
 

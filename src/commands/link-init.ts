@@ -29,7 +29,7 @@ export class LinkInit implements ICommand {
   async run(): Promise<void> {
 
     const notifier = new CommandNotifier('Link Init');
-    notifier.infoNewCmd();
+    notifier.markStart();
 
     if (!StyraInstall.checkWorkspace()) {
       return;
@@ -58,10 +58,10 @@ export class LinkInit implements ICommand {
     try {
       const result = await new CommandRunner().runShellCmd(STYRA_CLI_CMD, styraArgs);
       info(result);
-      notifier.infoCmdSucceeded();
+      notifier.markHappyFinish();
       info('\n*** Be sure to run "Styra Link: Config Git" next');
     } catch (err) {
-      notifier.infoCmdFailed();
+      notifier.markSadFinish();
     }
   }
 

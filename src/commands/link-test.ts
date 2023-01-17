@@ -10,16 +10,16 @@ export class LinkTest implements ICommand {
 
     const notifier = new CommandNotifier('Link Test');
 
-    notifier.infoNewCmd();
+    notifier.markStart();
     if (!(await checkStartup())) {
       return;
     }
     try {
       const result = await new CommandRunner().runShellCmd(STYRA_CLI_CMD, ['link', 'test']);
       info(result);
-      notifier.infoCmdSucceeded();
+      notifier.markHappyFinish();
     } catch (err) {
-      notifier.infoCmdFailed();
+      notifier.markSadFinish();
     }
   }
 }

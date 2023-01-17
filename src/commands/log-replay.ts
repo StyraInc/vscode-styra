@@ -19,7 +19,7 @@ export class LogReplay implements ICommand {
   async run(): Promise<void> {
 
     const notifier = new CommandNotifier('Log Replay');
-    notifier.infoNewCmd();
+    notifier.markStart();
 
     if (!StyraInstall.checkWorkspace()) {
       return;
@@ -61,7 +61,7 @@ export class LogReplay implements ICommand {
                 (system) => system.name === systemName.trim()
               )!.id;
               this.runLogReplayForSystem(systemId);
-              notifier.infoCmdSucceeded();
+              notifier.markHappyFinish();
             }
           });
         } else if (systems) {

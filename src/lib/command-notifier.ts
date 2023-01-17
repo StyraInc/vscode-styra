@@ -10,7 +10,7 @@ export class CommandNotifier {
   }
 
   // Use this at the start of the ICommand:run() method for every command.
-  infoNewCmd(): void {
+  markStart(): void {
     info('');
     info('------------------------------------------------------');
     // TODO: use https://www.npmjs.com/package/vscode-read-manifest to read commands
@@ -18,11 +18,11 @@ export class CommandNotifier {
     info('------------------------------------------------------');
   }
 
-  infoCmdSucceeded(): void {
+  markHappyFinish(): void {
     teeInfo(`====> ${this.name} complete`);
   }
 
-  infoCmdFailed(): void {
+  markSadFinish(): void {
     info(`====> ${this.name} failed`); // err already displayed so not emitting (with tee) again here
   }
 }

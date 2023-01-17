@@ -7,14 +7,14 @@ describe('CommandNotifier', () => {
 
   test('infoNewCmd starts with a blank line and prepends "Running Command" on the command name', () => {
     const cmdNotifier = new CommandNotifier('my command');
-    cmdNotifier.infoNewCmd();
+    cmdNotifier.markStart();
     expect(spyAppendLine).nthCalledWith(1, '');
     expect(spyAppendLine).nthCalledWith(3, 'Running Command: my command');
   });
 
   test('infoCmdSucceeded', () => {
     const cmdNotifier = new CommandNotifier('my command');
-    cmdNotifier.infoCmdSucceeded();
+    cmdNotifier.markHappyFinish();
     const [output] = spyAppendLine.mock.calls[0]; // allows testing partial matches
     expect(output).toMatch(/my command/);
     expect(output).toMatch(/complete/);
@@ -22,7 +22,7 @@ describe('CommandNotifier', () => {
 
 test('infoCmdFailed', () => {
     const cmdNotifier = new CommandNotifier('my command');
-    cmdNotifier.infoCmdFailed();
+    cmdNotifier.markSadFinish();
     const [output] = spyAppendLine.mock.calls[0]; // allows testing partial matches
     expect(output).toMatch(/my command/);
     expect(output).toMatch(/failed/);
