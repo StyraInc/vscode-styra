@@ -1,6 +1,7 @@
 import { QuickPickItem } from 'vscode';
 
-import { info, infoInput, infoNewCmd, teeInfo } from '../lib/outputPane';
+import { info, infoInput } from '../lib/outputPane';
+import { CommandNotifier } from '../lib/command-notifier';
 import { STYRA_CLI_CMD, StyraInstall } from '../lib/styra-install';
 import { CommandRunner } from '../lib/command-runner';
 import { ICommand } from '../lib/types';
@@ -28,7 +29,9 @@ export class LinkGitConfig implements ICommand {
   maxSteps = 6;
 
   async run(): Promise<void> {
-    infoNewCmd('Link Config Git');
+
+    const notifier = new CommandNotifier('Link Config Git');
+    notifier.infoNewCmd();
 
     if (!StyraInstall.checkWorkspace()) {
       return;
@@ -66,9 +69,9 @@ export class LinkGitConfig implements ICommand {
     try {
       const result = await new CommandRunner().runShellCmd(STYRA_CLI_CMD, styraArgs, secret);
       info(result);
-      teeInfo('Link config git complete');
+      notifier.infoCmdSucceeded();
     } catch (err) {
-      info('link config git failed'); // err already displayed so not emitting again here
+      notifier.infoCmdFailed();
     }
   }
 

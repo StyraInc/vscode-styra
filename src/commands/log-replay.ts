@@ -7,8 +7,9 @@
 import * as vscode from 'vscode';
 import { default as fetch, Request } from 'node-fetch';
 
+import { info, infoFromUserAction } from '../lib/outputPane';
+import { CommandNotifier } from '../lib/command-notifier';
 import { ICommand, System } from '../lib/types';
-import { info, infoFromUserAction, infoNewCmd  } from '../lib/outputPane';
 import { STYRA_CLI_CMD, StyraInstall } from '../lib/styra-install';
 import { CommandRunner } from '../lib/command-runner';
 import { StyraConfig } from '../lib/styra-config';
@@ -16,7 +17,9 @@ import { StyraConfig } from '../lib/styra-config';
 export class LogReplay implements ICommand {
 
   async run(): Promise<void> {
-    infoNewCmd('Log Replay');
+
+    const notifier = new CommandNotifier('Log Replay');
+    notifier.infoNewCmd();
 
     if (!StyraInstall.checkWorkspace()) {
       return;
@@ -58,6 +61,7 @@ export class LogReplay implements ICommand {
                 (system) => system.name === systemName.trim()
               )!.id;
               this.runLogReplayForSystem(systemId);
+              notifier.infoCmdSucceeded();
             }
           });
         } else if (systems) {

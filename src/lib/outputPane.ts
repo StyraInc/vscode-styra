@@ -11,23 +11,6 @@ export function info(msg: string): void {
   }
 }
 
-// Use this at the start of the ICommand:run() method for every command.
-export function infoNewCmd(cmd: string): void {
-  info('');
-  info('------------------------------------------------------');
-  // TODO: use https://www.npmjs.com/package/vscode-read-manifest to read commands
-  info(`Running Command: ${cmd}`);
-  info('------------------------------------------------------');
-}
-
-export function infoCmdSucceeded(cmd: string): void {
-      teeInfo(`====> ${cmd} complete`);
-}
-
-export function infoCmdFailed(cmd: string): void {
-      info(`====> ${cmd} failed`); // err already displayed so not emitting (with tee) again here
-}
-
 // Use this to provide supplemental description for an input box or pick box.
 export function infoInput(msg: string): void {
   info('');
@@ -53,3 +36,5 @@ export function teeError(msg: string): void {
   info(`ERROR: ${msg}`);
   IDE.showErrorMessage(msg);
 }
+
+

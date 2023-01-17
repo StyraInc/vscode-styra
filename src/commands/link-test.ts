@@ -1,4 +1,5 @@
-import { info, infoCmdFailed, infoCmdSucceeded, infoNewCmd, teeInfo } from '../lib/outputPane';
+import { info } from '../lib/outputPane';
+import { CommandNotifier } from '../lib/command-notifier';
 import { checkStartup } from './utility';
 import { CommandRunner } from '../lib/command-runner';
 import { ICommand } from '../lib/types';
@@ -7,17 +8,18 @@ import { STYRA_CLI_CMD } from '../lib/styra-install';
 export class LinkTest implements ICommand {
   async run(): Promise<void> {
 
-    const CMD = 'Link Test';
-    infoNewCmd(CMD);
+    const notifier = new CommandNotifier('Link Test');
+
+    notifier.infoNewCmd();
     if (!(await checkStartup())) {
       return;
     }
     try {
       const result = await new CommandRunner().runShellCmd(STYRA_CLI_CMD, ['link', 'test']);
       info(result);
-      infoCmdSucceeded(CMD);
+      notifier.infoCmdSucceeded();
     } catch (err) {
-      infoCmdFailed(CMD);
+      notifier.infoCmdFailed();
     }
   }
 }
