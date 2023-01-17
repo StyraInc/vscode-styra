@@ -8,12 +8,12 @@ import { STYRA_CLI_CMD } from '../lib/styra-install';
 export class LinkTest implements ICommand {
   async run(): Promise<void> {
 
-    const notifier = new CommandNotifier('Link Test');
-
-    notifier.markStart();
     if (!(await checkStartup())) {
       return;
     }
+    const notifier = new CommandNotifier('Link Test');
+    notifier.markStart();
+
     try {
       const result = await new CommandRunner().runShellCmd(STYRA_CLI_CMD, ['link', 'test']);
       info(result);

@@ -1,15 +1,12 @@
-import { QuickPickItem } from 'vscode';
-
 import { MultiStepInput } from '../external/multi-step-input';
 
+import { checkStartup, generatePickList, shouldResume, StepType, validateNonEmpty } from './utility';
 import { CommandNotifier } from '../lib/command-notifier';
 import { CommandRunner } from '../lib/command-runner';
 import { ICommand } from '../lib/types';
 import { info, infoInput, teeInfo } from '../lib/outputPane';
-import { STYRA_CLI_CMD, StyraInstall } from '../lib/styra-install';
-import { StyraConfig } from '../lib/styra-config';
-
-import { generatePickList, shouldResume, StepType, validateNonEmpty } from './utility';
+import { QuickPickItem } from '../lib/vscode-api';
+import { STYRA_CLI_CMD } from '../lib/styra-install';
 
 interface State {
   folder: string;
@@ -28,18 +25,11 @@ export class LinkInit implements ICommand {
 
   async run(): Promise<void> {
 
+    if (!(await checkStartup())) {
+      return;
+    }
     const notifier = new CommandNotifier('Link Init');
     notifier.markStart();
-
-    if (!StyraInstall.checkWorkspace()) {
-      return;
-    }
-    if (!(await StyraInstall.checkCliInstallation())) {
-      return;
-    }
-    if (!(await StyraConfig.checkCliConfiguration())) {
-      return;
-    }
 
     const state = await this.collectInputs();
     teeInfo(`Linking to ${state.systemName}...`);

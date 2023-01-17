@@ -1,14 +1,12 @@
-import { QuickPickItem } from 'vscode';
+import { MultiStepInput } from '../external/multi-step-input';
 
+import { checkStartup, generatePickList, shouldResume, StepType, validateNonEmpty, validateNoop } from './utility';
 import { CommandNotifier } from '../lib/command-notifier';
 import { CommandRunner } from '../lib/command-runner';
 import { ICommand } from '../lib/types';
 import { info, infoInput } from '../lib/outputPane';
-import { MultiStepInput } from '../external/multi-step-input';
-import { STYRA_CLI_CMD, StyraInstall } from '../lib/styra-install';
-import { StyraConfig } from '../lib/styra-config';
-
-import { generatePickList, shouldResume, StepType, validateNonEmpty, validateNoop } from './utility';
+import { QuickPickItem } from '../lib/vscode-api';
+import { STYRA_CLI_CMD } from '../lib/styra-install';
 
 interface State {
   forceGitOverwrite: QuickPickItem;
@@ -30,18 +28,11 @@ export class LinkGitConfig implements ICommand {
 
   async run(): Promise<void> {
 
+    if (!(await checkStartup())) {
+      return;
+    }
     const notifier = new CommandNotifier('Link Config Git');
     notifier.markStart();
-
-    if (!StyraInstall.checkWorkspace()) {
-      return;
-    }
-    if (!(await StyraInstall.checkCliInstallation())) {
-      return;
-    }
-    if (!(await StyraConfig.checkCliConfiguration())) {
-      return;
-    }
 
     const state = await this.collectInputs();
     let variantArgs = [] as string[];
