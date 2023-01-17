@@ -6,7 +6,8 @@
         "sourceType": "module"
     },
     "plugins": [
-        "@typescript-eslint"
+        "@typescript-eslint",
+        "sort-imports-es6-autofix"
     ],
     "extends": [
         "eslint:recommended",
@@ -20,13 +21,11 @@
         "curly": "error",
         "eqeqeq": ["error", "smart"],
         "no-throw-literal": "error",
-        "sort-imports": [
-            "error",
-            {
-                "allowSeparatedGroups": true,
-                "ignoreCase": true
-            }
-        ],
+        "sort-imports-es6-autofix/sort-imports-es6": [ "error", {
+            "ignoreCase": true,
+            "ignoreMemberSort": false,
+            "memberSyntaxSortOrder": [ "none", "single", "all", "multiple" ]
+            }],
         "@typescript-eslint/no-unused-vars": [
             "error",
             {

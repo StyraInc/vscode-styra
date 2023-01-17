@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
-import { info, outputChannel } from './lib/outputPane';
 import { ICommand } from './lib/types';
+import { info, outputChannel } from './lib/outputPane';
 import { LinkGitConfig } from './commands/link-git-config';
 import { LinkInit } from './commands/link-init';
 import { LinkTest } from './commands/link-test';

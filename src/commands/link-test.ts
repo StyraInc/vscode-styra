@@ -1,8 +1,8 @@
-import { info } from '../lib/outputPane';
-import { CommandNotifier } from '../lib/command-notifier';
 import { checkStartup } from './utility';
+import { CommandNotifier } from '../lib/command-notifier';
 import { CommandRunner } from '../lib/command-runner';
 import { ICommand } from '../lib/types';
+import { info } from '../lib/outputPane';
 import { STYRA_CLI_CMD } from '../lib/styra-install';
 
 export class LinkTest implements ICommand {

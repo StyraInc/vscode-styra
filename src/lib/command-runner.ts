@@ -1,10 +1,9 @@
 import { spawn } from 'child_process';
 import shellEscape = require('shell-escape');
 
-import { info, teeError } from './outputPane';
 import { IDE } from './vscode-api';
+import { info, teeError } from './outputPane';
 import { StyraInstall } from './styra-install';
-
 
 export class CommandRunner {
 
