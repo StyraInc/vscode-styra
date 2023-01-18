@@ -101,7 +101,7 @@ export class LinkGitConfig implements ICommand {
   }
 
   async inputURL(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
-   state.url = await input.showInputBox({
+    state.url = await input.showInputBox({
       ignoreFocusOut: true, // TODO bug: not working!
       title: this.title,
       step: 1,
@@ -138,6 +138,7 @@ export class LinkGitConfig implements ICommand {
 
     state.pwdOrToken = await input.showInputBox({
       ignoreFocusOut: true,
+      password: true,
       title: this.title,
       step: 3,
       totalSteps: this.maxSteps,
@@ -207,7 +208,7 @@ export class LinkGitConfig implements ICommand {
       prompt:
         syncType === 'branch' ? 'Enter Git branch (e.g. main)'
           : syncType === 'tag' ? 'Enter Git tag'
-          : 'Enter Git commit hash (or HEAD)', // syncType === 'commit'
+            : 'Enter Git commit hash (or HEAD)', // syncType === 'commit'
       validate: validateNonEmpty,
       shouldResume: shouldResume,
     });
