@@ -34,16 +34,16 @@ export class LinkInit implements ICommand {
     const state = await this.collectInputs();
     teeInfo(`Linking to ${state.systemName}...`);
     const styraArgs = [
-        'link',
-        'init',
-        state.isNewSystem ? '--create' : '--existing',
-        '--name',
-        state.systemName,
-        '--path',
-        state.folder,
-        '--type',
-        state.systemType.label,
-        '--skip-git'
+      'link',
+      'init',
+      state.isNewSystem ? '--create' : '--existing',
+      '--name',
+      state.systemName,
+      '--path',
+      state.folder,
+      '--type',
+      state.systemType.label,
+      '--skip-git'
     ];
     try {
       const result = await new CommandRunner().runShellCmd(STYRA_CLI_CMD, styraArgs);
