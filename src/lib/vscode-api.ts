@@ -3,6 +3,8 @@ import * as vscode from 'vscode';
 // The IDE interface for VSCode.
 // No `vscode...` calls should appear in almost any other file!
 
+export type QuickPickItem = vscode.QuickPickItem
+
 export class IDE {
 
   static createOutputChannel(name: string): vscode.OutputChannel {

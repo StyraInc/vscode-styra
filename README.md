@@ -6,6 +6,7 @@ Brings the capabilities of Styra Link into VSCode for streamlining your workflow
 
 * `Styra Link: Initialize` — create (or connect to) a system in DAS.
 * `Styra Link: Config Git` — configure Styra Link with a Git connection.
+* `Styra Link: Test` — run all defined Rego tests.
 
 ## Requirements
 

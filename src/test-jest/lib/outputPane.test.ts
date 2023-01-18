@@ -1,4 +1,4 @@
-import { info, infoNewCmd, outputChannel } from '../../lib/outputPane';
+import { info, outputChannel } from '../../lib/outputPane';
 
 describe('outputPane', () => {
 
@@ -25,16 +25,6 @@ describe('outputPane', () => {
       expect(spyAppend).not.toHaveBeenCalled();
       expect(spyAppendLine).toHaveBeenCalledWith(input);
     });
-  });
-
-
-  test('infoNewCmd starts with a blank line and prepends "Running Command" on the command name', () => {
-    infoNewCmd('my command');
-    expect(spyAppendLine).nthCalledWith(1, '');
-    expect(spyAppendLine).nthCalledWith(3, 'Running Command: my command');
-    // example of checking full context together:
-    // const output = spyAppendLine.mock.calls.join('');
-    // expect(output).toMatch(/---.*my command.*---/);
   });
 
 });

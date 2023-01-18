@@ -1,9 +1,9 @@
 import * as fs from 'fs';
 import * as os from 'os';
 
-import { info, infoFromUserAction } from './outputPane';
 import { CommandRunner } from './command-runner';
 import { IDE } from './vscode-api';
+import { info, infoFromUserAction } from './outputPane';
 import { STYRA_CLI_CMD } from './styra-install';
 
 export type ConfigData = {

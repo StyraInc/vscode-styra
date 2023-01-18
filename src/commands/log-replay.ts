@@ -7,26 +7,23 @@
 import * as vscode from 'vscode';
 import { default as fetch, Request } from 'node-fetch';
 
-import { ICommand, System } from '../lib/types';
-import { info, infoFromUserAction, infoNewCmd  } from '../lib/outputPane';
-import { STYRA_CLI_CMD, StyraInstall } from '../lib/styra-install';
+import { checkStartup } from './utility';
+import { CommandNotifier } from '../lib/command-notifier';
 import { CommandRunner } from '../lib/command-runner';
+import { ICommand, System } from '../lib/types';
+import { info, infoFromUserAction } from '../lib/outputPane';
+import { STYRA_CLI_CMD } from '../lib/styra-install';
 import { StyraConfig } from '../lib/styra-config';
 
 export class LogReplay implements ICommand {
 
   async run(): Promise<void> {
-    infoNewCmd('Log Replay');
 
-    if (!StyraInstall.checkWorkspace()) {
+    if (!(await checkStartup())) {
       return;
     }
-    if (!await StyraInstall.checkCliInstallation()) {
-      return;
-    }
-    if (!await StyraConfig.checkCliConfiguration()) {
-      return;
-    }
+    const notifier = new CommandNotifier('Log Replay');
+    notifier.markStart();
 
     const configData = await StyraConfig.read();
     const request = new Request(`${configData.url}/v1/systems?compact=true`, {
@@ -58,6 +55,7 @@ export class LogReplay implements ICommand {
                 (system) => system.name === systemName.trim()
               )!.id;
               this.runLogReplayForSystem(systemId);
+              notifier.markHappyFinish();
             }
           });
         } else if (systems) {

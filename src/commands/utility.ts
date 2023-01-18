@@ -1,6 +1,7 @@
-import { QuickPickItem } from 'vscode';
-
 import { MultiStepInput } from '../external/multi-step-input';
+import { QuickPickItem } from '../lib/vscode-api';
+import { StyraConfig } from '../lib/styra-config';
+import { StyraInstall } from '../lib/styra-install';
 
 export type StepType = (input: MultiStepInput) => Promise<StepType | void>;
 
@@ -21,4 +22,19 @@ export async function validateNoop(_value: string): Promise<string | undefined> 
 
 export async function validateNonEmpty(value: string): Promise<string | undefined> {
   return value.length > 0 ? undefined : 'must be non-empty';
+}
+
+// TODO: be quiet about the output on subsequent runs...?
+export async function checkStartup(): Promise<boolean> {
+
+  if (!StyraInstall.checkWorkspace()) {
+    return false;
+  }
+  if (!(await StyraInstall.checkCliInstallation())) {
+    return false;
+  }
+  if (!(await StyraConfig.checkCliConfiguration())) {
+    return false;
+  }
+  return true;
 }

@@ -1,14 +1,12 @@
-import { QuickPickItem } from 'vscode';
-
 import { MultiStepInput } from '../external/multi-step-input';
 
-import { info, infoInput, infoNewCmd, teeInfo } from '../lib/outputPane';
-import { STYRA_CLI_CMD, StyraInstall } from '../lib/styra-install';
+import { checkStartup, generatePickList, shouldResume, StepType, validateNonEmpty } from './utility';
+import { CommandNotifier } from '../lib/command-notifier';
 import { CommandRunner } from '../lib/command-runner';
 import { ICommand } from '../lib/types';
-import { StyraConfig } from '../lib/styra-config';
-
-import { generatePickList, shouldResume, StepType, validateNonEmpty } from './utility';
+import { info, infoInput, teeInfo } from '../lib/outputPane';
+import { QuickPickItem } from '../lib/vscode-api';
+import { STYRA_CLI_CMD } from '../lib/styra-install';
 
 interface State {
   folder: string;
@@ -27,17 +25,11 @@ export class LinkInit implements ICommand {
 
   async run(): Promise<void> {
 
-    infoNewCmd('Link Init');
-
-    if (!StyraInstall.checkWorkspace()) {
+    if (!(await checkStartup())) {
       return;
     }
-    if (!(await StyraInstall.checkCliInstallation())) {
-      return;
-    }
-    if (!(await StyraConfig.checkCliConfiguration())) {
-      return;
-    }
+    const notifier = new CommandNotifier('Link Init');
+    notifier.markStart();
 
     const state = await this.collectInputs();
     teeInfo(`Linking to ${state.systemName}...`);
@@ -56,10 +48,10 @@ export class LinkInit implements ICommand {
     try {
       const result = await new CommandRunner().runShellCmd(STYRA_CLI_CMD, styraArgs);
       info(result);
-      teeInfo('link init complete');
+      notifier.markHappyFinish();
       info('\n*** Be sure to run "Styra Link: Config Git" next');
     } catch (err) {
-      info('link init failed'); // err already displayed so not emitting again here
+      notifier.markSadFinish();
     }
   }
 

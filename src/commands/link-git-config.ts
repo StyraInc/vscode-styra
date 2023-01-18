@@ -1,13 +1,12 @@
-import { QuickPickItem } from 'vscode';
+import { MultiStepInput } from '../external/multi-step-input';
 
-import { info, infoInput, infoNewCmd, teeInfo } from '../lib/outputPane';
-import { STYRA_CLI_CMD, StyraInstall } from '../lib/styra-install';
+import { checkStartup, generatePickList, shouldResume, StepType, validateNonEmpty, validateNoop } from './utility';
+import { CommandNotifier } from '../lib/command-notifier';
 import { CommandRunner } from '../lib/command-runner';
 import { ICommand } from '../lib/types';
-import { MultiStepInput } from '../external/multi-step-input';
-import { StyraConfig } from '../lib/styra-config';
-
-import { generatePickList, shouldResume, StepType, validateNonEmpty, validateNoop } from './utility';
+import { info, infoInput } from '../lib/outputPane';
+import { QuickPickItem } from '../lib/vscode-api';
+import { STYRA_CLI_CMD } from '../lib/styra-install';
 
 interface State {
   forceGitOverwrite: QuickPickItem;
@@ -28,17 +27,12 @@ export class LinkGitConfig implements ICommand {
   maxSteps = 6;
 
   async run(): Promise<void> {
-    infoNewCmd('Link Config Git');
 
-    if (!StyraInstall.checkWorkspace()) {
+    if (!(await checkStartup())) {
       return;
     }
-    if (!(await StyraInstall.checkCliInstallation())) {
-      return;
-    }
-    if (!(await StyraConfig.checkCliConfiguration())) {
-      return;
-    }
+    const notifier = new CommandNotifier('Link Config Git');
+    notifier.markStart();
 
     const state = await this.collectInputs();
     let variantArgs = [] as string[];
@@ -66,9 +60,9 @@ export class LinkGitConfig implements ICommand {
     try {
       const result = await new CommandRunner().runShellCmd(STYRA_CLI_CMD, styraArgs, secret);
       info(result);
-      teeInfo('Link config git complete');
+      notifier.markHappyFinish();
     } catch (err) {
-      info('link config git failed'); // err already displayed so not emitting again here
+      notifier.markSadFinish();
     }
   }
 

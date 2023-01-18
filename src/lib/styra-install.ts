@@ -5,8 +5,8 @@ import { default as fetch } from 'node-fetch';
 import moveFile = require('move-file');
 import { sync as commandExistsSync } from 'command-exists';
 
-import { info, infoFromUserAction, teeError, teeInfo } from './outputPane';
 import { IDE } from './vscode-api';
+import { info, infoFromUserAction, teeError, teeInfo } from './outputPane';
 
 // export const STYRA_CLI_CMD = 'styra2'; // TODO: for testing; do not commit!
 export const STYRA_CLI_CMD = 'styra';

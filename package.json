@@ -21,16 +21,20 @@
   "contributes": {
     "commands": [
       {
-        "command": "styra.log.replay",
-        "title": "Styra: Decision Log Replay"
-      },
-      {
         "command": "styra.link.init",
         "title": "Styra Link: Initialize"
       },
       {
         "command": "styra.link.git-config",
         "title": "Styra Link: Config Git"
+      },
+      {
+        "command": "styra.link.test",
+        "title": "Styra Link: Test"
+      },
+      {
+        "command": "styra.log.replay",
+        "title": "Styra: Decision Log Replay"
       }
     ],
     "configuration": {
@@ -124,6 +128,7 @@
     "@typescript-eslint/parser": "^4.26.0",
     "babel-jest": "^29.3.1",
     "eslint": "^7.27.0",
+    "eslint-plugin-sort-imports-es6-autofix": "^0.6.0",
     "glob": "^7.1.7",
     "jest": "^29.3.1",
     "ts-jest": "^29.0.5",
