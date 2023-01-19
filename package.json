@@ -25,12 +25,16 @@
         "title": "Styra Link: Initialize"
       },
       {
-        "command": "styra.link.git-config",
+        "command": "styra.link.config-git",
         "title": "Styra Link: Config Git"
       },
       {
         "command": "styra.link.test",
         "title": "Styra Link: Test"
+      },
+      {
+        "command": "styra.link.validate-decisions",
+        "title": "Styra Link: Validate Decisions"
       },
       {
         "command": "styra.log.replay",

@@ -22,7 +22,7 @@ interface State {
 const TLS_PREFIX = 'https://';
 const SSH_PREFIX = 'git@';
 
-export class LinkGitConfig implements ICommand {
+export class LinkConfigGit implements ICommand {
   title = 'Styra Link Config Git';
   maxSteps = 6;
 
