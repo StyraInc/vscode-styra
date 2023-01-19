@@ -31,7 +31,27 @@
             "ignoreMemberSort": false,
             "memberSyntaxSortOrder": [ "none", "single", "all", "multiple" ]
             }],
-        "@typescript-eslint/naming-convention": "warn",
+        "@typescript-eslint/naming-convention": [ "warn",
+            {
+                "selector": "default",
+                "format": [ "camelCase" ],
+                "leadingUnderscore": "allow",
+                "trailingUnderscore": "allow"
+            },
+            {
+                "selector": "variable",
+                "format": [ "camelCase", "UPPER_CASE" ],
+                "leadingUnderscore": "allow",
+                "trailingUnderscore": "allow"
+            },
+            {
+                "selector": "typeLike",
+                "format": [ "PascalCase" ]
+            },
+            {
+                "selector": "enumMember",
+                "format": ["PascalCase" ]
+            }],
         "@typescript-eslint/no-unused-vars": [
             "error",
             {

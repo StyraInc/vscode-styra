@@ -1,4 +1,5 @@
 import { infoFromUserAction } from '../lib/outputPane';
+import { LocalStorageService, Workspace } from '../lib/local-storage-service';
 import { MultiStepInput } from '../external/multi-step-input';
 import { QuickPickItem } from '../lib/vscode-api';
 import { StyraConfig } from '../lib/styra-config';
@@ -13,7 +14,9 @@ export function generatePickList(items: string[]): QuickPickItem[] {
 export function shouldResume(): Promise<boolean> {
   // Could show a notification with the option to resume.
   return new Promise<boolean>((_resolve, _reject) => {
-    infoFromUserAction('ESCape key terminated command');
+
+    const cmd = LocalStorageService.instance.getValue<string>(Workspace.CmdName);
+    infoFromUserAction(`ESCape pressed: ${cmd} terminated`);
   });
 }
 
