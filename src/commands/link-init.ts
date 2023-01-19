@@ -80,6 +80,7 @@ Existing│      ┌───────────────┐            
 
   async pickNewOrExistingSystem(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
     state.systemAction = await input.showQuickPick({
+      ignoreFocusOut: true,
       title: this.title,
       step: 1,
       totalSteps: this.maxSteps,
@@ -117,6 +118,7 @@ Existing│      ┌───────────────┐            
 
   async pickSystemType(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
     state.systemType = await input.showQuickPick({
+      ignoreFocusOut: true,
       title: this.title,
       step: 3,
       totalSteps: this.maxSteps - this.stepDelta,
