@@ -73,10 +73,10 @@ export class StyraInstall {
       targetOS === 'win32'
         ? 'https://docs.styra.com/v1/docs/bin/windows/amd64/styra.exe'
         : targetOS !== 'darwin'
-        ? 'https://docs.styra.com/v1/docs/bin/linux/amd64/styra'
-        : targetArch === 'arm64'
-        ? 'https://docs.styra.com/v1/docs/bin/darwin/arm64/styra'
-        : 'https://docs.styra.com/v1/docs/bin/darwin/amd64/styra'; // otherwise target "x64"
+          ? 'https://docs.styra.com/v1/docs/bin/linux/amd64/styra'
+          : targetArch === 'arm64'
+            ? 'https://docs.styra.com/v1/docs/bin/darwin/arm64/styra'
+            : 'https://docs.styra.com/v1/docs/bin/darwin/amd64/styra'; // otherwise target "x64"
 
     await this.getBinary(url, tempFileLocation);
     info(`    Executable: ${exeFile}`);

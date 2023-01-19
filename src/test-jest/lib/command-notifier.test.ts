@@ -20,7 +20,7 @@ describe('CommandNotifier', () => {
     expect(output).toMatch(/complete/);
   });
 
-test('infoCmdFailed', () => {
+  test('infoCmdFailed', () => {
     const cmdNotifier = new CommandNotifier('my command');
     cmdNotifier.markSadFinish();
     const [output] = spyAppendLine.mock.calls[0]; // allows testing partial matches
