@@ -77,7 +77,7 @@ export class LogReplay implements ICommand {
   }
 
   async runLogReplayForSystem(systemId: string): Promise<void> {
-    console.log(`running log replay for system: ${systemId}`);
+    // console.log(`running log replay for system: ${systemId}`);
     // run the styra command with the systemId and the policy from the active vscode window
     // TODO: handle no-open-editor more gracefully.
     const policiesFile = vscode.window.activeTextEditor!.document.uri.fsPath;
@@ -96,11 +96,8 @@ export class LogReplay implements ICommand {
           '-o',
           'json',
         ];
-        console.log(
-          'the running command would be:' + STYRA_CLI_CMD + ' ' + styraArgs
-        );
         const result = JSON.parse(await runner.runShellCmd(STYRA_CLI_CMD, styraArgs));
-        console.log(result);
+        info(result);
         const samples = result.samples.length;
         const resultChanged = result.stats.results_changed;
         const entriesEvaluated = result.stats.entries_evaluated;
