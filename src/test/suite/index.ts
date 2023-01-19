@@ -2,7 +2,7 @@ import * as glob from 'glob';
 import * as Mocha from 'mocha';
 import * as path from 'path';
 
-// 2023-01-15 removed mocha and @types/mocha packages so these integration testd will no longer run.
+// 2023-01-15 removed mocha and @types/mocha packages so these integration tests will no longer run.
 // Why? Because of conflicts with jest (reference: https://stackoverflow.com/a/64202454)
 // that manifested as a series of errors in the Github check a la:
 //   Error: node_modules/@types/jest/index.d.ts(34,13): error TS2403: Subsequent variable declarations must have the same type.
@@ -39,6 +39,7 @@ export function run(): Promise<void> {
           }
         });
       } catch (err) {
+        // eslint-disable-next-line no-console
         console.error(err);
         e(err);
       }

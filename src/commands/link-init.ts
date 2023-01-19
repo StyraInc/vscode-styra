@@ -80,6 +80,7 @@ Existing│      ┌───────────────┐            
 
   async pickNewOrExistingSystem(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
     state.systemAction = await input.showQuickPick({
+      ignoreFocusOut: true,
       title: this.title,
       step: 1,
       totalSteps: this.maxSteps,
@@ -89,11 +90,7 @@ Existing│      ┌───────────────┐            
       shouldResume: shouldResume,
     });
     state.isNewSystem = state.systemAction.label === 'create new DAS system';
-
-    if (!state.isNewSystem) {
-      this.stepDelta = 1;
-    }
-
+    this.stepDelta = state.isNewSystem ? 0 : 1;
     return (input: MultiStepInput) => this.inputSystemName(input, state);
   }
 
@@ -117,6 +114,7 @@ Existing│      ┌───────────────┐            
 
   async pickSystemType(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
     state.systemType = await input.showQuickPick({
+      ignoreFocusOut: true,
       title: this.title,
       step: 3,
       totalSteps: this.maxSteps - this.stepDelta,

@@ -30,7 +30,6 @@ export class CommandRunner {
     // adapted from https://stackoverflow.com/a/58571306
     let data = '';
     for await (const chunk of proc.stdout) {
-      console.log('stdout chunk: ' + chunk);
       data += chunk;
     }
     let error = '';

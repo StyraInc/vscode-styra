@@ -3,7 +3,7 @@ import * as os from 'os';
 
 import { CommandRunner } from './command-runner';
 import { IDE } from './vscode-api';
-import { info, infoFromUserAction } from './outputPane';
+import { info, infoFromUserAction, infoInput } from './outputPane';
 import { STYRA_CLI_CMD } from './styra-install';
 
 export type ConfigData = {
@@ -42,24 +42,27 @@ export class StyraConfig {
 
     info('Styra CLI is not configured');
     const dasURL = await IDE.showInputBox({
+      ignoreFocusOut: true,
       title: 'Styra CLI Configuration (1/2)',
-      placeHolder: 'Base URL to Styra DAS Tenant',
-      // prompt: "further details can go here..."
+      placeHolder: 'https://test.YOUR-DOMAIN.com',
+      prompt: 'Enter base URL to Styra DAS Tenant',
     });
     if (!dasURL || !dasURL.trim()) {
       infoFromUserAction('Configuration cancelled due to no input');
       return false;
     }
+    infoInput('Obtain a token by going to DAS in your browser, selecting the Workspace, then: Access Control >> API Tokens >> Add API Token');
     const token = await IDE.showInputBox({
+      ignoreFocusOut: true,
+      password: true,
       title: 'Styra CLI Configuration (2/2)',
-      placeHolder: 'API token for Styra DAS Tenant',
-      // prompt: "further details can go here..."
+      prompt: 'Enter API token for Styra DAS Tenant',
     });
     if (!token || !token.trim()) {
       infoFromUserAction('Configuration cancelled due to no input');
       return false;
     }
-    info('Configuring Styra CLI...');
+    info('\nConfiguring Styra CLI...');
     try {
       await runner.runShellCmd(
         STYRA_CLI_CMD, // no output upon success
