@@ -90,11 +90,7 @@ Existing│      ┌───────────────┐            
       shouldResume: shouldResume,
     });
     state.isNewSystem = state.systemAction.label === 'create new DAS system';
-
-    if (!state.isNewSystem) {
-      this.stepDelta = 1;
-    }
-
+    this.stepDelta = state.isNewSystem ? 0 : 1;
     return (input: MultiStepInput) => this.inputSystemName(input, state);
   }
 
