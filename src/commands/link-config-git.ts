@@ -6,7 +6,6 @@ import { CommandRunner } from '../lib/command-runner';
 import { ICommand } from '../lib/types';
 import { info, infoInput } from '../lib/outputPane';
 import { QuickPickItem } from '../lib/vscode-api';
-import { STYRA_CLI_CMD } from '../lib/styra-install';
 
 interface State {
   forceGitOverwrite: QuickPickItem;
@@ -58,15 +57,14 @@ export class LinkConfigGit implements ICommand {
       '--password-stdin',
     ].concat(variantArgs);
     try {
-      const result = await new CommandRunner().runShellCmd(STYRA_CLI_CMD, styraArgs, secret);
+      const result = await new CommandRunner().runStyraCmd(styraArgs, { stdinData: secret });
       info(result);
       notifier.markHappyFinish();
-    } catch (err) {
+    } catch {
       notifier.markSadFinish();
     }
   }
 
-  // adapted from vscode-extension-samples/quickinput-sample/src/multiStepInput.ts
   async collectInputs(): Promise<State> {
     // For complex editing, just copy the lines here and paste into https://asciiflow.com/#/
     infoInput(`Here is the flow of Styra Link Config Git that you just started:
@@ -95,6 +93,8 @@ export class LinkConfigGit implements ICommand {
                      └──────────►│Key passphrase├──────┘
                                  └──────────────┘
     `);
+
+    // adapted from vscode-extension-samples/quickinput-sample/src/multiStepInput.ts
     const state = {} as Partial<State>;
     await MultiStepInput.run((input) => this.inputURL(input, state));
     return state as State;

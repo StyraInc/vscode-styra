@@ -5,7 +5,20 @@ import * as vscode from 'vscode';
 
 export type QuickPickItem = vscode.QuickPickItem
 
+type ProgressItemDetails = vscode.Progress<{
+  increment?: number;
+  message: string;
+}>;
+
 export class IDE {
+
+  static ProgressLocation = vscode.ProgressLocation;
+
+  static async withProgress<T>(
+    options: vscode.ProgressOptions,
+    task: (progress: ProgressItemDetails, token: vscode.CancellationToken) => Thenable<T>): Promise<T> {
+    return vscode.window.withProgress(options, task);
+  }
 
   static createOutputChannel(name: string): vscode.OutputChannel {
     return vscode.window.createOutputChannel(name);

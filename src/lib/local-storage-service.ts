@@ -11,12 +11,12 @@ export class LocalStorageService {
 
   private constructor() { /* */ }
 
-  private static _instance: LocalStorageService;
+  private static Instance: LocalStorageService;
   private state: Memento | undefined;
 
   public static get instance(): LocalStorageService {
 
-    return this._instance || (this._instance = new this());
+    return this.Instance || (this.Instance = new this());
   }
 
   // NB: This must be called during program startup!

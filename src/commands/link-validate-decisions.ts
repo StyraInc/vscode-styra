@@ -3,7 +3,6 @@ import { CommandNotifier } from '../lib/command-notifier';
 import { CommandRunner } from '../lib/command-runner';
 import { ICommand } from '../lib/types';
 import { info } from '../lib/outputPane';
-import { STYRA_CLI_CMD } from '../lib/styra-install';
 
 export class LinkValidateDecisions implements ICommand {
   async run(): Promise<void> {
@@ -15,10 +14,10 @@ export class LinkValidateDecisions implements ICommand {
     notifier.markStart();
 
     try {
-      const result = await new CommandRunner().runShellCmd(STYRA_CLI_CMD, ['link', 'validate', 'decisions']);
+      const result = await new CommandRunner().runStyraCmd(['link', 'validate', 'decisions']);
       info(result);
       notifier.markHappyFinish();
-    } catch (err) {
+    } catch {
       notifier.markSadFinish();
     }
   }

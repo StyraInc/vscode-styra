@@ -27,7 +27,6 @@ import { CommandNotifier } from '../lib/command-notifier';
 import { CommandRunner } from '../lib/command-runner';
 import { ICommand } from '../lib/types';
 import { info } from '../lib/outputPane';
-import { STYRA_CLI_CMD } from '../lib/styra-install';
 
 export class Link<CMD> implements ICommand {
   async run(): Promise<void> {
@@ -40,10 +39,10 @@ export class Link<CMD> implements ICommand {
 
     try {
       <CODE>...
-      const result = await new CommandRunner().runShellCmd(STYRA_CLI_CMD, ['link', <OTHER_PARAMS>...
+      const result = await new CommandRunner().runStyraCmd(['link', <OTHER_PARAMS>...])
       info(result);
       notifier.markHappyFinish();
-    } catch (err) {
+    } catch {
       notifier.markSadFinish();
     }
  

@@ -49,6 +49,11 @@
                 "format": [ "PascalCase" ]
             },
             {
+                "selector": "classProperty",
+                "modifiers": ["static"],
+                "format": [ "PascalCase" ]
+            },
+            {
                 "selector": "enumMember",
                 "format": ["PascalCase" ]
             }],
