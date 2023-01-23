@@ -4,6 +4,10 @@ All notable changes to the "vscode-styra" extension will be documented in this f
 
 ## [Unreleased]
 
+### Added
+
+- `Styra Link: Validate Decisions` initial release.
+
 ## [0.0.2-alpha]
 
 ### Added
