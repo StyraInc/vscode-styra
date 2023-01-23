@@ -171,6 +171,7 @@ export class LinkConfigGit implements ICommand {
     infoInput('The private key passphrase is required only if your private key file is passphrase protected');
     state.keyPassphrase = await input.showInputBox({
       ignoreFocusOut: true,
+      password: true,
       title: this.title,
       step: 3,
       totalSteps: this.maxSteps,
