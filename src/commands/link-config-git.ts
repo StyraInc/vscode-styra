@@ -47,8 +47,6 @@ export class LinkConfigGit implements ICommand {
       'link',
       'config',
       'git',
-      // "https://github.com/msorens/_ms-demo-compliance-repo.git", // TODO: to save typing
-      // 'git@github.com:msorens/_ms-demo-compliance-repo.git', // TODO: to save typing
       state.url,
       // '--debug', // TODO: Wire up a VSCode setting to toggle this
       `--${state.syncStyleType.label}`,
@@ -102,7 +100,7 @@ export class LinkConfigGit implements ICommand {
 
   async inputURL(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
     state.url = await input.showInputBox({
-      ignoreFocusOut: true, // TODO bug: not working!
+      ignoreFocusOut: true,
       title: this.title,
       step: 1,
       totalSteps: this.maxSteps,
@@ -159,7 +157,7 @@ export class LinkConfigGit implements ICommand {
       step: 2,
       totalSteps: this.maxSteps,
       value: state.keyFilePath ?? '',
-      placeholder: 'e.g. /Users/YOU/.ssh/id_ALGORITHM', // TODO bug: not working!
+      placeholder: 'e.g. /Users/YOU/.ssh/id_ALGORITHM',
       prompt: 'Enter SSH private key file path',
       validate: validateNonEmpty,
       shouldResume: shouldResume,

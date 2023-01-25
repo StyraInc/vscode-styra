@@ -8,7 +8,6 @@ import { sync as commandExistsSync } from 'command-exists';
 import { IDE } from './vscode-api';
 import { info, infoFromUserAction, teeError, teeInfo } from './outputPane';
 
-// export const STYRA_CLI_CMD = 'styra2'; // TODO: for testing; do not commit!
 export const STYRA_CLI_CMD = 'styra';
 
 export class StyraInstall {
@@ -80,7 +79,6 @@ export class StyraInstall {
 
     await this.getBinary(url, tempFileLocation);
     info(`    Executable: ${exeFile}`);
-    // throw new Error('dummy err'); // TODO: do not commit this!
     fs.chmodSync(tempFileLocation, '755');
     moveFile(tempFileLocation, exeFile);
   }

@@ -135,7 +135,7 @@ Existing│      ┌───────────────┐            
       totalSteps: this.maxSteps - this.stepDelta,
       value: state.folder ?? '',
       prompt: 'Where should policies be stored in the project?',
-      validate: validateNonEmpty, // TODO
+      validate: validateNonEmpty,
       shouldResume: shouldResume,
     });
   }

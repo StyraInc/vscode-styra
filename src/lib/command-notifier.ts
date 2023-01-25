@@ -20,8 +20,6 @@ export class CommandNotifier {
     info(`Running Command: ${this.name}`);
     info(`** You will see "${this.name} completed" (or "failed") when this is done.`);
     info('--------------------------------------------------------------------------');
-
-    // TODO: set a status flag here that can be checked with a "Styra Link: status" command.
   }
 
   // Conclude a command with these next two methods at appropriate points.
