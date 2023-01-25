@@ -55,7 +55,7 @@ export class LinkInit implements ICommand {
     }
   }
 
-  async collectInputs(): Promise<State> {
+  private async collectInputs(): Promise<State> {
     // For complex editing, just copy the lines here and paste into https://asciiflow.com/#/
     infoInput(`Here is the flow of Styra Link Init that you just started:
                 ┌──────────┐      ┌─────────────┐
@@ -79,7 +79,7 @@ Existing│      ┌───────────────┐            
     return state as State;
   }
 
-  async pickNewOrExistingSystem(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
+  private async pickNewOrExistingSystem(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
     state.systemAction = await input.showQuickPick({
       ignoreFocusOut: true,
       title: this.title,
@@ -95,7 +95,7 @@ Existing│      ┌───────────────┐            
     return (input: MultiStepInput) => this.inputSystemName(input, state);
   }
 
-  async inputSystemName(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
+  private async inputSystemName(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
     state.systemName = await input.showInputBox({
       ignoreFocusOut: true,
       title: this.title,
@@ -113,7 +113,7 @@ Existing│      ┌───────────────┐            
       : (input: MultiStepInput) => this.inputFolder(input, state);
   }
 
-  async pickSystemType(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
+  private async pickSystemType(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
     state.systemType = await input.showQuickPick({
       ignoreFocusOut: true,
       title: this.title,
@@ -127,7 +127,7 @@ Existing│      ┌───────────────┐            
     return (input: MultiStepInput) => this.inputFolder(input, state);
   }
 
-  async inputFolder(input: MultiStepInput, state: Partial<State>): Promise<void> {
+  private async inputFolder(input: MultiStepInput, state: Partial<State>): Promise<void> {
     state.folder = await input.showInputBox({
       ignoreFocusOut: true,
       title: this.title,
