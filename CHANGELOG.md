@@ -2,13 +2,22 @@
 
 All notable changes to the "vscode-styra" extension will be documented in this file.
 
+<!-- markdownlint-disable MD024 -->
 ## [Unreleased]
+
+## [0.0.3-alpha] - 2023-01-24
 
 ### Added
 
 - `Styra Link: Validate Decisions` initial release.
+- Long-running commands provide progress notification.
 
-## [0.0.2-alpha]
+### Fixed
+
+- Suppress display of passwords/passphrases
+- A couple input steps were not instrumented to remain open upon loss of focus.
+
+## [0.0.2-alpha] - 2023-01-18
 
 ### Added
 
