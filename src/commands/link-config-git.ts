@@ -63,7 +63,7 @@ export class LinkConfigGit implements ICommand {
     }
   }
 
-  async collectInputs(): Promise<State> {
+  private async collectInputs(): Promise<State> {
     // For complex editing, just copy the lines here and paste into https://asciiflow.com/#/
     infoInput(`Here is the flow of Styra Link Config Git that you just started:
                      ───
@@ -98,7 +98,7 @@ export class LinkConfigGit implements ICommand {
     return state as State;
   }
 
-  async inputURL(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
+  private async inputURL(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
     state.url = await input.showInputBox({
       ignoreFocusOut: true,
       title: this.title,
@@ -114,7 +114,7 @@ export class LinkConfigGit implements ICommand {
       : (input: MultiStepInput) => this.inputKeyFilePath(input, state);
   }
 
-  async inputUserName(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
+  private async inputUserName(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
     state.username = await input.showInputBox({
       ignoreFocusOut: true,
       title: this.title,
@@ -128,7 +128,7 @@ export class LinkConfigGit implements ICommand {
     return (input: MultiStepInput) => this.inputPwdOrToken(input, state);
   }
 
-  async inputPwdOrToken(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
+  private async inputPwdOrToken(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
     infoInput(`If you are using 2FA (two-factor authentication) on your Git login you must use a token rather than a password
     Reference: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
     Alternately, you can use SSH for authentication by backing up to the first input (the URL) in the input dialog
@@ -148,7 +148,7 @@ export class LinkConfigGit implements ICommand {
     return (input: MultiStepInput) => this.pickSyncStyle(input, state);
   }
 
-  async inputKeyFilePath(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
+  private async inputKeyFilePath(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
     infoInput(`The private key file path path is typically /Users/YOU/.ssh/id_ALGORITHM
     Reference: https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent`);
     state.keyFilePath = await input.showInputBox({
@@ -165,7 +165,7 @@ export class LinkConfigGit implements ICommand {
     return (input: MultiStepInput) => this.inputKeyPassphrase(input, state);
   }
 
-  async inputKeyPassphrase(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
+  private async inputKeyPassphrase(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
     infoInput('The private key passphrase is required only if your private key file is passphrase protected');
     state.keyPassphrase = await input.showInputBox({
       ignoreFocusOut: true,
@@ -181,7 +181,7 @@ export class LinkConfigGit implements ICommand {
     return (input: MultiStepInput) => this.pickSyncStyle(input, state);
   }
 
-  async pickSyncStyle(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
+  private async pickSyncStyle(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
     infoInput('In the next step you specify the target of your selection here');
     state.syncStyleType = await input.showQuickPick({
       ignoreFocusOut: true,
@@ -196,7 +196,7 @@ export class LinkConfigGit implements ICommand {
     return (input: MultiStepInput) => this.inputSyncStyleValue(input, state);
   }
 
-  async inputSyncStyleValue(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
+  private async inputSyncStyleValue(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
     const syncType = state.syncStyleType?.label;
     state.syncStyleValue = await input.showInputBox({
       ignoreFocusOut: true,
@@ -215,7 +215,7 @@ export class LinkConfigGit implements ICommand {
   }
 
   // TODO: make this a VSCode setting instead of a step
-  async pickForceOverwrite(input: MultiStepInput, state: Partial<State>): Promise<void> {
+  private async pickForceOverwrite(input: MultiStepInput, state: Partial<State>): Promise<void> {
     state.forceGitOverwrite = await input.showQuickPick({
       ignoreFocusOut: true,
       title: this.title,
@@ -228,7 +228,7 @@ export class LinkConfigGit implements ICommand {
     });
   }
 
-  async validateProtocol(url: string): Promise<string | undefined> {
+  private async validateProtocol(url: string): Promise<string | undefined> {
     return url.startsWith(TLS_PREFIX) || url.startsWith(SSH_PREFIX)
       ? undefined
       : `must start with ${TLS_PREFIX} or ${SSH_PREFIX} `;

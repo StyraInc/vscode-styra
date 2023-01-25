@@ -4,8 +4,8 @@ import { LocalStorageService, Workspace } from './local-storage-service';
 
 export class CommandNotifier {
 
-  name: string;
-  storageManager = LocalStorageService.instance;
+  private name: string;
+  private storageManager = LocalStorageService.instance;
 
   constructor(name: string) {
     this.name = name;
