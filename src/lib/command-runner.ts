@@ -22,9 +22,10 @@ export class CommandRunner {
   ];
 
   async runStyraCmd(args: string[], options?: CommandRunnerOptions): Promise<string> {
-    const cmd = LocalStorageService.instance.getValue<string>(Workspace.CmdName) ?? '';
+    const cmd = options?.progressTitle ??
+      LocalStorageService.instance.getValue<string>(Workspace.CmdName) ?? '';
     if (!cmd) {
-      throw new Error('commands must use CommandNotifier methods to manage the command life cycle');
+      throw new Error('code error: progressTitle required: use CommandNotifier or pass explicit value');
     }
     options = { ...options, progressTitle: cmd };
     return await this.runShellCmd(STYRA_CLI_CMD, args, options);
