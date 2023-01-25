@@ -1,0 +1,42 @@
+{
+  "Rego here soon": {
+    "prefix": "magic",
+    "body": [
+      "console.log.log.log('$1');",
+      "$2"
+    ],
+    "description": "MY LOG output"
+  },
+  "Ingresses: Require TLS": {
+    "//": "fields from `styra link rules search -r ingress_missing_tls -o json`",
+    "//": "body from `styra link rules use ingress_missing_tls`",
+    "prefix": "ingress_missing_tls",
+    "body": [
+      "monitor[decision] {",
+      "        data.library.v1.kubernetes.admission.network.v1.ingress_missing_tls[message]",
+      "        decision := {",
+      "                \"allowed\": false,",
+      "                \"message\": message,",
+      "        }",
+      "}",
+      "$1"
+    ],
+    "description": "Require all ingresses to have Transport Layer Security (TLS) configured."
+  },
+  "Containers: Restrict Images (Exact)": {
+    "prefix": "repository_unsafe_exact",
+    "body": [
+      "monitor[decision] {",
+      "        parameters := {\"whitelist\": {$1}}",
+      "        data.library.v1.kubernetes.admission.workload.v1.repository_unsafe_exact[message] with data.library.parameters as parameters",
+      "        decision := {",
+      "                \"allowed\": false,",
+      "                \"message\": message,",
+      "        }",
+      "}",
+      "$2"
+    ],
+    "description": "Restrict container images to images pulled from specified registries (Host) and (optionally) from specified repository image paths."
+  }
+
+}

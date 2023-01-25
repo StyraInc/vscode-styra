@@ -14,7 +14,7 @@
     "vscode": "^1.74.0"
   },
   "categories": [
-    "Other"
+    "Other", "Snippets"
   ],
   "activationEvents": [],
   "main": "./out/extension.js",
@@ -100,7 +100,11 @@
           "default": null
         }
       }
-    }
+    },
+    "snippets": [{
+      "language": "rego",
+      "path": "./snippets.json"
+    }]
   },
   "scripts": {
     "package": "vsce package --pre-release",
