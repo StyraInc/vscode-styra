@@ -3,7 +3,9 @@ import * as os from 'os';
 
 import { CommandRunner } from './command-runner';
 import { IDE } from './vscode-api';
-import { info, infoFromUserAction, infoInput, teeError } from './outputPane';
+import { info, infoInput, teeError } from './outputPane';
+import { MultiStepInput } from '../external/multi-step-input';
+import { shouldResume, StepType, validateNonEmpty } from '../commands/utility';
 
 export type ConfigData = {
   url: string;
@@ -11,6 +13,11 @@ export type ConfigData = {
 };
 
 const CONFIG_FILE_PATH = `${os.homedir}/.styra/config`;
+
+interface State {
+  token: string;
+  url: string;
+}
 
 export class StyraConfig {
 
@@ -40,31 +47,11 @@ export class StyraConfig {
     }
 
     info('Styra CLI is not configured');
-    const dasURL = await IDE.showInputBox({
-      ignoreFocusOut: true,
-      title: 'Styra CLI Configuration (1/2)',
-      placeHolder: 'https://test.YOUR-DOMAIN.com',
-      prompt: 'Enter base URL to Styra DAS Tenant',
-    });
-    if (!dasURL || !dasURL.trim()) {
-      infoFromUserAction('Configuration cancelled due to no input');
-      return false;
-    }
-    infoInput('Obtain a token by going to DAS in your browser, selecting the Workspace, then: Access Control >> API Tokens >> Add API Token');
-    const token = await IDE.showInputBox({
-      ignoreFocusOut: true,
-      password: true,
-      title: 'Styra CLI Configuration (2/2)',
-      prompt: 'Enter API token for Styra DAS Tenant',
-    });
-    if (!token || !token.trim()) {
-      infoFromUserAction('Configuration cancelled due to no input');
-      return false;
-    }
+    const state = await this.collectInputs();
     info('\nConfiguring Styra CLI...');
     try {
       await runner.runStyraCmd( // no output upon success
-        ['configure', '--url', dasURL, '--access-token', token],
+        ['configure', '--url', state.url, '--access-token', state.token],
         { progressTitle: 'Styra configuration'}
       );
       IDE.showInformationMessage('Styra CLI configured.');
@@ -80,4 +67,41 @@ export class StyraConfig {
     }
     return true;
   }
+
+  private static async collectInputs(): Promise<State> {
+    const state = {} as Partial<State>;
+    await MultiStepInput.run((input) => this.inputURL(input, state));
+    return state as State;
+  } 
+
+  private static async inputURL(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
+    state.url = await input.showInputBox({
+      ignoreFocusOut: true,
+      title: 'Styra CLI Configuration',
+      step: 1,
+      totalSteps: 2,
+      value: state.url ?? '',
+      placeholder: 'https://test.YOUR-DOMAIN.com',
+      prompt: 'Enter base URL to Styra DAS Tenant',
+      validate: validateNonEmpty,
+      shouldResume: shouldResume,
+    });
+    return (input: MultiStepInput) => this.inputToken(input, state);
+  }
+
+  private static async inputToken(input: MultiStepInput, state: Partial<State>): Promise<void> {
+    infoInput('Obtain a token by going to DAS in your browser, selecting the Workspace, then: Access Control >> API Tokens >> Add API Token');
+    state.token = await input.showInputBox({
+      ignoreFocusOut: true,
+      password: true,
+      title: 'Styra CLI Configuration',
+      step: 2,
+      totalSteps: 2,
+      value: state.token ?? '',
+      prompt: 'Enter API token for Styra DAS Tenant',
+      validate: validateNonEmpty,
+      shouldResume: shouldResume,
+    });
+  }
+ 
 }
