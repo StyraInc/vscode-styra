@@ -6,12 +6,14 @@ import { LinkConfigGit } from './commands/link-config-git';
 import { LinkInit } from './commands/link-init';
 import { LinkTest } from './commands/link-test';
 import { LinkValidateDecisions } from './commands/link-validate-decisions';
+import { LocalStorageService } from './lib/local-storage-service';
 import { LogReplay } from './commands/log-replay';
 
 // extension entry point
 export function activate(context: vscode.ExtensionContext): void {
   outputChannel.show(true);
   info('Styra extension active!');
+  LocalStorageService.instance.storage = context.workspaceState;
 
   // commands come from package.json::contribute.commands
   const styraCommands: { [key: string]: ICommand } = {
@@ -29,4 +31,5 @@ export function activate(context: vscode.ExtensionContext): void {
       })
     )
   );
+
 }

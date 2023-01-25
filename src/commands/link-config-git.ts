@@ -6,7 +6,6 @@ import { CommandRunner } from '../lib/command-runner';
 import { ICommand } from '../lib/types';
 import { info, infoInput } from '../lib/outputPane';
 import { QuickPickItem } from '../lib/vscode-api';
-import { STYRA_CLI_CMD } from '../lib/styra-install';
 
 interface State {
   forceGitOverwrite: QuickPickItem;
@@ -48,8 +47,6 @@ export class LinkConfigGit implements ICommand {
       'link',
       'config',
       'git',
-      // "https://github.com/msorens/_ms-demo-compliance-repo.git", // TODO: to save typing
-      // 'git@github.com:msorens/_ms-demo-compliance-repo.git', // TODO: to save typing
       state.url,
       // '--debug', // TODO: Wire up a VSCode setting to toggle this
       `--${state.syncStyleType.label}`,
@@ -58,15 +55,14 @@ export class LinkConfigGit implements ICommand {
       '--password-stdin',
     ].concat(variantArgs);
     try {
-      const result = await new CommandRunner().runShellCmd(STYRA_CLI_CMD, styraArgs, secret);
+      const result = await new CommandRunner().runStyraCmd(styraArgs, { stdinData: secret });
       info(result);
       notifier.markHappyFinish();
-    } catch (err) {
+    } catch {
       notifier.markSadFinish();
     }
   }
 
-  // adapted from vscode-extension-samples/quickinput-sample/src/multiStepInput.ts
   async collectInputs(): Promise<State> {
     // For complex editing, just copy the lines here and paste into https://asciiflow.com/#/
     infoInput(`Here is the flow of Styra Link Config Git that you just started:
@@ -95,6 +91,8 @@ export class LinkConfigGit implements ICommand {
                      └──────────►│Key passphrase├──────┘
                                  └──────────────┘
     `);
+
+    // adapted from vscode-extension-samples/quickinput-sample/src/multiStepInput.ts
     const state = {} as Partial<State>;
     await MultiStepInput.run((input) => this.inputURL(input, state));
     return state as State;
@@ -102,7 +100,7 @@ export class LinkConfigGit implements ICommand {
 
   async inputURL(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
     state.url = await input.showInputBox({
-      ignoreFocusOut: true, // TODO bug: not working!
+      ignoreFocusOut: true,
       title: this.title,
       step: 1,
       totalSteps: this.maxSteps,
@@ -159,7 +157,7 @@ export class LinkConfigGit implements ICommand {
       step: 2,
       totalSteps: this.maxSteps,
       value: state.keyFilePath ?? '',
-      placeholder: 'e.g. /Users/YOU/.ssh/id_ALGORITHM', // TODO bug: not working!
+      placeholder: 'e.g. /Users/YOU/.ssh/id_ALGORITHM',
       prompt: 'Enter SSH private key file path',
       validate: validateNonEmpty,
       shouldResume: shouldResume,
@@ -171,6 +169,7 @@ export class LinkConfigGit implements ICommand {
     infoInput('The private key passphrase is required only if your private key file is passphrase protected');
     state.keyPassphrase = await input.showInputBox({
       ignoreFocusOut: true,
+      password: true,
       title: this.title,
       step: 3,
       totalSteps: this.maxSteps,

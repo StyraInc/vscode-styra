@@ -13,6 +13,10 @@
     ],
     "patterns": [
         {
+            "name": "git-url",
+            "pattern": "git@github.com:[./\\w-]*"
+        },
+        {
             "name": "importJS1",
             "pattern": "^\\s*import .* from '.*'$"
         },
@@ -22,6 +26,7 @@
         }
    ],
     "ignoreRegExpList": [
+        "git-url",
         "importJS1",
         "importJS2"
     ],

@@ -6,7 +6,6 @@ import { CommandRunner } from '../lib/command-runner';
 import { ICommand } from '../lib/types';
 import { info, infoInput, teeInfo } from '../lib/outputPane';
 import { QuickPickItem } from '../lib/vscode-api';
-import { STYRA_CLI_CMD } from '../lib/styra-install';
 
 interface State {
   folder: string;
@@ -46,16 +45,16 @@ export class LinkInit implements ICommand {
       '--skip-git'
     ];
     try {
-      const result = await new CommandRunner().runShellCmd(STYRA_CLI_CMD, styraArgs);
+      const result = await new CommandRunner().runStyraCmd(styraArgs);
       info(result);
       notifier.markHappyFinish();
       info('\n*** Be sure to run "Styra Link: Config Git" next');
-    } catch (err) {
+    }
+    catch {
       notifier.markSadFinish();
     }
   }
 
-  // adapted from vscode-extension-samples/quickinput-sample/src/multiStepInput.ts
   async collectInputs(): Promise<State> {
     // For complex editing, just copy the lines here and paste into https://asciiflow.com/#/
     infoInput(`Here is the flow of Styra Link Init that you just started:
@@ -71,6 +70,8 @@ Existing│      ┌───────────────┐            
         └─────►│ Existing name ├───────────────────┘
                └───────────────┘
     `);
+
+    // adapted from vscode-extension-samples/quickinput-sample/src/multiStepInput.ts
     const state = {} as Partial<State>;
     await MultiStepInput.run((input) =>
       this.pickNewOrExistingSystem(input, state)
@@ -134,7 +135,7 @@ Existing│      ┌───────────────┐            
       totalSteps: this.maxSteps - this.stepDelta,
       value: state.folder ?? '',
       prompt: 'Where should policies be stored in the project?',
-      validate: validateNonEmpty, // TODO
+      validate: validateNonEmpty,
       shouldResume: shouldResume,
     });
   }

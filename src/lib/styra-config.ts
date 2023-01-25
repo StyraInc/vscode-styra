@@ -3,8 +3,7 @@ import * as os from 'os';
 
 import { CommandRunner } from './command-runner';
 import { IDE } from './vscode-api';
-import { info, infoFromUserAction, infoInput } from './outputPane';
-import { STYRA_CLI_CMD } from './styra-install';
+import { info, infoFromUserAction, infoInput, teeError } from './outputPane';
 
 export type ConfigData = {
   url: string;
@@ -64,15 +63,19 @@ export class StyraConfig {
     }
     info('\nConfiguring Styra CLI...');
     try {
-      await runner.runShellCmd(
-        STYRA_CLI_CMD, // no output upon success
-        ['configure', '--url', dasURL, '--access-token', token]
+      await runner.runStyraCmd( // no output upon success
+        ['configure', '--url', dasURL, '--access-token', token],
+        { progressTitle: 'Styra configuration'}
       );
       IDE.showInformationMessage('Styra CLI configured.');
       info('Configuration complete');
-    } catch (err) {
-      // invalid URL or TOKEN will trigger this
-      info('Configuration failed'); // err already displayed so not emitting again here
+    } catch ({message}) { // invalid URL or TOKEN will typically trigger this
+      if ((message as string).startsWith('code error')) {
+        teeError(message as string);
+      } else {
+        // err already displayed for runtime errors
+      }
+      info('Configuration failed');
       return false;
     }
     return true;
