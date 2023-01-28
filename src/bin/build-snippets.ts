@@ -1,6 +1,5 @@
-import jmespath = require('jmespath');
-// import fs = require('fs');
-import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
+// import jmespath = require('jmespath');
+import { runStyraCmd } from '../lib-sans-vscode/command-runner';
 
 // Why jmespath? In the node world, it is much more prevalent than jsonPath:
 // https://npmtrends.com/JSONPath-vs-jmespath
@@ -17,38 +16,40 @@ import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 //   return jmespath.search({ foo: { bar: { baz: [0, 1, 2, 3, 4] } } }, 'foo.bar.baz[2]');
 // }
 
-async function spawnChild(child: ChildProcessWithoutNullStreams) {
+type InputSnippetType = {
+  id: string;
+  title: string;
+  description: string;
+}
 
-  let data = '';
-  for await (const chunk of child.stdout) {
-    data += chunk;
-  }
-  let error = '';
-  for await (const chunk of child.stderr) {
-    error += chunk;
-  }
-  const exitCode = await new Promise((resolve, _reject) => {
-    child.on('close', resolve);
-  });
-
-  if (exitCode && !exitCode) { // TODO
-    throw new Error(`subprocess error exit ${exitCode}, ${error}`);
-  }
-  return data;
+type OutputSnippetType = {
+  body: string[];
+  prefix: string;
+  description: string;
 }
 
 async function main() {
-  const child = spawn('styra', [ 'link', 'rules', 'search', '-o', 'json' ]);
   try {
-    const data = await spawnChild(child);
+    const data = await runStyraCmd('link rules search -o json');
     const myJson = JSON.parse(data);
-    const keys = jmespath.search(myJson, 'keys(@)');
+    const snippets = await generateSnippets(Object.values(myJson).slice(0, 3) as InputSnippetType[]);
     // eslint-disable-next-line no-console
-    console.log(keys);
+    console.log(JSON.stringify(snippets, null, 4));
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error('async error:\n' + err);
   }
+}
+
+async function getTemplate(id: string): Promise<string> {
+  return await runStyraCmd(`link rules use ${id}`);
+}
+
+async function generateSnippets(inputSnippets: InputSnippetType[]): Promise<{ [key: string]: OutputSnippetType }> {
+  return inputSnippets.reduce(async (snippets, { id: prefix, title, description }) => {
+    const result = { prefix, description, body: [await getTemplate(prefix)] };
+    return { ...(await snippets), [title]: result };
+  }, Promise.resolve({}));
 }
 
 main();
