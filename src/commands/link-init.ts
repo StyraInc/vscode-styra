@@ -88,7 +88,7 @@ Existing│      ┌───────────────┐            
       placeholder: 'Create a new DAS system or connect with an existing one?',
       items: generatePickList(['create new DAS system', 'connect with existing DAS system']),
       activeItem: state.systemAction,
-      shouldResume: shouldResume,
+      shouldResume,
     });
     state.isNewSystem = state.systemAction.label === 'create new DAS system';
     this.stepDelta = state.isNewSystem ? 0 : 1;
@@ -106,7 +106,7 @@ Existing│      ┌───────────────┐            
         ? 'Choose a unique name for the DAS System'
         : 'Enter the name of an existing DAS System',
       validate: validateNonEmpty,
-      shouldResume: shouldResume,
+      shouldResume,
     });
     return state.isNewSystem
       ? (input: MultiStepInput) => this.pickSystemType(input, state)
@@ -122,7 +122,7 @@ Existing│      ┌───────────────┐            
       placeholder: 'Pick a system type',
       items: generatePickList(['kubernetes', 'envoy']),
       activeItem: state.systemType,
-      shouldResume: shouldResume,
+      shouldResume,
     });
     return (input: MultiStepInput) => this.inputFolder(input, state);
   }
@@ -136,7 +136,7 @@ Existing│      ┌───────────────┐            
       value: state.folder ?? '',
       prompt: 'Where should policies be stored in the project?',
       validate: validateNonEmpty,
-      shouldResume: shouldResume,
+      shouldResume,
     });
   }
 

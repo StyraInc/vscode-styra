@@ -84,7 +84,7 @@ export class StyraConfig {
       placeholder: 'https://test.YOUR-DOMAIN.com',
       prompt: 'Enter base URL to Styra DAS Tenant',
       validate: validateNonEmpty,
-      shouldResume: shouldResume,
+      shouldResume,
     });
     return (input: MultiStepInput) => this.inputToken(input, state);
   }
@@ -100,7 +100,7 @@ export class StyraConfig {
       value: state.token ?? '',
       prompt: 'Enter API token for Styra DAS Tenant',
       validate: validateNonEmpty,
-      shouldResume: shouldResume,
+      shouldResume,
     });
   }
  
