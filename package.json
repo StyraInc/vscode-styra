@@ -101,6 +101,26 @@
         }
       }
     },
+    "languages": [
+      {
+        "id": "rego",
+        "aliases": [
+          "Rego",
+          "rego"
+        ],
+        "extensions": [
+          ".rego"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "rego",
+        "scopeName": "source.rego",
+        "path": "./syntaxes/Rego.tmLanguage"
+      }
+    ],
     "snippets": [{
       "language": "rego",
       "path": "./snippets.json"
