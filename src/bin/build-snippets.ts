@@ -1,20 +1,21 @@
-// import jmespath = require('jmespath');
 import { runStyraCmd } from '../lib-sans-vscode/command-runner';
 
-// Why jmespath? In the node world, it is much more prevalent than jsonPath:
-// https://npmtrends.com/JSONPath-vs-jmespath
-// https://jmespath.org/tutorial.html
+// This is an offline snippet generation tool.
+//
+// Usage:
+//
+// (1) Install ts-node:
+//       npm install -g ts-node
+// (2) Configure a styra link project with a kubernetes system:
+//       cmd line: styra link init...
+//       VSCode: "Styra Link: Initialize"
+// (3) From that styra link project's root directory run this,
+//     redirecting output to overwrite the snippets.json file in this project. Example:
+//       ts-node ../vscode-styra/src/bin/build-snippets.ts > ../vscode-styra/snippets.json
+//     Note that this will take 6 minutes to run, which is fine for now since it is done offline.
 
 // Tips on running from the command line:
 // https://stackoverflow.com/questions/33535879/how-to-run-typescript-files-from-command-line
-
-// function hello() {
-//   fs.readFile('./all_snippets.json', 'utf8', function (err, data) {
-//     if (err) {throw err;} // we'll not consider error handling for now
-//     return JSON.parse(data);
-//   });
-//   return jmespath.search({ foo: { bar: { baz: [0, 1, 2, 3, 4] } } }, 'foo.bar.baz[2]');
-// }
 
 type InputSnippetType = {
   id: string;
