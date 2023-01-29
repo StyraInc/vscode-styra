@@ -29,17 +29,29 @@ import { ICommand } from '../lib/types';
 import { info } from '../lib/outputPane';
 
 export class Link<CMD> implements ICommand {
+
+  title = 'Styra Link <CMD>';
+
   async run(): Promise<void> {
 
     if (!(await checkStartup())) {
       return;
     }
-    const notifier = new CommandNotifier('Link <CMD>');
+    const notifier = new CommandNotifier(this.title);
     notifier.markStart();
 
+    /* uncomment if you need to collect input */
+    // const state = await this.collectInputs();
+
+    const styraArgs = [
+      'link',
+      // customize as needed (including `state` object if input collected)
+      <OTHER_PARAMS>. . .
+    ];
+    */
+
     try {
-      <CODE>...
-      const result = await new CommandRunner().runStyraCmd(['link', <OTHER_PARAMS>...])
+      const result = await new CommandRunner().runStyraCmd(styraArgs)
       info(result);
       notifier.markHappyFinish();
     } catch {
@@ -47,5 +59,24 @@ export class Link<CMD> implements ICommand {
     }
  
   }
+
+  /* if you need to collect input uncomment-and customize-this block:
+  private async collectInputs(): Promise<State> {
+    const state = {} as Partial<State>;
+    await MultiStepInput.run((input) => this.YOUR_FIRST_STEP_HERE(input, state));
+    return state as State;
+  } 
+
+  private async YOUR_FIRST_STEP_HERE(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
+    . . .
+  } 
+
+  . . .
+
+  private async YOUR_LAST_STEP_HERE(input: MultiStepInput, state: Partial<State>): Promise<void> {
+    . . .
+  } 
+  */
+
 }
 ```

@@ -22,6 +22,7 @@ const TLS_PREFIX = 'https://';
 const SSH_PREFIX = 'git@';
 
 export class LinkConfigGit implements ICommand {
+
   title = 'Styra Link Config Git';
   maxSteps = 6;
 
@@ -30,7 +31,7 @@ export class LinkConfigGit implements ICommand {
     if (!(await checkStartup())) {
       return;
     }
-    const notifier = new CommandNotifier('Link Config Git');
+    const notifier = new CommandNotifier(this.title);
     notifier.markStart();
 
     const state = await this.collectInputs();
@@ -65,7 +66,7 @@ export class LinkConfigGit implements ICommand {
 
   private async collectInputs(): Promise<State> {
     // For complex editing, just copy the lines here and paste into https://asciiflow.com/#/
-    infoInput(`Here is the flow of Styra Link Config Git that you just started:
+    infoInput(`Here is the flow of ${this.title} that you just started:
                      ───
                      2FA         ┌──────────┐
                      ┌──────────►│ Password ├──────────┐

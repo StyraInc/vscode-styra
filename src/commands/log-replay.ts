@@ -17,12 +17,14 @@ import { StyraConfig } from '../lib/styra-config';
 
 export class LogReplay implements ICommand {
 
+  title = 'Styra Log Replay';
+
   async run(): Promise<void> {
 
     if (!(await checkStartup())) {
       return;
     }
-    const notifier = new CommandNotifier('Log Replay');
+    const notifier = new CommandNotifier(this.title);
     notifier.markStart();
 
     const configData = await StyraConfig.read();

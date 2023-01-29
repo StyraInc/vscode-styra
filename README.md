@@ -8,6 +8,7 @@ Brings the capabilities of Styra Link into VSCode for streamlining your workflow
 * `Styra Link: Config Git` — configure Styra Link with a Git connection.
 * `Styra Link: Test` — run your unit tests using the latest authored policies.
 * `Styra Link: Validate Decisions` — replay prior decisions against your latest authored polices to see how decisions will change.
+* `Styra Link: Search` — find available library rules for the current Styra Link project.
 
 ## Requirements
 

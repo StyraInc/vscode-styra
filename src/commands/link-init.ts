@@ -27,7 +27,7 @@ export class LinkInit implements ICommand {
     if (!(await checkStartup())) {
       return;
     }
-    const notifier = new CommandNotifier('Link Init');
+    const notifier = new CommandNotifier(this.title);
     notifier.markStart();
 
     const state = await this.collectInputs();
@@ -57,7 +57,7 @@ export class LinkInit implements ICommand {
 
   private async collectInputs(): Promise<State> {
     // For complex editing, just copy the lines here and paste into https://asciiflow.com/#/
-    infoInput(`Here is the flow of Styra Link Init that you just started:
+    infoInput(`Here is the flow of ${this.title} that you just started:
                 ┌──────────┐      ┌─────────────┐
         ┌──────►│ New name ├─────►│ System type ├──┐
      New│       └──────────┘      └─────────────┘  │
