@@ -32,9 +32,10 @@ async function main() {
   try {
     const data = await runStyraCmd('link rules search -o json');
     const myJson = JSON.parse(data);
-    const snippets = await generateSnippets(Object.values(myJson).slice(0, 3) as InputSnippetType[]);
+    const snippets = await generateSnippets(Object.values(myJson) as InputSnippetType[]);
     // eslint-disable-next-line no-console
     console.log(JSON.stringify(snippets, null, 4));
+    // TODO: write to file here
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error('async error:\n' + err);
@@ -46,10 +47,17 @@ async function getTemplate(id: string): Promise<string> {
 }
 
 async function generateSnippets(inputSnippets: InputSnippetType[]): Promise<{ [key: string]: OutputSnippetType }> {
-  return inputSnippets.reduce(async (snippets, { id: prefix, title, description }) => {
+  const snippets: { [key: string]: OutputSnippetType } = {};
+  
+  // Neither reduce nor forEach will iterate the async operations serially; need the humble for loop to do it.
+  // Running them in parallel overwhelms the system and causes an eventual timeout
+  for (const { id: prefix, title, description } of inputSnippets) {
     const result = { prefix, description, body: [await getTemplate(prefix)] };
-    return { ...(await snippets), [title]: result };
-  }, Promise.resolve({}));
+    snippets[title] = result;
+    // eslint-disable-next-line no-console
+    console.error(prefix); // report progress since it takes a couple seconds per snippet
+  }
+  return snippets;
 }
 
 main();

@@ -20,7 +20,7 @@ async function getResults(child: ChildProcessWithoutNullStreams): Promise<string
   });
 
   if (exitCode) {
-    throw new Error(`subprocess error exit ${exitCode}, ${error}`);
+    throw new Error(error);
   }
   return data;
 }
