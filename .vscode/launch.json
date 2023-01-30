@@ -6,6 +6,17 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
+			"name": "Snippet Builder",
+			"program": "${workspaceFolder}/src/bin/build-snippets.ts",
+			"cwd": "${workspaceFolder}/../demo-repo",
+			"preLaunchTask": "npm: compile",
+			"request": "launch",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"type": "node"
+		},
+		{
 			"name": "Run Extension",
 			"type": "extensionHost",
 			"request": "launch",

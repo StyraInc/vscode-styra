@@ -14,7 +14,7 @@
     "vscode": "^1.74.0"
   },
   "categories": [
-    "Other"
+    "Other", "Snippets"
   ],
   "activationEvents": [],
   "main": "./out/extension.js",
@@ -100,7 +100,31 @@
           "default": null
         }
       }
-    }
+    },
+    "languages": [
+      {
+        "id": "rego",
+        "aliases": [
+          "Rego",
+          "rego"
+        ],
+        "extensions": [
+          ".rego"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "rego",
+        "scopeName": "source.rego",
+        "path": "./syntaxes/Rego.tmLanguage"
+      }
+    ],
+    "snippets": [{
+      "language": "rego",
+      "path": "./snippets.json"
+    }]
   },
   "scripts": {
     "package": "vsce package --pre-release",

@@ -9,7 +9,9 @@
         "autofix",
         "logreplay",
         "quickinput",
-        "styra"
+        "rego",
+        "styra",
+        "vsix"
     ],
     "patterns": [
         {
