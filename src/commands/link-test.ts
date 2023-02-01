@@ -5,12 +5,15 @@ import { ICommand } from '../lib/types';
 import { info } from '../lib/outputPane';
 
 export class LinkTest implements ICommand {
+
+  title = 'Styra Link Test';
+
   async run(): Promise<void> {
 
     if (!(await checkStartup())) {
       return;
     }
-    const notifier = new CommandNotifier('Link Test');
+    const notifier = new CommandNotifier(this.title);
     notifier.markStart();
 
     try {

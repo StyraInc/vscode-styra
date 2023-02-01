@@ -22,6 +22,7 @@ const TLS_PREFIX = 'https://';
 const SSH_PREFIX = 'git@';
 
 export class LinkConfigGit implements ICommand {
+
   title = 'Styra Link Config Git';
   maxSteps = 6;
 
@@ -30,7 +31,7 @@ export class LinkConfigGit implements ICommand {
     if (!(await checkStartup())) {
       return;
     }
-    const notifier = new CommandNotifier('Link Config Git');
+    const notifier = new CommandNotifier(this.title);
     notifier.markStart();
 
     const state = await this.collectInputs();
@@ -65,7 +66,7 @@ export class LinkConfigGit implements ICommand {
 
   private async collectInputs(): Promise<State> {
     // For complex editing, just copy the lines here and paste into https://asciiflow.com/#/
-    infoInput(`Here is the flow of Styra Link Config Git that you just started:
+    infoInput(`Here is the flow of ${this.title} that you just started:
                      ───
                      2FA         ┌──────────┐
                      ┌──────────►│ Password ├──────────┐
@@ -107,7 +108,7 @@ export class LinkConfigGit implements ICommand {
       value: state.url ?? '',
       prompt: 'Enter remote Git URL',
       validate: this.validateProtocol,
-      shouldResume: shouldResume,
+      shouldResume,
     });
     return state.url.startsWith(TLS_PREFIX)
       ? (input: MultiStepInput) => this.inputUserName(input, state)
@@ -123,7 +124,7 @@ export class LinkConfigGit implements ICommand {
       value: state.username ?? '',
       prompt: 'Enter Git user name',
       validate: validateNonEmpty,
-      shouldResume: shouldResume,
+      shouldResume,
     });
     return (input: MultiStepInput) => this.inputPwdOrToken(input, state);
   }
@@ -143,7 +144,7 @@ export class LinkConfigGit implements ICommand {
       value: state.pwdOrToken ?? '',
       prompt: 'Enter Git access token or password',
       validate: validateNonEmpty,
-      shouldResume: shouldResume,
+      shouldResume,
     });
     return (input: MultiStepInput) => this.pickSyncStyle(input, state);
   }
@@ -160,7 +161,7 @@ export class LinkConfigGit implements ICommand {
       placeholder: 'e.g. /Users/YOU/.ssh/id_ALGORITHM',
       prompt: 'Enter SSH private key file path',
       validate: validateNonEmpty,
-      shouldResume: shouldResume,
+      shouldResume,
     });
     return (input: MultiStepInput) => this.inputKeyPassphrase(input, state);
   }
@@ -176,7 +177,7 @@ export class LinkConfigGit implements ICommand {
       value: state.keyPassphrase ?? '',
       prompt: 'Enter SSH private key passphrase',
       validate: validateNoop,
-      shouldResume: shouldResume,
+      shouldResume,
     });
     return (input: MultiStepInput) => this.pickSyncStyle(input, state);
   }
@@ -191,7 +192,7 @@ export class LinkConfigGit implements ICommand {
       placeholder: 'How would you like to sync your policies?',
       items: generatePickList(['commit', 'branch', 'tag']),
       activeItem: state.syncStyleType,
-      shouldResume: shouldResume,
+      shouldResume,
     });
     return (input: MultiStepInput) => this.inputSyncStyleValue(input, state);
   }
@@ -209,7 +210,7 @@ export class LinkConfigGit implements ICommand {
           : syncType === 'tag' ? 'Enter Git tag'
             : 'Enter Git commit hash (or HEAD)', // syncType === 'commit'
       validate: validateNonEmpty,
-      shouldResume: shouldResume,
+      shouldResume,
     });
     return (input: MultiStepInput) => this.pickForceOverwrite(input, state);
   }
@@ -224,7 +225,7 @@ export class LinkConfigGit implements ICommand {
       placeholder: 'Would you like to force an overwrite of Git settings if they already exist?',
       items: generatePickList(['yes', 'no']),
       activeItem: state.forceGitOverwrite,
-      shouldResume: shouldResume,
+      shouldResume,
     });
   }
 

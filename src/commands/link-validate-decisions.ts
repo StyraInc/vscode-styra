@@ -5,12 +5,15 @@ import { ICommand } from '../lib/types';
 import { info } from '../lib/outputPane';
 
 export class LinkValidateDecisions implements ICommand {
+
+  title = 'Styra Link Validate Decisions';
+
   async run(): Promise<void> {
 
     if (!(await checkStartup())) {
       return;
     }
-    const notifier = new CommandNotifier('Link Validate Decisions');
+    const notifier = new CommandNotifier(this.title);
     notifier.markStart();
 
     try {
