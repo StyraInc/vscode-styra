@@ -15,7 +15,7 @@ interface State {
 
 export class LinkSearch implements ICommand {
 
-  title = 'Styra Link Search';
+  title = 'Styra Link Snippets Search';
 
   async run(): Promise<void> {
 
