@@ -4,7 +4,7 @@ import { checkStartup, generatePickList, shouldResume, StepType, validateNonEmpt
 import { CommandNotifier } from '../lib/command-notifier';
 import { CommandRunner } from '../lib/command-runner';
 import { ICommand } from '../lib/types';
-import { info, infoInput, teeInfo } from '../lib/outputPane';
+import { info, infoDiagram } from '../lib/outputPane';
 import { QuickPickItem } from '../lib/vscode-api';
 
 interface State {
@@ -19,8 +19,21 @@ interface State {
 export class LinkInit implements ICommand {
 
   title = 'Styra Link Init';
-  stepDelta = 0;
-  maxSteps = 4;
+  totalSteps = 4;
+  // For complex editing, just copy the lines here and paste into https://asciiflow.com/#/
+  flow = `
+                  ┌──────────┐         ┌─────────────┐
+          ┌──────►│ New name ├────────►│ System type ├──┐
+       New│       └──────────┘         └─────────────┘  │
+          │                                             │
+┌┐    ┌───┴────┐                                        │   ┌────────┐   ┌┐
+│┼───►│ System │                                        ├──►│ Folder ├──►├│
+└┘    └───┬────┘                                        │   └────────┘   └┘
+          │                                             │
+  Existing│      ┌───────────────┐   ┌───────────────┐  │
+          └─────►│ Existing name ├──►│ Existing type ├──┘
+                 └───────────────┘   └───────────────┘
+`;
 
   async run(): Promise<void> {
 
@@ -31,7 +44,6 @@ export class LinkInit implements ICommand {
     notifier.markStart();
 
     const state = await this.collectInputs();
-    teeInfo(`Linking to ${state.systemName}...`);
     const styraArgs = [
       'link',
       'init',
@@ -56,20 +68,7 @@ export class LinkInit implements ICommand {
   }
 
   private async collectInputs(): Promise<State> {
-    // For complex editing, just copy the lines here and paste into https://asciiflow.com/#/
-    infoInput(`Here is the flow of ${this.title} that you just started:
-                ┌──────────┐      ┌─────────────┐
-        ┌──────►│ New name ├─────►│ System type ├──┐
-     New│       └──────────┘      └─────────────┘  │
-        │                                          │
-    ┌───┴────┐                                     │   ┌────────┐
-    │ System │                                     ├──►│ Folder │
-    └───┬────┘                                     │   └────────┘
-        │                                          │
-Existing│      ┌───────────────┐                   │
-        └─────►│ Existing name ├───────────────────┘
-               └───────────────┘
-    `);
+    infoDiagram(this.title, this.flow);
 
     // adapted from vscode-extension-samples/quickinput-sample/src/multiStepInput.ts
     const state = {} as Partial<State>;
@@ -84,14 +83,13 @@ Existing│      ┌───────────────┐            
       ignoreFocusOut: true,
       title: this.title,
       step: 1,
-      totalSteps: this.maxSteps,
+      totalSteps: this.totalSteps,
       placeholder: 'Create a new DAS system or connect with an existing one?',
       items: generatePickList(['create new DAS system', 'connect with existing DAS system']),
       activeItem: state.systemAction,
       shouldResume,
     });
     state.isNewSystem = state.systemAction.label === 'create new DAS system';
-    this.stepDelta = state.isNewSystem ? 0 : 1;
     return (input: MultiStepInput) => this.inputSystemName(input, state);
   }
 
@@ -100,7 +98,7 @@ Existing│      ┌───────────────┐            
       ignoreFocusOut: true,
       title: this.title,
       step: 2,
-      totalSteps: this.maxSteps - this.stepDelta,
+      totalSteps: this.totalSteps,
       value: state.systemName || '',
       prompt: state.isNewSystem
         ? 'Choose a unique name for the DAS System'
@@ -108,9 +106,7 @@ Existing│      ┌───────────────┐            
       validate: validateNonEmpty,
       shouldResume,
     });
-    return state.isNewSystem
-      ? (input: MultiStepInput) => this.pickSystemType(input, state)
-      : (input: MultiStepInput) => this.inputFolder(input, state);
+    return (input: MultiStepInput) => this.pickSystemType(input, state);
   }
 
   private async pickSystemType(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
@@ -118,7 +114,7 @@ Existing│      ┌───────────────┐            
       ignoreFocusOut: true,
       title: this.title,
       step: 3,
-      totalSteps: this.maxSteps - this.stepDelta,
+      totalSteps: this.totalSteps,
       placeholder: 'Pick a system type',
       items: generatePickList(['kubernetes', 'envoy']),
       activeItem: state.systemType,
@@ -131,8 +127,8 @@ Existing│      ┌───────────────┐            
     state.folder = await input.showInputBox({
       ignoreFocusOut: true,
       title: this.title,
-      step: this.maxSteps - this.stepDelta,
-      totalSteps: this.maxSteps - this.stepDelta,
+      step: this.totalSteps,
+      totalSteps: this.totalSteps,
       value: state.folder ?? '',
       prompt: 'Where should policies be stored in the project?',
       validate: validateNonEmpty,
