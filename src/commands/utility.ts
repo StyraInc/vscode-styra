@@ -1,4 +1,4 @@
-import {infoFromUserAction} from '../lib/outputPane';
+import {infoFromUserAction, outputChannel} from '../lib/outputPane';
 import {LocalStorageService, Workspace} from '../lib/local-storage-service';
 import {MultiStepInput} from '../external/multi-step-input';
 import {QuickPickItem} from '../lib/vscode-api';
@@ -30,6 +30,8 @@ export async function validateNonEmpty(value: string): Promise<string | undefine
 
 // TODO: be quiet about the output on subsequent runs...?
 export async function checkStartup(): Promise<boolean> {
+
+  outputChannel.show(true);
 
   if (!StyraInstall.checkWorkspace()) {
     return false;
