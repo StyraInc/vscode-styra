@@ -17,6 +17,12 @@ export function infoInput(msg: string): void {
   info(`*** Input note: ${msg}`);
 }
 
+// Use this to introduce a multi-step dialog whenever you use one.
+export function infoDiagram(title: string, flow: string): void {
+  info('');
+  info(`Here is the flow of ${title} that you just started: ${flow}`);
+}
+
 // Use this when emitting a message directly caused by an action from the user.
 export function infoFromUserAction(msg: string): void {
   info(`[USER]: ${msg}`);
