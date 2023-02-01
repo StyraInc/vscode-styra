@@ -4,7 +4,7 @@ import { checkStartup, generatePickList, shouldResume, StepType, validateNonEmpt
 import { CommandNotifier } from '../lib/command-notifier';
 import { CommandRunner } from '../lib/command-runner';
 import { ICommand } from '../lib/types';
-import { info, infoInput } from '../lib/outputPane';
+import { info, infoDiagram, infoInput } from '../lib/outputPane';
 import { QuickPickItem } from '../lib/vscode-api';
 
 interface State {
@@ -24,7 +24,34 @@ const SSH_PREFIX = 'git@';
 export class LinkConfigGit implements ICommand {
 
   title = 'Styra Link Config Git';
-  maxSteps = 6;
+  totalSteps = 6;
+  // For complex editing, just copy the lines here and paste into https://asciiflow.com/#/
+  flow = `
+                           ───
+                           2FA         ┌──────────┐
+                           ┌──────────►│ Password ├──────────┐
+                           │           └──────────┘          │
+                      ┌────┴─────┐                           │
+         ┌───────────►│ Username │                           │
+         │            └────┬─────┘                           │          ┌────────┐
+         │                 │           ┌──────────┐          │   ┌─────►│ Commit ├──┐
+         │TLS              └──────────►│ Token    ├──────────┤   │      └────────┘  │
+         │https://         2FA         └──────────┘          │   │                  │
+         │                                                   ▼   │                  │
+┌┐    ┌──┴──┐                                            ┌───────┴──┐   ┌────────┐  │      ┌─────────────┐   ┌┐
+│┼───►│ URL │                                            │Sync Style├──►│ Branch ├──┼─────►│Git overwrite├──►├│
+└┘    └──┬──┘                                            └───────┬──┘   └────────┘  │      └─────────────┘   └┘
+         │                                                   ▲   │                  │
+         │SSL                           No passphrase        │   │                  │
+         │git@             ┌─────────────────────────────────┤   │      ┌────────┐  │
+         │                 │                                 │   └─────►│ Tag    ├──┘
+         │            ┌────┴─────────                        │          └────────┘
+         └───────────►│Key file path │                        │
+                      └────┬─────────                        │
+                           │           ┌──────────────┐      │
+                           └──────────►│Key passphrase├──────┘
+                                       └──────────────┘
+`;
 
   async run(): Promise<void> {
 
@@ -65,35 +92,7 @@ export class LinkConfigGit implements ICommand {
   }
 
   private async collectInputs(): Promise<State> {
-    // For complex editing, just copy the lines here and paste into https://asciiflow.com/#/
-    infoInput(`Here is the flow of ${this.title} that you just started:
-                     ───
-                     2FA         ┌──────────┐
-                     ┌──────────►│ Password ├──────────┐
-                     │           └──────────┘          │
-                ┌────┴─────┐                           │
-   ┌───────────►┤ Username │                           │
-   │            └────┬─────┘                           │          ┌────────┐
-   │                 │           ┌──────────┐          │   ┌─────►│ Commit ├──┐
-   │TLS              └──────────►│ Token    ├──────────┤   │      └────────┘  │
-   │https://         2FA         └──────────┘          │   │                  │
-   │                                                   ▼   │                  │
-┌──┴──┐                                            ┌───────┴──┐   ┌────────┐  │      ┌─────────────┐
-│ URL │                                            │Sync Style├──►│ Branch ├──┼─────►│Git overwrite│
-└──┬──┘                                            └───────┬──┘   └────────┘  │      └─────────────┘
-   │                                                   ▲   │                  │
-   │SSL                           No passphrase        │   │                  │
-   │git@             ┌─────────────────────────────────┤   │      ┌────────┐  │
-   │                 │                                 │   └─────►│ Tag    ├──┘
-   │            ┌────┴────────┐                        │          └────────┘
-   └───────────►┤Key file path │                        │
-                └────┬────────┘                        │
-                     │           ┌──────────────┐      │
-                     └──────────►│Key passphrase├──────┘
-                                 └──────────────┘
-    `);
-
-    // adapted from vscode-extension-samples/quickinput-sample/src/multiStepInput.ts
+    infoDiagram(this.title, this.flow);
     const state = {} as Partial<State>;
     await MultiStepInput.run((input) => this.inputURL(input, state));
     return state as State;
@@ -104,7 +103,7 @@ export class LinkConfigGit implements ICommand {
       ignoreFocusOut: true,
       title: this.title,
       step: 1,
-      totalSteps: this.maxSteps,
+      totalSteps: this.totalSteps,
       value: state.url ?? '',
       prompt: 'Enter remote Git URL',
       validate: this.validateProtocol,
@@ -120,7 +119,7 @@ export class LinkConfigGit implements ICommand {
       ignoreFocusOut: true,
       title: this.title,
       step: 2,
-      totalSteps: this.maxSteps,
+      totalSteps: this.totalSteps,
       value: state.username ?? '',
       prompt: 'Enter Git user name',
       validate: validateNonEmpty,
@@ -140,7 +139,7 @@ export class LinkConfigGit implements ICommand {
       password: true,
       title: this.title,
       step: 3,
-      totalSteps: this.maxSteps,
+      totalSteps: this.totalSteps,
       value: state.pwdOrToken ?? '',
       prompt: 'Enter Git access token or password',
       validate: validateNonEmpty,
@@ -156,7 +155,7 @@ export class LinkConfigGit implements ICommand {
       ignoreFocusOut: true,
       title: this.title,
       step: 2,
-      totalSteps: this.maxSteps,
+      totalSteps: this.totalSteps,
       value: state.keyFilePath ?? '',
       placeholder: 'e.g. /Users/YOU/.ssh/id_ALGORITHM',
       prompt: 'Enter SSH private key file path',
@@ -173,7 +172,7 @@ export class LinkConfigGit implements ICommand {
       password: true,
       title: this.title,
       step: 3,
-      totalSteps: this.maxSteps,
+      totalSteps: this.totalSteps,
       value: state.keyPassphrase ?? '',
       prompt: 'Enter SSH private key passphrase',
       validate: validateNoop,
@@ -188,7 +187,7 @@ export class LinkConfigGit implements ICommand {
       ignoreFocusOut: true,
       title: this.title,
       step: 4,
-      totalSteps: this.maxSteps,
+      totalSteps: this.totalSteps,
       placeholder: 'How would you like to sync your policies?',
       items: generatePickList(['commit', 'branch', 'tag']),
       activeItem: state.syncStyleType,
@@ -203,7 +202,7 @@ export class LinkConfigGit implements ICommand {
       ignoreFocusOut: true,
       title: this.title,
       step: 5,
-      totalSteps: this.maxSteps,
+      totalSteps: this.totalSteps,
       value: state.syncStyleValue ?? '',
       prompt:
         syncType === 'branch' ? 'Enter Git branch (e.g. main)'
@@ -221,7 +220,7 @@ export class LinkConfigGit implements ICommand {
       ignoreFocusOut: true,
       title: this.title,
       step: 6,
-      totalSteps: this.maxSteps,
+      totalSteps: this.totalSteps,
       placeholder: 'Would you like to force an overwrite of Git settings if they already exist?',
       items: generatePickList(['yes', 'no']),
       activeItem: state.forceGitOverwrite,

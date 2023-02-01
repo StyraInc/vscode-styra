@@ -2,7 +2,7 @@ import { checkStartup, generatePickList, shouldResume, StepType, validateNoop } 
 import { CommandNotifier } from '../lib/command-notifier';
 import { CommandRunner } from '../lib/command-runner';
 import { ICommand } from '../lib/types';
-import { info, infoInput } from '../lib/outputPane';
+import { info, infoDiagram } from '../lib/outputPane';
 import { MultiStepInput } from '../external/multi-step-input';
 import { QuickPickItem } from 'vscode';
 
@@ -16,6 +16,21 @@ interface State {
 export class LinkSearch implements ICommand {
 
   title = 'Styra Link Snippets Search';
+  totalSteps = 3;
+  // For complex editing, just copy the lines here and paste into https://asciiflow.com/#/
+  flow = `
+                   ┌───────────────────────┐
+           ┌──────►│ Full or Partial Title ├────┐                 Table
+     Title │       └───────────────────────┘    │               ┌───────┐
+           │                                    │               │       │
+┌┐     ┌───┴─────────┐                          │   ┌────────┐  │ JSON  ▼   ┌┐
+│┼────►│ Search Type │                          ├──►│ Format ├──┼──────────►├│
+└┘     └───┬─────────┘                          │   └────────┘  │       ▲   └┘
+           │                                    │               │ YAML  │
+        ID │       ┌───────────────────────┐    │               └───────┘
+           └──────►│ Exact snippet ID      ├────┘
+                   └───────────────────────┘
+`;
 
   async run(): Promise<void> {
 
@@ -49,21 +64,7 @@ export class LinkSearch implements ICommand {
   }
 
   private async collectInputs(): Promise<State> {
-    // For complex editing, just copy the lines here and paste into https://asciiflow.com/#/
-    infoInput(`Here is the flow of ${this.title} that you just started:
-                   ┌───────────────────────┐
-           ┌──────►│ Full or Partial Title ├────┐                 Table
-     Title │       └───────────────────────┘    │               ┌───────┐
-           │                                    │               │       │
-┌┐     ┌───┴─────────┐                          │   ┌────────┐  │ JSON  ▼    ┌┐
-││ ───►│ Search Type │                          ├──►│ Format ├──┼──────────► ││
-└┘     └───┬─────────┘                          │   └────────┘  │       ▲    └┘
-           │                                    │               │ YAML  │
-        ID │       ┌───────────────────────┐    │               └───────┘
-           └──────►│ Exact snippet ID      ├────┘
-                   └───────────────────────┘
-    `);
-
+    infoDiagram(this.title, this.flow);
     const state = {} as Partial<State>;
     await MultiStepInput.run((input) => this.pickSearchType(input, state));
     return state as State;
@@ -74,7 +75,7 @@ export class LinkSearch implements ICommand {
       ignoreFocusOut: true,
       title: this.title,
       step: 1,
-      totalSteps: 3,
+      totalSteps: this.totalSteps,
       placeholder: 'Select what to search',
       items: generatePickList(['snippet title (partials OK)', 'snippet id (exact match)']),
       activeItem: state.searchTypeRaw,
@@ -89,7 +90,7 @@ export class LinkSearch implements ICommand {
       ignoreFocusOut: true,
       title: this.title,
       step: 2,
-      totalSteps: 3,
+      totalSteps: this.totalSteps,
       value: state.searchTerm ?? '',
       prompt:  `Enter ${state.searchByTitle ? 'portion of a snippet title':'exact rule ID' } to search for`,
       validate: validateNoop,
@@ -103,7 +104,7 @@ export class LinkSearch implements ICommand {
       ignoreFocusOut: true,
       title: this.title,
       step: 3,
-      totalSteps: 3,
+      totalSteps: this.totalSteps,
       placeholder: 'Select output format',
       items: generatePickList(['table', 'JSON', 'YAML']),
       activeItem: state.format,

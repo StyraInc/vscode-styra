@@ -31,6 +31,12 @@ import { info } from '../lib/outputPane';
 export class Link<CMD> implements ICommand {
 
   title = 'Styra Link <CMD>';
+  /* if you need to collect input uncomment-and customize-this block:
+  totalSteps = <NUM>;
+  flow = `
+  CREATE DIAGRAM AT https://asciiflow.com/#/
+  `;
+  */
 
   async run(): Promise<void> {
 
@@ -62,6 +68,7 @@ export class Link<CMD> implements ICommand {
 
   /* if you need to collect input uncomment-and customize-this block:
   private async collectInputs(): Promise<State> {
+    infoDiagram(this.title, this.flow);
     const state = {} as Partial<State>;
     await MultiStepInput.run((input) => this.YOUR_FIRST_STEP_HERE(input, state));
     return state as State;
