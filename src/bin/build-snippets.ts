@@ -1,4 +1,4 @@
-import { runStyraCmd } from '../lib-sans-vscode/command-runner';
+import {runStyraCmd} from '../lib-sans-vscode/command-runner';
 
 // This is an offline snippet generation tool.
 //
@@ -49,11 +49,11 @@ async function getTemplate(id: string): Promise<string> {
 
 async function generateSnippets(inputSnippets: InputSnippetType[]): Promise<{ [key: string]: OutputSnippetType }> {
   const snippets: { [key: string]: OutputSnippetType } = {};
-  
+
   // Neither reduce nor forEach will iterate the async operations serially; need the humble for loop to do it.
   // Running them in parallel overwhelms the system and causes an eventual timeout
-  for (const { id: prefix, title, description } of inputSnippets) {
-    const result = { prefix, description, body: [await getTemplate(prefix)] };
+  for (const {id: prefix, title, description} of inputSnippets) {
+    const result = {prefix, description, body: [await getTemplate(prefix)]};
     snippets[title] = result;
     // eslint-disable-next-line no-console
     console.error(prefix); // report progress since it takes a couple seconds per snippet

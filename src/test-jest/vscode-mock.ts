@@ -23,11 +23,11 @@ jest.mock('vscode',
         executeCommand: jest.fn()
       },
       Uri: {
-        parse: jest.fn().mockImplementation(url => url)
+        parse: jest.fn().mockImplementation((url) => url)
       },
       env: {
       }
     };
   },
-  { virtual: true }
+  {virtual: true}
 );

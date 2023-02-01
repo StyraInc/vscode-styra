@@ -1,5 +1,5 @@
-import { CommandNotifier } from '../../lib/command-notifier';
-import { outputChannel } from '../../lib/outputPane';
+import {CommandNotifier} from '../../lib/command-notifier';
+import {outputChannel} from '../../lib/outputPane';
 
 describe('CommandNotifier', () => {
 

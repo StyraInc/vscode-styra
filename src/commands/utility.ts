@@ -1,14 +1,14 @@
-import { infoFromUserAction } from '../lib/outputPane';
-import { LocalStorageService, Workspace } from '../lib/local-storage-service';
-import { MultiStepInput } from '../external/multi-step-input';
-import { QuickPickItem } from '../lib/vscode-api';
-import { StyraConfig } from '../lib/styra-config';
-import { StyraInstall } from '../lib/styra-install';
+import {infoFromUserAction} from '../lib/outputPane';
+import {LocalStorageService, Workspace} from '../lib/local-storage-service';
+import {MultiStepInput} from '../external/multi-step-input';
+import {QuickPickItem} from '../lib/vscode-api';
+import {StyraConfig} from '../lib/styra-config';
+import {StyraInstall} from '../lib/styra-install';
 
 export type StepType = (input: MultiStepInput) => Promise<StepType | void>;
 
 export function generatePickList(items: string[]): QuickPickItem[] {
-  return items.map((label) => ({ label }));
+  return items.map((label) => ({label}));
 }
 
 export function shouldResume(): Promise<boolean> {

@@ -1,4 +1,4 @@
-import { info, outputChannel } from '../../lib/outputPane';
+import {info, outputChannel} from '../../lib/outputPane';
 
 describe('outputPane', () => {
 

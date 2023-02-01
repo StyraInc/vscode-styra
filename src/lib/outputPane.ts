@@ -1,4 +1,4 @@
-import { IDE } from './vscode-api';
+import {IDE} from './vscode-api';
 
 export const outputChannel = IDE.createOutputChannel('Styra');
 
@@ -42,5 +42,3 @@ export function teeError(msg: string): void {
   info(`ERROR: ${msg}`);
   IDE.showErrorMessage(msg);
 }
-
-

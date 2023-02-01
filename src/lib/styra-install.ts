@@ -1,12 +1,12 @@
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as os from 'os';
-import { default as fetch } from 'node-fetch';
+import {default as fetch} from 'node-fetch';
 import moveFile = require('move-file');
-import { sync as commandExistsSync } from 'command-exists';
+import {sync as commandExistsSync} from 'command-exists';
 
-import { IDE } from './vscode-api';
-import { info, infoFromUserAction, teeError, teeInfo } from './outputPane';
+import {IDE} from './vscode-api';
+import {info, infoFromUserAction, teeError, teeInfo} from './outputPane';
 
 export const STYRA_CLI_CMD = 'styra';
 

@@ -1,8 +1,8 @@
-import { checkStartup } from './utility';
-import { CommandNotifier } from '../lib/command-notifier';
-import { CommandRunner } from '../lib/command-runner';
-import { ICommand } from '../lib/types';
-import { info } from '../lib/outputPane';
+import {checkStartup} from './utility';
+import {CommandNotifier} from '../lib/command-notifier';
+import {CommandRunner} from '../lib/command-runner';
+import {ICommand} from '../lib/types';
+import {info} from '../lib/outputPane';
 
 export class LinkValidateDecisions implements ICommand {
 

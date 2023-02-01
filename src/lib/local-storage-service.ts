@@ -1,5 +1,4 @@
-
-import { Memento } from 'vscode';
+import {Memento} from 'vscode';
 
 export enum Workspace {
   // add values as the need arises
@@ -32,5 +31,5 @@ export class LocalStorageService {
   public setValue<T>(key: string, value: T): void {
     this.state?.update(key, value);
   }
-  
+
 }

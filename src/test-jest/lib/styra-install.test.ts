@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { IDE } from '../../lib/vscode-api';
-import { StyraInstall } from '../../lib/styra-install';
+import {IDE} from '../../lib/vscode-api';
+import {StyraInstall} from '../../lib/styra-install';
 
 import * as fs from 'fs';
 jest.mock('fs');
-import { sync as commandExistsSync } from 'command-exists';
+import {sync as commandExistsSync} from 'command-exists';
 jest.mock('command-exists');
 
 describe('StyraInstall', () => {
