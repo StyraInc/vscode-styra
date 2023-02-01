@@ -1,10 +1,10 @@
-import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
+import {ChildProcessWithoutNullStreams, spawn} from 'child_process';
 import shellEscape = require('shell-escape');
 
-import { IDE } from './vscode-api';
-import { info, teeError } from './outputPane';
-import { LocalStorageService, Workspace } from './local-storage-service';
-import { STYRA_CLI_CMD, StyraInstall } from './styra-install';
+import {IDE} from './vscode-api';
+import {info, teeError} from './outputPane';
+import {LocalStorageService, Workspace} from './local-storage-service';
+import {STYRA_CLI_CMD, StyraInstall} from './styra-install';
 
 type CommandRunnerOptions = {
   stdinData?: string;
@@ -27,7 +27,7 @@ export class CommandRunner {
     if (!cmd) {
       throw new Error('code error: progressTitle required: use CommandNotifier or pass explicit value');
     }
-    options = { ...options, progressTitle: cmd };
+    options = {...options, progressTitle: cmd};
     return await this.runShellCmd(STYRA_CLI_CMD, args, options);
   }
 
@@ -48,8 +48,8 @@ export class CommandRunner {
     info(`    project path: ${cwd}`);
     info(`    ${path} ${shellEscape(args)}`);
 
-    // https://nodejs.org/api/child_process.html#child_processspawncommand-args-options 
-    const proc = spawn(path, args, { cwd });
+    // https://nodejs.org/api/child_process.html#child_processspawncommand-args-options
+    const proc = spawn(path, args, {cwd});
     proc.stdin.write(stdinData.endsWith('\n') ? stdinData : stdinData + '\n');
     proc.stdin.end();
 
@@ -60,14 +60,14 @@ export class CommandRunner {
         cancellable: false
       }, async (progress, _token) => {
         const timeouts = this.progressMsgs.map(
-          ({ msg, seconds }) => setTimeout(() => progress.report({ message: `${msg}...` }), seconds * 1000));
+          ({msg, seconds}) => setTimeout(() => progress.report({message: `${msg}...`}), seconds * 1000));
         const result = await this.getResults(proc, path);
         timeouts.forEach((id) => clearTimeout(id));
         return result;
       });
-    } else {
-      return await this.getResults(proc, path);
     }
+    return await this.getResults(proc, path);
+
   }
 
   // adapted from https://stackoverflow.com/a/58571306

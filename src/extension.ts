@@ -1,13 +1,13 @@
 import * as vscode from 'vscode';
 
-import { ICommand } from './lib/types';
-import { info, outputChannel } from './lib/outputPane';
-import { LinkConfigGit } from './commands/link-config-git';
-import { LinkInit } from './commands/link-init';
-import { LinkSearch } from './commands/link-search';
-import { LinkTest } from './commands/link-test';
-import { LinkValidateDecisions } from './commands/link-validate-decisions';
-import { LocalStorageService } from './lib/local-storage-service';
+import {ICommand} from './lib/types';
+import {info, outputChannel} from './lib/outputPane';
+import {LinkConfigGit} from './commands/link-config-git';
+import {LinkInit} from './commands/link-init';
+import {LinkSearch} from './commands/link-search';
+import {LinkTest} from './commands/link-test';
+import {LinkValidateDecisions} from './commands/link-validate-decisions';
+import {LocalStorageService} from './lib/local-storage-service';
 
 // extension entry point
 export function activate(context: vscode.ExtensionContext): void {

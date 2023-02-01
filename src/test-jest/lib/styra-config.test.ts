@@ -2,10 +2,10 @@
 
 import * as fs from 'fs';
 jest.mock('fs');
-import { CommandRunner } from '../../lib/command-runner';
-import { MultiStepInput } from '../../external/multi-step-input';
-import { outputChannel } from '../../lib/outputPane';
-import { StyraConfig } from '../../lib/styra-config';
+import {CommandRunner} from '../../lib/command-runner';
+import {MultiStepInput} from '../../external/multi-step-input';
+import {outputChannel} from '../../lib/outputPane';
+import {StyraConfig} from '../../lib/styra-config';
 
 describe('StyraConfig', () => {
 

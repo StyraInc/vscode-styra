@@ -1,10 +1,10 @@
-import { checkStartup, generatePickList, shouldResume, StepType, validateNoop } from './utility';
-import { CommandNotifier } from '../lib/command-notifier';
-import { CommandRunner } from '../lib/command-runner';
-import { ICommand } from '../lib/types';
-import { info, infoDiagram } from '../lib/outputPane';
-import { MultiStepInput } from '../external/multi-step-input';
-import { QuickPickItem } from 'vscode';
+import {checkStartup, generatePickList, shouldResume, StepType, validateNoop} from './utility';
+import {CommandNotifier} from '../lib/command-notifier';
+import {CommandRunner} from '../lib/command-runner';
+import {ICommand} from '../lib/types';
+import {info, infoDiagram} from '../lib/outputPane';
+import {MultiStepInput} from '../external/multi-step-input';
+import {QuickPickItem} from 'vscode';
 
 interface State {
   searchTypeRaw: QuickPickItem;
@@ -53,7 +53,7 @@ export class LinkSearch implements ICommand {
       styraArgs.push('-r', state.searchTerm);
     }
     styraArgs.push('-o', state.format.label.toLowerCase());
- 
+
     try {
       const result = await new CommandRunner().runStyraCmd(styraArgs);
       info(result);
@@ -68,7 +68,7 @@ export class LinkSearch implements ICommand {
     const state = {} as Partial<State>;
     await MultiStepInput.run((input) => this.pickSearchType(input, state));
     return state as State;
-  } 
+  }
 
   private async pickSearchType(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
     state.searchTypeRaw = await input.showQuickPick({
@@ -81,10 +81,10 @@ export class LinkSearch implements ICommand {
       activeItem: state.searchTypeRaw,
       shouldResume,
     });
-    state.searchByTitle = state.searchTypeRaw.label === 'snippet title (partials OK)'; 
+    state.searchByTitle = state.searchTypeRaw.label === 'snippet title (partials OK)';
     return (input: MultiStepInput) => this.inputSearchTerm(input, state);
   }
- 
+
   private async inputSearchTerm(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
     state.searchTerm = await input.showInputBox({
       ignoreFocusOut: true,
@@ -92,7 +92,7 @@ export class LinkSearch implements ICommand {
       step: 2,
       totalSteps: this.totalSteps,
       value: state.searchTerm ?? '',
-      prompt:  `Enter ${state.searchByTitle ? 'portion of a snippet title':'exact rule ID' } to search for`,
+      prompt: `Enter ${state.searchByTitle ? 'portion of a snippet title' : 'exact rule ID'} to search for`,
       validate: validateNoop,
       shouldResume,
     });
@@ -111,5 +111,5 @@ export class LinkSearch implements ICommand {
       shouldResume,
     });
   }
- 
+
 }

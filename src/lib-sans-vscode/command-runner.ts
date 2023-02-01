@@ -1,4 +1,4 @@
-import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
+import {ChildProcessWithoutNullStreams, spawn} from 'child_process';
 
 export async function runStyraCmd(cmd: string): Promise<string> {
   const child = spawn('styra', cmd.split(/ +/));

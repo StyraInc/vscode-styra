@@ -1,11 +1,11 @@
 import * as fs from 'fs';
 import * as os from 'os';
 
-import { CommandRunner } from './command-runner';
-import { IDE } from './vscode-api';
-import { info, infoInput, teeError } from './outputPane';
-import { MultiStepInput } from '../external/multi-step-input';
-import { shouldResume, StepType, validateNonEmpty } from '../commands/utility';
+import {CommandRunner} from './command-runner';
+import {IDE} from './vscode-api';
+import {info, infoInput, teeError} from './outputPane';
+import {MultiStepInput} from '../external/multi-step-input';
+import {shouldResume, StepType, validateNonEmpty} from '../commands/utility';
 
 export type ConfigData = {
   url: string;
@@ -25,7 +25,7 @@ export class StyraConfig {
     const configData = <ConfigData>{};
     return await fs.promises.readFile(CONFIG_FILE_PATH, 'utf8').then((data) => {
       data.split(/\r?\n/).forEach((line) => {
-        const { key, value } = line.match(/(?<key>\w+):\s*(?<value>.+)/)?.groups ?? {};
+        const {key, value} = line.match(/(?<key>\w+):\s*(?<value>.+)/)?.groups ?? {};
         if (key === 'url') {
           configData.url = value;
         }
@@ -52,7 +52,7 @@ export class StyraConfig {
     try {
       await runner.runStyraCmd( // no output upon success
         ['configure', '--url', state.url, '--access-token', state.token],
-        { progressTitle: 'Styra configuration'}
+        {progressTitle: 'Styra configuration'}
       );
       IDE.showInformationMessage('Styra CLI configured.');
       info('Configuration complete');
@@ -72,7 +72,7 @@ export class StyraConfig {
     const state = {} as Partial<State>;
     await MultiStepInput.run((input) => this.inputURL(input, state));
     return state as State;
-  } 
+  }
 
   private static async inputURL(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
     state.url = await input.showInputBox({
@@ -103,5 +103,5 @@ export class StyraConfig {
       shouldResume,
     });
   }
- 
+
 }

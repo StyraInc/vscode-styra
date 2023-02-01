@@ -1,6 +1,5 @@
-import { LocalStorageService } from '../../lib/local-storage-service';
-import { Memento } from 'vscode';
-
+import {LocalStorageService} from '../../lib/local-storage-service';
+import {Memento} from 'vscode';
 
 class TestMemento implements Memento {
 
@@ -53,7 +52,7 @@ describe('LocalStorageService', () => {
     storageMgr.storage = new TestMemento();
     storageMgr.setValue('foo', 123);
     storageMgr.setValue('bar', true);
-    storageMgr.setValue('baz', { a: 1, b: 5.3});
+    storageMgr.setValue('baz', {a: 1, b: 5.3});
     expect(storageMgr.getValue('foo')).toBe(123);
     expect(storageMgr.getValue('bar')).toBe(true);
     expect(storageMgr.getValue('baz')).toStrictEqual({a: 1, b: 5.3});

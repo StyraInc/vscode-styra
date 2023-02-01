@@ -1,11 +1,11 @@
-import { MultiStepInput } from '../external/multi-step-input';
+import {MultiStepInput} from '../external/multi-step-input';
 
-import { checkStartup, generatePickList, shouldResume, StepType, validateNonEmpty, validateNoop } from './utility';
-import { CommandNotifier } from '../lib/command-notifier';
-import { CommandRunner } from '../lib/command-runner';
-import { ICommand } from '../lib/types';
-import { info, infoDiagram, infoInput } from '../lib/outputPane';
-import { QuickPickItem } from '../lib/vscode-api';
+import {checkStartup, generatePickList, shouldResume, StepType, validateNonEmpty, validateNoop} from './utility';
+import {CommandNotifier} from '../lib/command-notifier';
+import {CommandRunner} from '../lib/command-runner';
+import {ICommand} from '../lib/types';
+import {info, infoDiagram, infoInput} from '../lib/outputPane';
+import {QuickPickItem} from '../lib/vscode-api';
 
 interface State {
   forceGitOverwrite: QuickPickItem;
@@ -83,7 +83,7 @@ export class LinkConfigGit implements ICommand {
       '--password-stdin',
     ].concat(variantArgs);
     try {
-      const result = await new CommandRunner().runStyraCmd(styraArgs, { stdinData: secret });
+      const result = await new CommandRunner().runStyraCmd(styraArgs, {stdinData: secret});
       info(result);
       notifier.markHappyFinish();
     } catch {

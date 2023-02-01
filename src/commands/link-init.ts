@@ -1,11 +1,11 @@
-import { MultiStepInput } from '../external/multi-step-input';
+import {MultiStepInput} from '../external/multi-step-input';
 
-import { checkStartup, generatePickList, shouldResume, StepType, validateNonEmpty } from './utility';
-import { CommandNotifier } from '../lib/command-notifier';
-import { CommandRunner } from '../lib/command-runner';
-import { ICommand } from '../lib/types';
-import { info, infoDiagram } from '../lib/outputPane';
-import { QuickPickItem } from '../lib/vscode-api';
+import {checkStartup, generatePickList, shouldResume, StepType, validateNonEmpty} from './utility';
+import {CommandNotifier} from '../lib/command-notifier';
+import {CommandRunner} from '../lib/command-runner';
+import {ICommand} from '../lib/types';
+import {info, infoDiagram} from '../lib/outputPane';
+import {QuickPickItem} from '../lib/vscode-api';
 
 interface State {
   folder: string;
@@ -14,7 +14,6 @@ interface State {
   systemName: string;
   systemType: QuickPickItem;
 }
-
 
 export class LinkInit implements ICommand {
 
@@ -61,8 +60,7 @@ export class LinkInit implements ICommand {
       info(result);
       notifier.markHappyFinish();
       info('\n*** Be sure to run "Styra Link: Config Git" next');
-    }
-    catch {
+    } catch {
       notifier.markSadFinish();
     }
   }

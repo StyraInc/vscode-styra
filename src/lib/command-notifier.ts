@@ -1,6 +1,5 @@
-import { info, teeInfo } from './outputPane';
-import { LocalStorageService, Workspace } from './local-storage-service';
-
+import {info, teeInfo} from './outputPane';
+import {LocalStorageService, Workspace} from './local-storage-service';
 
 export class CommandNotifier {
 
