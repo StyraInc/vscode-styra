@@ -1,5 +1,30 @@
 # Developer Notes
 
+## General Notes
+
+### Unit Tests
+
+The project boilerplate provides unit tests in a vscode-hosted container of sorts (see /src/tests);
+however, those tests are not being used nor developed.
+Instead conventional unit tests are actively developed and used in CI with the Jest framework;
+this provides the additional advantage of being supported by wallabyJS, the continuous-testing runner.
+
+On the command-line, you can run Jest tests in a few ways (per scripts in package.json):
+
+- npm run test — run once and terminate; detail only failed tests.
+- npm run test:verbose — run once and terminate; detail all tests.
+- npm run test:watch — run and stay alive; rerunning when you save files.
+
+## Preparing a Release
+
+1. Add release to top of /CHANGELOG.md, following "Keep a Changelog" conventions.
+2. Add release tag to bottom of /CHANGELOG.md, to make the title a hyperlink to a version diff.
+3. Update version in package.json.
+4. Run `npm run package`.
+5. Create a new release in GitHub [Releases](https://github.com/StyraInc/vscode-styra/releases) page.
+6. Upload package (`vscode-styra-n.n.n.vsix`) to the release; once we publish to VSCode marketplace, this will change.
+7. Post notice of release in `#proj-link` channel.
+
 ## Adding a New Command
 
 | File | Action |
