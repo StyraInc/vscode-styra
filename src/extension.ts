@@ -8,7 +8,6 @@ import { LinkSearch } from './commands/link-search';
 import { LinkTest } from './commands/link-test';
 import { LinkValidateDecisions } from './commands/link-validate-decisions';
 import { LocalStorageService } from './lib/local-storage-service';
-import { LogReplay } from './commands/log-replay';
 
 // extension entry point
 export function activate(context: vscode.ExtensionContext): void {
@@ -23,7 +22,6 @@ export function activate(context: vscode.ExtensionContext): void {
     'styra.link.test': new LinkTest(),
     'styra.link.validate-decisions': new LinkValidateDecisions(),
     'styra.link.search': new LinkSearch(),
-    'styra.log.replay': new LogReplay()
   };
 
   Object.entries(styraCommands).forEach(([cmd, target]) =>

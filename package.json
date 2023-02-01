@@ -39,10 +39,6 @@
       {
         "command": "styra.link.search",
         "title": "Styra Link: Search"
-      },
-      {
-        "command": "styra.log.replay",
-        "title": "Styra: Decision Log Replay"
       }
     ],
     "configuration": {
