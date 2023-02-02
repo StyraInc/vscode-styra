@@ -125,7 +125,7 @@ export class LinkInit implements ICommand {
     state.folder = await input.showInputBox({
       ignoreFocusOut: true,
       title: this.title,
-      step: this.totalSteps,
+      step: 4,
       totalSteps: this.totalSteps,
       value: state.folder ?? '',
       prompt: 'Where should policies be stored in the project?',

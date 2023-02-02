@@ -4,7 +4,7 @@ import {checkStartup, generatePickList, shouldResume, StepType, validateNonEmpty
 import {CommandNotifier} from '../lib/command-notifier';
 import {CommandRunner} from '../lib/command-runner';
 import {ICommand} from '../lib/types';
-import {info, infoDiagram, infoInput} from '../lib/outputPane';
+import {info, infoDiagram, infoFromUserAction, infoInput} from '../lib/outputPane';
 import {QuickPickItem} from '../lib/vscode-api';
 
 interface State {
@@ -24,33 +24,34 @@ const SSH_PREFIX = 'git@';
 export class LinkConfigGit implements ICommand {
 
   title = 'Styra Link Config Git';
-  totalSteps = 6;
+  step = {total: 0, delta: 0};
+  existingGitConfigURL = ''
   // For complex editing, just copy the lines here and paste into https://asciiflow.com/#/
   flow = `
-                           ───
-                           2FA         ┌──────────┐
-                           ┌──────────►│ Password ├──────────┐
-                           │           └──────────┘          │
-                      ┌────┴─────┐                           │
-         ┌───────────►│ Username │                           │
-         │            └────┬─────┘                           │          ┌────────┐
-         │                 │           ┌──────────┐          │   ┌─────►│ Commit ├──┐
-         │TLS              └──────────►│ Token    ├──────────┤   │      └────────┘  │
-         │https://         2FA         └──────────┘          │   │                  │
-         │                                                   ▼   │                  │
-┌┐    ┌──┴──┐                                            ┌───────┴──┐   ┌────────┐  │      ┌─────────────┐   ┌┐
-│┼───►│ URL │                                            │Sync Style├──►│ Branch ├──┼─────►│Git overwrite├──►├│
-└┘    └──┬──┘                                            └───────┬──┘   └────────┘  │      └─────────────┘   └┘
-         │                                                   ▲   │                  │
-         │SSL                           No passphrase        │   │                  │
-         │git@             ┌─────────────────────────────────┤   │      ┌────────┐  │
-         │                 │                                 │   └─────►│ Tag    ├──┘
-         │            ┌────┴─────────                        │          └────────┘
-         └───────────►│Key file path │                        │
-                      └────┬─────────                        │
-                           │           ┌──────────────┐      │
-                           └──────────►│Key passphrase├──────┘
-                                       └──────────────┘
+                          Exit  ┌┐                    ───
+                    ┌──────────►├│                    2FA         ┌──────────┐
+                    │           └┘                    ┌──────────►│ Password ├──────────┐
+                    │No                               │           └──────────┘          │
+           ┌────────┴─────┐                      ┌────┴─────┐                           │
+     ┌────►│Overwrite Git?├──┐      ┌───────────►│ Username │                           │
+     │     └──────────────┘  │      │            └────┬─────┘                           │          ┌────────┐
+     │                       │      │                 │           ┌──────────┐          │   ┌─────►│ Commit ├──┐
+     │Git                Yes │      │TLS              └──────────►│ Token    ├──────────┤   │      └────────┘  │
+     │Previously             │      │https://         2FA         └──────────┘          │   │                  │
+     │Configured              │      │                                                   ▼   │                  │
+┌┐   │                       │   ┌──┴──┐                                            ┌───────┴──┐   ┌────────┐  │   ┌┐
+│┼───┤                       ├──►│ URL │                                            │Sync Style├──►│ Branch ├──┼──►├│
+└┘   │                       │   └──┬──┘                                            └───────┬──┘   └────────┘  │   └┘
+     │                       │      │                                                   ▲   │                  │
+     │No                     │      │SSL                           No passphrase        │   │                  │
+     │Previous               │      │git@             ┌─────────────────────────────────┤   │      ┌────────┐  │
+     │Configuration           │      │                 │                                 │   └─────►│ Tag    ├──┘
+     │                       │      │            ┌────┴────────┐                        │          └────────┘
+     └───────────────────────┘      └───────────►│Key file path│                         │
+                                                 └────┬────────┘                        │
+                                                      │           ┌──────────────┐      │
+                                                      └──────────►│Key passphrase├──────┘
+                                                                  └──────────────┘
 `;
 
   async run(): Promise<void> {
@@ -61,7 +62,19 @@ export class LinkConfigGit implements ICommand {
     const notifier = new CommandNotifier(this.title);
     notifier.markStart();
 
+    try {
+      this.existingGitConfigURL = await this.getExistingGitURL();
+    } catch ({message}) {
+      // testing: can arrive here by deleting the project's .styra folder before running this cmd
+      notifier.markSadFinish();
+      return;
+    }
+
     const state = await this.collectInputs();
+    if (state.forceGitOverwrite?.label === 'no') {
+      infoFromUserAction(`${this.title} terminated`);
+      return;
+    }
     let variantArgs = [] as string[];
     let secret = '';
     if (state.username) {
@@ -79,7 +92,7 @@ export class LinkConfigGit implements ICommand {
       // '--debug', // TODO: Wire up a VSCode setting to toggle this
       `--${state.syncStyleType.label}`,
       state.syncStyleValue,
-      state.forceGitOverwrite.label === 'yes' ? '--force' : '',
+      state.forceGitOverwrite?.label === 'yes' ? '--force' : '',
       '--password-stdin',
     ].concat(variantArgs);
     try {
@@ -91,19 +104,56 @@ export class LinkConfigGit implements ICommand {
     }
   }
 
+  private async getExistingGitURL() {
+    const possibleError = 'source_control is not found';
+    const result = await new CommandRunner().runStyraCmd(
+      'link config read -s system -o jsonpath {.source_control..url}'.split(' '),
+      {
+        progressTitle: '',
+        quiet: true,
+        possibleError // allow returning either an error or a git URL
+      }
+
+    );
+    return new RegExp(possibleError).test(result as string) ? '' : result;
+  }
+
   private async collectInputs(): Promise<State> {
     infoDiagram(this.title, this.flow);
     const state = {} as Partial<State>;
-    await MultiStepInput.run((input) => this.inputURL(input, state));
+    this.step = this.existingGitConfigURL ? {total: 6, delta: 0} : {total: 5, delta: -1};
+    await MultiStepInput.run((input) =>
+      this.existingGitConfigURL
+        ? this.pickForceOverwrite(input, state)
+        : this.inputURL(input, state)
+    );
     return state as State;
+  }
+
+  private async pickForceOverwrite(input: MultiStepInput, state: Partial<State>): Promise<StepType | void> {
+    infoInput(`This system appears to already be configured for git integration
+    Remote repository: ${this.existingGitConfigURL}`);
+    state.forceGitOverwrite = await input.showQuickPick({
+      ignoreFocusOut: true,
+      title: this.title,
+      step: 1,
+      totalSteps: this.step.total,
+      placeholder: 'Do you want to overwrite this configuration?',
+      items: generatePickList(['yes', 'no']),
+      activeItem: state.forceGitOverwrite,
+      shouldResume,
+    });
+    if (state.forceGitOverwrite.label === 'yes') {
+      return (input: MultiStepInput) => this.inputURL(input, state);
+    }
   }
 
   private async inputURL(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
     state.url = await input.showInputBox({
       ignoreFocusOut: true,
       title: this.title,
-      step: 1,
-      totalSteps: this.totalSteps,
+      step: 2 + this.step.delta,
+      totalSteps: this.step.total,
       value: state.url ?? '',
       prompt: 'Enter remote Git URL',
       validate: this.validateProtocol,
@@ -118,8 +168,8 @@ export class LinkConfigGit implements ICommand {
     state.username = await input.showInputBox({
       ignoreFocusOut: true,
       title: this.title,
-      step: 2,
-      totalSteps: this.totalSteps,
+      step: 3 + this.step.delta,
+      totalSteps: this.step.total,
       value: state.username ?? '',
       prompt: 'Enter Git user name',
       validate: validateNonEmpty,
@@ -138,8 +188,8 @@ export class LinkConfigGit implements ICommand {
       ignoreFocusOut: true,
       password: true,
       title: this.title,
-      step: 3,
-      totalSteps: this.totalSteps,
+      step: 4 + this.step.delta,
+      totalSteps: this.step.total,
       value: state.pwdOrToken ?? '',
       prompt: 'Enter Git access token or password',
       validate: validateNonEmpty,
@@ -154,8 +204,8 @@ export class LinkConfigGit implements ICommand {
     state.keyFilePath = await input.showInputBox({
       ignoreFocusOut: true,
       title: this.title,
-      step: 2,
-      totalSteps: this.totalSteps,
+      step: 3 + this.step.delta,
+      totalSteps: this.step.total,
       value: state.keyFilePath ?? '',
       placeholder: 'e.g. /Users/YOU/.ssh/id_ALGORITHM',
       prompt: 'Enter SSH private key file path',
@@ -171,8 +221,8 @@ export class LinkConfigGit implements ICommand {
       ignoreFocusOut: true,
       password: true,
       title: this.title,
-      step: 3,
-      totalSteps: this.totalSteps,
+      step: 4 + this.step.delta,
+      totalSteps: this.step.total,
       value: state.keyPassphrase ?? '',
       prompt: 'Enter SSH private key passphrase',
       validate: validateNoop,
@@ -186,8 +236,8 @@ export class LinkConfigGit implements ICommand {
     state.syncStyleType = await input.showQuickPick({
       ignoreFocusOut: true,
       title: this.title,
-      step: 4,
-      totalSteps: this.totalSteps,
+      step: 5 + this.step.delta,
+      totalSteps: this.step.total,
       placeholder: 'How would you like to sync your policies?',
       items: generatePickList(['commit', 'branch', 'tag']),
       activeItem: state.syncStyleType,
@@ -196,34 +246,19 @@ export class LinkConfigGit implements ICommand {
     return (input: MultiStepInput) => this.inputSyncStyleValue(input, state);
   }
 
-  private async inputSyncStyleValue(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
+  private async inputSyncStyleValue(input: MultiStepInput, state: Partial<State>): Promise<void> {
     const syncType = state.syncStyleType?.label;
     state.syncStyleValue = await input.showInputBox({
       ignoreFocusOut: true,
       title: this.title,
-      step: 5,
-      totalSteps: this.totalSteps,
+      step: 6 + this.step.delta,
+      totalSteps: this.step.total,
       value: state.syncStyleValue ?? '',
       prompt:
         syncType === 'branch' ? 'Enter Git branch (e.g. main)'
           : syncType === 'tag' ? 'Enter Git tag'
             : 'Enter Git commit hash (or HEAD)', // syncType === 'commit'
       validate: validateNonEmpty,
-      shouldResume,
-    });
-    return (input: MultiStepInput) => this.pickForceOverwrite(input, state);
-  }
-
-  // TODO: make this a VSCode setting instead of a step
-  private async pickForceOverwrite(input: MultiStepInput, state: Partial<State>): Promise<void> {
-    state.forceGitOverwrite = await input.showQuickPick({
-      ignoreFocusOut: true,
-      title: this.title,
-      step: 6,
-      totalSteps: this.totalSteps,
-      placeholder: 'Would you like to force an overwrite of Git settings if they already exist?',
-      items: generatePickList(['yes', 'no']),
-      activeItem: state.forceGitOverwrite,
       shouldResume,
     });
   }
