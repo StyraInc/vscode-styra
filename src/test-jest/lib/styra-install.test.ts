@@ -18,7 +18,7 @@ describe('StyraInstall', () => {
     expect(errorMock.mock.calls.length).toBe(0);
   });
 
-  test('checkWorkspace returns false and reports error when in a workspace', () => {
+  test('checkWorkspace returns false and reports error when NOT in a workspace', () => {
     IDE.workspaceFolders = jest.fn().mockReturnValue(undefined);
     const errorMock = jest.fn();
     IDE.showErrorMessage = errorMock;

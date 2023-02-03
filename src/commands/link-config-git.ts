@@ -38,16 +38,16 @@ export class LinkConfigGit implements ICommand {
      │                       │      │                 │           ┌──────────┐          │   ┌─────►│ Commit ├──┐
      │Git                Yes │      │TLS              └──────────►│ Token    ├──────────┤   │      └────────┘  │
      │Previously             │      │https://         2FA         └──────────┘          │   │                  │
-     │Configured              │      │                                                   ▼   │                  │
+     │Configured             │      │                                                   ▼   │                  │
 ┌┐   │                       │   ┌──┴──┐                                            ┌───────┴──┐   ┌────────┐  │   ┌┐
 │┼───┤                       ├──►│ URL │                                            │Sync Style├──►│ Branch ├──┼──►├│
 └┘   │                       │   └──┬──┘                                            └───────┬──┘   └────────┘  │   └┘
      │                       │      │                                                   ▲   │                  │
      │No                     │      │SSL                           No passphrase        │   │                  │
      │Previous               │      │git@             ┌─────────────────────────────────┤   │      ┌────────┐  │
-     │Configuration           │      │                 │                                 │   └─────►│ Tag    ├──┘
+     │Configuration          │      │                 │                                 │   └─────►│ Tag    ├──┘
      │                       │      │            ┌────┴────────┐                        │          └────────┘
-     └───────────────────────┘      └───────────►│Key file path│                         │
+     └───────────────────────┘      └───────────►│Key file path│                        │
                                                  └────┬────────┘                        │
                                                       │           ┌──────────────┐      │
                                                       └──────────►│Key passphrase├──────┘
@@ -109,12 +109,13 @@ export class LinkConfigGit implements ICommand {
     const result = await new CommandRunner().runStyraCmd(
       'link config read -s system -o jsonpath {.source_control..url}'.split(' '),
       {
-        progressTitle: '',
-        quiet: true,
+        progressTitle: '', // no progress bar
+        quiet: true, // no invocation details revealed for this "internal" command
         possibleError // allow returning either an error or a git URL
       }
 
     );
+    // returns prior git URL iff it exists (i.e. no error)
     return new RegExp(possibleError).test(result as string) ? '' : result;
   }
 
