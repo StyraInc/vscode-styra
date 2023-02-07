@@ -6,7 +6,32 @@ import * as fs from 'fs';
 jest.mock('fs');
 import {sync as commandExistsSync} from 'command-exists';
 jest.mock('command-exists');
+import {CommandRunner} from '../../lib/command-runner';
+import {DAS} from '../../lib/das-query';
+import {LocalStorageService, Workspace} from '../../lib/local-storage-service';
+import {Memento} from 'vscode';
 import {OutputPaneSpy} from '../utility';
+
+// copied from local-storage-service.test.ts; importing it fails!?!
+class TestMemento implements Memento {
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private data: { [key: string]: any } = {};
+
+  public keys(): readonly string[] {
+    return Object.keys(this.data);
+  }
+
+  public get<T>(key: string): T | undefined {
+    return this.data[key];
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public update(key: string, value: any): Thenable<void> {
+    this.data[key] = value;
+    return Promise.resolve();
+  }
+}
 
 describe('StyraInstall', () => {
 
@@ -82,7 +107,82 @@ describe('StyraInstall', () => {
     });
   });
 
+  describe('checkForUpdates', () => {
 
+    [
+      [null, 'first time executed'],
+      ['Sun Feb 05 2023', 'last time run was before today'] // any past date works here
+    ].forEach(([targetDate, description]) => {
+
+      test(`checked date is advanced to today when ${description}`, async () => {
+        DAS.runQuery = jest.fn().mockResolvedValue({cli_version: '1.2.4'});
+        CommandRunner.prototype.runShellCmd = jest.fn().mockResolvedValue('1.2.3');
+        const storageMgr = LocalStorageService.instance;
+        const storage = new TestMemento();
+        storageMgr.storage = storage;
+        storageMgr.setValue<string>(Workspace.UpdateCheckDate, targetDate as string);
+        Date.prototype.toDateString = jest.fn()
+          .mockReturnValue('Mon Feb 06 2023'); // any date different than targetDate works here
+
+        await StyraInstall.checkForUpdates();
+
+        expect(storageMgr.getValue<string>(Workspace.UpdateCheckDate)).toBe('Mon Feb 06 2023');
+      });
+    });
+
+    [
+      ['1.2.3', '1.2.4', 'installed less than available'],
+      ['1.2.3', '1.2.10', 'installed less than available, proving semantic ordering'],
+    ].forEach(([installed, available, description]) => {
+
+      test(`prompts for install when ${description}`, async () => {
+        DAS.runQuery = jest.fn().mockResolvedValue({cli_version: available});
+        CommandRunner.prototype.runShellCmd = jest.fn().mockResolvedValue(installed);
+        const installMock = jest.fn();
+        StyraInstall.promptForInstall = installMock;
+
+        await StyraInstall.checkForUpdates();
+
+        expect(installMock).toHaveBeenCalled();
+      });
+    });
+
+    [
+      ['1.2.4', '1.2.3', 'installed greater than available'],
+      ['1.2.4', '1.2.4', 'installed equals available'],
+      ['1.20.4', '1.2.5', 'installed greater than available in other-than-last-octet'],
+    ].forEach(([installed, available, description]) => {
+
+      test(`does NOT prompt for install when ${description}`, async () => {
+        DAS.runQuery = jest.fn().mockResolvedValue({cli_version: available});
+        CommandRunner.prototype.runShellCmd = jest.fn().mockResolvedValue(installed);
+        const installMock = jest.fn();
+        StyraInstall.promptForInstall = installMock;
+
+        await StyraInstall.checkForUpdates();
+
+        expect(installMock).not.toHaveBeenCalled();
+      });
+    });
+
+    [
+      {description: 'available version is invalid', installed: () => ({cli_version: '1.2.3'}), available: () => ({cli_version: '1.2.x'}), expected: /invalid version/i},
+      {description: 'installed version is invalid', installed: () => ({cli_version: '1.2.x'}), available: () => ({cli_version: '1.2.3'}), expected: /invalid version/i},
+      {description: 'available callback throws error', installed: () => ({cli_version: '1.2.3'}), available: () => Promise.reject({message: 'error bar'}), expected: /error bar/},
+      {description: 'installed callback throws error', installed: () => Promise.reject({message: 'error foo'}), available: () => ({cli_version: '1.2.3'}), expected: /error foo/},
+    ].forEach(({description, installed, available, expected}) => {
+
+      test(`does NOT prompt for install and reports error when ${description}`, async () => {
+        DAS.runQuery = jest.fn().mockImplementation(available);
+        CommandRunner.prototype.runShellCmd = jest.fn().mockImplementation(installed);
+        const installMock = jest.fn();
+        StyraInstall.promptForInstall = installMock;
+
+        await StyraInstall.checkForUpdates();
+
+        expect(installMock).not.toHaveBeenCalled();
+        expect(spy.content).toMatch(expected);
+      });
     });
   });
 });

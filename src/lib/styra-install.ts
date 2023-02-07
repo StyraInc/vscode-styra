@@ -4,9 +4,14 @@ import * as os from 'os';
 import {default as fetch} from 'node-fetch';
 import moveFile = require('move-file');
 import {sync as commandExistsSync} from 'command-exists';
+import {compare} from 'semver';
 
+import {CommandRunner} from './command-runner';
+import {DAS} from './das-query';
 import {IDE} from './vscode-api';
 import {info, infoFromUserAction, teeError, teeInfo} from './outputPane';
+import {LocalStorageService, Workspace} from './local-storage-service';
+import {VersionType} from './types';
 
 export const STYRA_CLI_CMD = 'styra';
 
@@ -36,8 +41,12 @@ export class StyraInstall {
     }
     info('Styra CLI is not installed');
 
+    return await StyraInstall.promptForInstall('is not installed');
+  }
+
+  static async promptForInstall(description: string): Promise<boolean> {
     const selection = await IDE.showInformationMessage(
-      'Styra CLI is not installed. Would you like to install it now?',
+      `Styra CLI ${description}. Would you like to install it now?`,
       'Install',
       'Cancel'
     );
@@ -55,6 +64,30 @@ export class StyraInstall {
     } else {
       infoFromUserAction('Installation cancelled');
       return false;
+    }
+  }
+
+  static async checkForUpdates(): Promise<void> {
+    const localStorage = LocalStorageService.instance;
+    const last = localStorage.getValue<string>(Workspace.UpdateCheckDate);
+    const currentDate = new Date();
+    if (!last || currentDate.getDate() !== new Date(last).getDate()) {
+
+      // Update stored date so check is done at most once per day
+      localStorage.setValue(Workspace.UpdateCheckDate, currentDate.toDateString());
+
+      try {
+        const availableVersion = await DAS.runQuery('/v1/system/version') as VersionType;
+        const installedVersion = await new CommandRunner().runStyraCmdQuietly(
+          'version -o jsonpath {.version}'.split(' '));
+
+        // Check if the installed version is lower than the latest available version
+        if (compare(availableVersion.cli_version, installedVersion) === 1) {
+          await StyraInstall.promptForInstall('has an update available');
+        }
+      } catch ({message}) {
+        teeError(message as string);
+      }
     }
   }
 

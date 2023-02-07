@@ -42,5 +42,6 @@ export async function checkStartup(): Promise<boolean> {
   if (!(await StyraConfig.checkCliConfiguration())) {
     return false;
   }
+  await StyraInstall.checkForUpdates();
   return true;
 }

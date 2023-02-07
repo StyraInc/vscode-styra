@@ -2,7 +2,8 @@ import {Memento} from 'vscode';
 
 export enum Workspace {
   // add values as the need arises
-  CmdName = 'CmdName'
+  CmdName = 'CmdName',
+  UpdateCheckDate = 'UpdateCheckDate'
 }
 
 // Adapted from https://www.chrishasz.com/blog/2020/07/28/vscode-how-to-use-local-storage-api/
