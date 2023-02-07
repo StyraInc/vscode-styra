@@ -4,13 +4,13 @@ import * as utility from '../../commands/utility';
 import {CommandRunner} from '../../lib/command-runner';
 import {LinkConfigGit} from '../../commands/link-config-git';
 import {MultiStepInput} from '../../external/multi-step-input';
-import {outputChannel} from '../../lib/outputPane';
+import {OutputPaneSpy} from '../utility';
 
 jest.mock('../../commands/utility');
 
 describe('LinkConfigGit', () => {
 
-  const spyAppendLine = jest.spyOn(outputChannel, 'appendLine');
+  const spy = new OutputPaneSpy();
 
   beforeEach(() => {
     jest.resetModules();
@@ -25,12 +25,16 @@ describe('LinkConfigGit', () => {
 
     test(`command ${description} when checkStartup returns ${succeeds}`, async () => {
       (utility.checkStartup as unknown as jest.MockInstance<any, any>).mockImplementation(() => succeeds);
-      const runnerMock = commandRunnerMock();
+      const runnerQuietMock = jest.fn().mockImplementation(() => 'git@dummyUrlHere.git');
+      CommandRunner.prototype.runStyraCmdQuietly = runnerQuietMock;
       MultiStepInput.prototype.showQuickPick = jest.fn().mockImplementation(() => ({label: 'no'}));
 
       await new LinkConfigGit().run();
 
-      expect(runnerMock.mock.calls.length).toBe(succeeds ? 1 : 0); // reached the check-git step or not
+      expect(runnerQuietMock.mock.calls.length).toBe(succeeds ? 1 : 0); // reached the check-git step or not
+      if (succeeds) {
+        expect(spy.content).toMatch(/Styra Link Config Git terminated/);
+      }
     });
   });
 
@@ -40,8 +44,8 @@ describe('LinkConfigGit', () => {
 
     await new LinkConfigGit().run();
 
-    expect(runnerMock.mock.calls.length).toBe(1); // just 1 for checking git
-    expectOutputPaneContains(/Styra Link Config Git terminated/);
+    expect(runnerMock.mock.calls.length).toBe(0);
+    expect(spy.content).toMatch(/Styra Link Config Git terminated/);
   });
 
   test('command COMPLETES when previous git config present and user chooses TO overwrite', async () => {
@@ -53,8 +57,23 @@ describe('LinkConfigGit', () => {
 
     await new LinkConfigGit().run();
 
-    expect(runnerMock.mock.calls.length).toBe(2); // 1 for checking git AND 1 for executing command
-    expectOutputPaneContains(/Styra Link Config Git completed/);
+    expect(runnerMock.mock.calls.length).toBe(1);
+    expect(spy.content).toMatch(/Styra Link Config Git completed/);
+  });
+
+  test('nominally makes one reported call to runStyraCmd and one internal call to runStyraCmdQuietly', async () => {
+    const runnerMock = jest.fn();
+    CommandRunner.prototype.runStyraCmd = runnerMock;
+    const runnerQuietMock = jest.fn().mockImplementation(() => 'yo! source_control is not found');
+    CommandRunner.prototype.runStyraCmdQuietly = runnerQuietMock;
+
+    MultiStepInput.prototype.showQuickPick = jest.fn().mockImplementation(() => ({label: 'do not care'}));
+    MultiStepInput.prototype.showInputBox = jest.fn().mockImplementation(() => 'do not care');
+
+    await new LinkConfigGit().run();
+
+    expect(runnerQuietMock.mock.calls.length).toBe(1);
+    expect(runnerMock.mock.calls.length).toBe(1);
   });
 
   [
@@ -74,7 +93,7 @@ describe('LinkConfigGit', () => {
 
       await new LinkConfigGit().run();
 
-      expect(runnerMock).nthCalledWith(2,
+      expect(runnerMock).toHaveBeenCalledWith(
         ['link', 'config', 'git', 'git@my.url.git', '--branch', 'my-branch',
           hasPreviousConfig ? '--force' : '',
           '--password-stdin', '--key-file', 'my key file path'],
@@ -98,7 +117,7 @@ describe('LinkConfigGit', () => {
 
       await new LinkConfigGit().run();
 
-      expect(runnerMock).nthCalledWith(2,
+      expect(runnerMock).toHaveBeenCalledWith(
         ['link', 'config', 'git', 'git@my.url.git', `--${syncStyle}`, syncValue, '--force', '--password-stdin', '--key-file', 'my key file path'],
         {stdinData: 'my key passphrase'});
     });
@@ -118,7 +137,7 @@ describe('LinkConfigGit', () => {
 
       await new LinkConfigGit().run();
 
-      expect(runnerMock).nthCalledWith(2,
+      expect(runnerMock).toHaveBeenCalledWith(
         ['link', 'config', 'git', url, '--branch', 'my-branch', '--force', '--password-stdin',
           useTLS ? '--username' : '--key-file',
           useTLS ? 'my-username' : 'my key file path'],
@@ -126,15 +145,13 @@ describe('LinkConfigGit', () => {
     });
   });
 
-  function expectOutputPaneContains(regexp: RegExp) {
-    const output = spyAppendLine.mock.calls.join(',');
-    expect(output).toMatch(regexp);
-  }
-
   const commandRunnerMock = (hasPreviousConfig = true) => {
     // responds to query to fetch existing git url, if any
-    const runnerMock = jest.fn().mockImplementation(
+    const runnerQuietMock = jest.fn().mockImplementation(
       () => hasPreviousConfig ? 'git@dummyUrlHere.git' : 'yo! source_control is not found');
+    CommandRunner.prototype.runStyraCmdQuietly = runnerQuietMock;
+    // responds to primary styra link command
+    const runnerMock = jest.fn();
     CommandRunner.prototype.runStyraCmd = runnerMock;
     return runnerMock;
   };

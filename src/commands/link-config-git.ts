@@ -105,15 +105,11 @@ export class LinkConfigGit implements ICommand {
   }
 
   private async getExistingGitURL() {
+    // allow returning either an error or a git URL for this command
     const possibleError = 'source_control is not found';
-    const result = await new CommandRunner().runStyraCmd(
+    const result = await new CommandRunner().runStyraCmdQuietly(
       'link config read -s system -o jsonpath {.source_control..url}'.split(' '),
-      {
-        progressTitle: '', // no progress bar
-        quiet: true, // no invocation details revealed for this "internal" command
-        possibleError // allow returning either an error or a git URL
-      }
-
+      possibleError
     );
     // returns prior git URL iff it exists (i.e. no error)
     return new RegExp(possibleError).test(result as string) ? '' : result;
