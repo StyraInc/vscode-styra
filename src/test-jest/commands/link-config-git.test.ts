@@ -15,7 +15,7 @@ describe('LinkConfigGit', () => {
   beforeEach(() => {
     jest.resetModules();
     // almost all tests want checkStartup to succeed
-    (utility.checkStartup as unknown as jest.MockInstance<any, any>).mockImplementation(() => true);
+    (utility.checkStartup as unknown as jest.MockInstance<any, any>).mockResolvedValue(true);
   });
 
   [
@@ -24,10 +24,10 @@ describe('LinkConfigGit', () => {
   ].forEach(([succeeds, description]) => {
 
     test(`command ${description} when checkStartup returns ${succeeds}`, async () => {
-      (utility.checkStartup as unknown as jest.MockInstance<any, any>).mockImplementation(() => succeeds);
-      const runnerQuietMock = jest.fn().mockImplementation(() => 'git@dummyUrlHere.git');
+      (utility.checkStartup as unknown as jest.MockInstance<any, any>).mockResolvedValue(succeeds);
+      const runnerQuietMock = jest.fn().mockResolvedValue('git@dummyUrlHere.git');
       CommandRunner.prototype.runStyraCmdQuietly = runnerQuietMock;
-      MultiStepInput.prototype.showQuickPick = jest.fn().mockImplementation(() => ({label: 'no'}));
+      MultiStepInput.prototype.showQuickPick = jest.fn().mockResolvedValue(({label: 'no'}));
 
       await new LinkConfigGit().run();
 
@@ -40,7 +40,7 @@ describe('LinkConfigGit', () => {
 
   test('command TERMINATES when previous git config present and user chooses NOT to overwrite', async () => {
     const runnerMock = commandRunnerMock();
-    MultiStepInput.prototype.showQuickPick = jest.fn().mockImplementation(() => ({label: 'no'}));
+    MultiStepInput.prototype.showQuickPick = jest.fn().mockResolvedValue({label: 'no'});
 
     await new LinkConfigGit().run();
 
@@ -51,9 +51,9 @@ describe('LinkConfigGit', () => {
   test('command COMPLETES when previous git config present and user chooses TO overwrite', async () => {
     const runnerMock = commandRunnerMock();
     MultiStepInput.prototype.showQuickPick = jest.fn()
-      .mockImplementationOnce(() => ({label: 'yes'})) // prompt on overwriting
-      .mockImplementation(() => ({label: 'do not care'})); // any further prompts
-    MultiStepInput.prototype.showInputBox = jest.fn().mockImplementation(() => 'do not care');
+      .mockResolvedValueOnce({label: 'yes'}) // prompt on overwriting
+      .mockResolvedValue({label: 'do not care'}); // any further prompts
+    MultiStepInput.prototype.showInputBox = jest.fn().mockResolvedValue('do not care');
 
     await new LinkConfigGit().run();
 
@@ -64,11 +64,11 @@ describe('LinkConfigGit', () => {
   test('nominally makes one reported call to runStyraCmd and one internal call to runStyraCmdQuietly', async () => {
     const runnerMock = jest.fn();
     CommandRunner.prototype.runStyraCmd = runnerMock;
-    const runnerQuietMock = jest.fn().mockImplementation(() => 'yo! source_control is not found');
+    const runnerQuietMock = jest.fn().mockResolvedValue('yo! source_control is not found');
     CommandRunner.prototype.runStyraCmdQuietly = runnerQuietMock;
 
-    MultiStepInput.prototype.showQuickPick = jest.fn().mockImplementation(() => ({label: 'do not care'}));
-    MultiStepInput.prototype.showInputBox = jest.fn().mockImplementation(() => 'do not care');
+    MultiStepInput.prototype.showQuickPick = jest.fn().mockResolvedValue({label: 'do not care'});
+    MultiStepInput.prototype.showInputBox = jest.fn().mockResolvedValue('do not care');
 
     await new LinkConfigGit().run();
 
@@ -85,11 +85,11 @@ describe('LinkConfigGit', () => {
       const runnerMock = commandRunnerMock(hasPreviousConfig as boolean);
       MultiStepInput.prototype.showQuickPick = hasPreviousConfig ?
       // with previous git config, there is an additional question about overwrite to answer
-        jest.fn().mockImplementationOnce(() => ({label: 'yes'}))
-          .mockImplementationOnce(() => ({label: 'branch'}))
-        : jest.fn().mockImplementationOnce(() => ({label: 'branch'}));
+        jest.fn().mockResolvedValueOnce({label: 'yes'})
+          .mockResolvedValueOnce({label: 'branch'})
+        : jest.fn().mockResolvedValueOnce({label: 'branch'});
       MultiStepInput.prototype.showInputBox = jest.fn()
-      .mockImplementation(inputBoxMock(false));
+        .mockImplementation(inputBoxMock(false));
 
       await new LinkConfigGit().run();
 
@@ -110,8 +110,8 @@ describe('LinkConfigGit', () => {
     test(`correct prompt is used for ${syncStyle.toUpperCase()} sync style`, async () => {
       const runnerMock = commandRunnerMock();
       MultiStepInput.prototype.showQuickPick = jest.fn()
-      .mockImplementationOnce(() => ({label: 'yes'}))
-      .mockImplementationOnce(() => ({label: syncStyle}));
+      .mockResolvedValueOnce({label: 'yes'})
+      .mockResolvedValueOnce({label: syncStyle});
       MultiStepInput.prototype.showInputBox = jest.fn()
       .mockImplementation(inputBoxMock(false));
 
@@ -147,8 +147,8 @@ describe('LinkConfigGit', () => {
 
   const commandRunnerMock = (hasPreviousConfig = true) => {
     // responds to query to fetch existing git url, if any
-    const runnerQuietMock = jest.fn().mockImplementation(
-      () => hasPreviousConfig ? 'git@dummyUrlHere.git' : 'yo! source_control is not found');
+    const runnerQuietMock = jest.fn().mockResolvedValue(
+      hasPreviousConfig ? 'git@dummyUrlHere.git' : 'yo! source_control is not found');
     CommandRunner.prototype.runStyraCmdQuietly = runnerQuietMock;
     // responds to primary styra link command
     const runnerMock = jest.fn();
