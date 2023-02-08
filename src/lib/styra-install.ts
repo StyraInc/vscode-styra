@@ -52,7 +52,7 @@ export class StyraInstall {
     );
 
     if (selection === 'Install') {
-      teeInfo('Installing Styra CLI. This may take a few minutes...');
+      info('Installing Styra CLI. This may take a few minutes...');
       try {
         await this.installStyra();
         teeInfo(`CLI ${operation} completed.`);
@@ -112,10 +112,16 @@ export class StyraInstall {
             ? 'https://docs.styra.com/v1/docs/bin/darwin/arm64/styra'
             : 'https://docs.styra.com/v1/docs/bin/darwin/amd64/styra'; // otherwise target "x64"
 
-    await this.getBinary(url, tempFileLocation);
-    info(`    Executable: ${exeFile}`);
-    fs.chmodSync(tempFileLocation, '755');
-    moveFile(tempFileLocation, exeFile);
+    return await IDE.withProgress({
+      location: IDE.ProgressLocation.Notification,
+      title: 'Installing Styra CLI',
+      cancellable: false
+    }, async () => {
+      await this.getBinary(url, tempFileLocation);
+      info(`    Executable: ${exeFile}`);
+      fs.chmodSync(tempFileLocation, '755');
+      moveFile(tempFileLocation, exeFile);
+    });
   }
 
   private static async getBinary(url: string, tempFileLocation: string): Promise<void> {
