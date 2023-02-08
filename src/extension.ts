@@ -1,14 +1,13 @@
 import * as vscode from 'vscode';
 
 import {ICommand} from './lib/types';
-import {IDE} from './lib/vscode-api';
 import {info, outputChannel} from './lib/outputPane';
 import {LinkConfigGit} from './commands/link-config-git';
 import {LinkInit} from './commands/link-init';
 import {LinkSearch} from './commands/link-search';
 import {LinkTest} from './commands/link-test';
 import {LinkValidateDecisions} from './commands/link-validate-decisions';
-import {LocalStorageService, Workspace} from './lib/local-storage-service';
+import {LocalStorageService} from './lib/local-storage-service';
 
 // reference: https://github.com/bwateratmsft/memento-explorer
 interface IMementoExplorerExtension {
@@ -22,12 +21,7 @@ interface IMementoExplorerExtension {
 export function activate(context: vscode.ExtensionContext): IMementoExplorerExtension {
   outputChannel.show(true);
   info('Styra extension active!');
-  const localStorage = LocalStorageService.instance;
-  localStorage.storage = context.workspaceState;
-  if (IDE.getConfigValue('styra.internal', 'clearLocalStorage')) {
-    localStorage.setValue(Workspace.UpdateCheckDate, undefined);
-    localStorage.setValue(Workspace.CmdName, undefined);
-  }
+  LocalStorageService.instance.storage = context.workspaceState;
 
   // commands come from package.json::contribute.commands
   const styraCommands: { [key: string]: ICommand } = {

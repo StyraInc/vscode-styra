@@ -58,14 +58,8 @@
           "title": "Check Update Interval",
           "description": "How often to check for updates to the Styra CLI (in days)",
           "default": 1
-        },
-        "styra.internal.clearLocalStorage": {
-          "type": "boolean",
-          "title": "Clear Local Storage",
-          "description": "Clears local storage at startup (for troubleshooting only)",
-          "defaultValue": false
         }
-      }
+     }
     },
     "languages": [
       {
