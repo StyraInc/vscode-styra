@@ -28,7 +28,7 @@ export class StyraInstall {
   }
 
   static isInstalled(): boolean {
-    const styraPath = IDE.getConfigValue('styra', 'path');
+    const styraPath = IDE.getConfigValue<string>('styra', 'path');
     const existsOnPath = commandExistsSync(STYRA_CLI_CMD);
     const existsInUserSettings =
       styraPath !== undefined && styraPath !== null && fs.existsSync(styraPath);
@@ -71,10 +71,12 @@ export class StyraInstall {
   static async checkForUpdates(): Promise<void> {
     const localStorage = LocalStorageService.instance;
     const last = localStorage.getValue<string>(Workspace.UpdateCheckDate);
-    const currentDate = new Date();
-    if (!last || currentDate.getDate() !== new Date(last).getDate()) {
+    const interval = IDE.getConfigValue<number>('styra', 'checkUpdateInterval') ?? 1;
+    const currentDate = new Date(Date.now());
 
-      // Update stored date so check is done at most once per day
+    // run check periodically based on user preference in VSCode settings
+    if (!last || (currentDate.getDate() - new Date(last).getDate() >= interval)) {
+
       localStorage.setValue(Workspace.UpdateCheckDate, currentDate.toDateString());
 
       try {
@@ -82,9 +84,9 @@ export class StyraInstall {
         const installedVersion = await new CommandRunner().runStyraCmdQuietly(
           'version -o jsonpath {.version}'.split(' '));
 
-        // Check if the installed version is lower than the latest available version
         if (compare(available.cliVersion, installedVersion) === 1) {
-          await StyraInstall.promptForInstall(`has an update available (installed=${installedVersion}, available=${available.cliVersion})`, 'update');
+          await StyraInstall.promptForInstall(
+            `has an update available (installed=${installedVersion}, available=${available.cliVersion})`, 'update');
         }
       } catch ({message}) {
         teeError(message as string);

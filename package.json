@@ -51,6 +51,14 @@
           "description": "Path to the Styra CLI executable",
           "default": null
         },
+         "styra.checkUpdateInterval": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 30,
+          "title": "Check Update Interval",
+          "description": "How often to check for updates to the Styra CLI (in days)",
+          "default": 1
+        },
         "styra.internal.clearLocalStorage": {
           "type": "boolean",
           "title": "Clear Local Storage",

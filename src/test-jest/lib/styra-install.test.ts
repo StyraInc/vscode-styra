@@ -144,6 +144,38 @@ describe('StyraInstall', () => {
     });
 
     [
+      ['with a 0-day interval, DOES check update on same day', 0, true, 'Sun Feb 05 2023', 'Sun Feb 05 2023'],
+      ['with a 1-day interval, does NOT check update on same day', 1, false, 'Sun Feb 05 2023', 'Sun Feb 05 2023'],
+      ['with a 1-day interval, DOES check update next day', 1, true, 'Sun Feb 05 2023', 'Mon Feb 06 2023'],
+      ['with a 1-day interval, DOES check update next week', 1, true, 'Sun Feb 05 2023', 'Sun Feb 12 2023'],
+      ['with a 5-day interval, does NOT check update next day', 5, false, 'Sun Feb 05 2023', 'Mon Feb 06 2023'],
+      ['with a 5-day interval, does NOT check update after 4 days', 5, false, 'Sun Feb 05 2023', 'Thu Feb 09 2023'],
+      ['with a 5-day interval, DOES check update after 5 days', 5, true, 'Sun Feb 05 2023', 'Fri Feb 10 2023'],
+    ].forEach(([description, interval, wasCalled, lastCheckedDate, currentDate]) => {
+      test(description as string, async () => {
+        const runQueryMock = jest.fn().mockResolvedValue({cliVersion: '1.2.4'});
+        DAS.runQuery = runQueryMock;
+        CommandRunner.prototype.runShellCmd = jest.fn().mockResolvedValue('1.2.3');
+        const storageMgr = LocalStorageService.instance;
+        const storage = new TestMemento();
+        storageMgr.storage = storage;
+        storageMgr.setValue<string>(Workspace.UpdateCheckDate, lastCheckedDate as string);
+        IDE.getConfigValue = jest.fn().mockReturnValue(interval);
+        // from https://codewithhugo.com/mocking-the-current-date-in-jest-tests/
+        global.Date.now = jest.fn().mockReturnValue(currentDate);
+
+        await StyraInstall.checkForUpdates();
+
+        if (wasCalled) {
+          expect(runQueryMock).toHaveBeenCalled();
+        } else {
+          expect(runQueryMock).not.toHaveBeenCalled();
+
+        }
+      });
+    });
+
+    [
       ['Cancel', /CLI update cancelled/],
       ['Install', /CLI update completed/]
     ].forEach(([choice, postedOutput]) => {
