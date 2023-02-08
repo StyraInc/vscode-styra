@@ -1,12 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
-import * as utility from '../../commands/utility';
+import * as utility from '../../lib/utility';
+jest.mock('../../lib/utility');
 import {CommandRunner} from '../../lib/command-runner';
 import {LinkConfigGit} from '../../commands/link-config-git';
 import {MultiStepInput} from '../../external/multi-step-input';
 import {OutputPaneSpy} from '../utility';
-
-jest.mock('../../commands/utility');
 
 describe('LinkConfigGit', () => {
 

@@ -1,6 +1,7 @@
-import {checkStartup, generatePickList, shouldResume, StepType, validateNoop} from './utility';
+import {checkStartup} from '../lib/utility';
 import {CommandNotifier} from '../lib/command-notifier';
 import {CommandRunner} from '../lib/command-runner';
+import {generatePickList, shouldResume, StepType, validateNoop} from './utility';
 import {ICommand} from '../lib/types';
 import {info, infoDiagram} from '../lib/outputPane';
 import {MultiStepInput} from '../external/multi-step-input';

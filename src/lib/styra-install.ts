@@ -11,6 +11,7 @@ import {DAS} from './das-query';
 import {IDE} from './vscode-api';
 import {info, infoFromUserAction, teeError, teeInfo} from './outputPane';
 import {LocalStorageService, Workspace} from './local-storage-service';
+import {normalizeJsonProperties} from './utility';
 import {VersionType} from './types';
 
 export const STYRA_CLI_CMD = 'styra';
@@ -41,10 +42,10 @@ export class StyraInstall {
     }
     info('Styra CLI is not installed');
 
-    return await StyraInstall.promptForInstall('is not installed');
+    return await StyraInstall.promptForInstall('is not installed', 'installation');
   }
 
-  static async promptForInstall(description: string): Promise<boolean> {
+  private static async promptForInstall(description: string, operation: string): Promise<boolean> {
     const selection = await IDE.showInformationMessage(
       `Styra CLI ${description}. Would you like to install it now?`,
       'Install',
@@ -55,14 +56,14 @@ export class StyraInstall {
       teeInfo('Installing Styra CLI. This may take a few minutes...');
       try {
         await this.installStyra();
-        teeInfo('Styra CLI installed.');
+        teeInfo(`CLI ${operation} completed.`);
         return true;
       } catch (err) {
-        teeError(`CLI installation failed: ${err}`);
+        teeError(`CLI ${operation} failed: ${err}`);
         return false;
       }
     } else {
-      infoFromUserAction('Installation cancelled');
+      infoFromUserAction(`CLI ${operation} cancelled`);
       return false;
     }
   }
@@ -77,13 +78,13 @@ export class StyraInstall {
       localStorage.setValue(Workspace.UpdateCheckDate, currentDate.toDateString());
 
       try {
-        const availableVersion = await DAS.runQuery('/v1/system/version') as VersionType;
+        const available = normalizeJsonProperties(await DAS.runQuery('/v1/system/version')) as VersionType;
         const installedVersion = await new CommandRunner().runStyraCmdQuietly(
           'version -o jsonpath {.version}'.split(' '));
 
         // Check if the installed version is lower than the latest available version
-        if (compare(availableVersion.cli_version, installedVersion) === 1) {
-          await StyraInstall.promptForInstall('has an update available');
+        if (compare(available.cliVersion, installedVersion) === 1) {
+          await StyraInstall.promptForInstall(`has an update available (installed=${installedVersion}, available=${available.cliVersion})`, 'update');
         }
       } catch ({message}) {
         teeError(message as string);
