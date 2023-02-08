@@ -1,13 +1,13 @@
 import {default as fetch, Request} from 'node-fetch';
 
 import {GenericJson} from './types';
-import {info} from '../lib/outputPane';
+import {normalizeJsonProperties} from './utility';
 import {StyraConfig} from '../lib/styra-config';
 
 export class DAS {
 
   // path example: /v1/systems?compact=true
-  static async runQuery(path: string): Promise<GenericJson> {
+  static async runQuery(path: string, normalize = true): Promise<GenericJson> {
 
     const configData = await StyraConfig.read();
     const request = new Request(`${configData.url}${path}`, {
@@ -19,8 +19,7 @@ export class DAS {
         Authorization: `Bearer ${configData.token}`,
       },
     });
-    info('Fetching ...'); // TODO
-    const response = await fetch(request);
-    return response.json();
+    const response = await (await fetch(request)).json();
+    return normalize ? normalizeJsonProperties(response) : response;
   }
 }

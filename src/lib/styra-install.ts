@@ -11,7 +11,6 @@ import {DAS} from './das-query';
 import {IDE} from './vscode-api';
 import {info, infoFromUserAction, teeError, teeInfo} from './outputPane';
 import {LocalStorageService, Workspace} from './local-storage-service';
-import {normalizeJsonProperties} from './utility';
 import {VersionType} from './types';
 
 export const STYRA_CLI_CMD = 'styra';
@@ -80,7 +79,7 @@ export class StyraInstall {
       localStorage.setValue(Workspace.UpdateCheckDate, currentDate.toDateString());
 
       try {
-        const available = normalizeJsonProperties(await DAS.runQuery('/v1/system/version')) as VersionType;
+        const available = await DAS.runQuery('/v1/system/version') as VersionType;
         const installedVersion = await new CommandRunner().runStyraCmdQuietly(
           'version -o jsonpath {.version}'.split(' '));
 
