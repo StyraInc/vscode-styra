@@ -2,14 +2,16 @@
 .vscode-test/**
 .github/**
 out/test/**
+out/test-jest/**
 
+.gitignore
+.yarnrc
 cspell.json
 Makefile
 packaging/**
 src/**
-.gitignore
-.yarnrc
 vsc-extension-quickstart.md
+*.config.js
 **/tsconfig.json
 **/.eslintrc.json
 **/*.map
