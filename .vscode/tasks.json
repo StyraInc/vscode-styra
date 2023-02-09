@@ -1,20 +1,28 @@
 // See https://go.microsoft.com/fwlink/?LinkId=733558
 // for the documentation about the tasks.json format
+
+// esbuild from https://marketplace.visualstudio.com/items?itemName=connor4312.esbuild-problem-matchers
 {
 	"version": "2.0.0",
 	"tasks": [
 		{
 			"type": "npm",
-			"script": "watch",
-			"problemMatcher": "$tsc-watch",
-			"isBackground": true,
-			"presentation": {
-				"reveal": "never"
-			},
+			"script": "esbuild-watch",
 			"group": {
 				"kind": "build",
 				"isDefault": true
-			}
+			},
+			"problemMatcher": "$esbuild-watch",
+			"isBackground": true,
+			"label": "npm: esbuild-watch",
+			"detail": "npm run esbuild-base -- --sourcemap --watch"
+		},
+		{
+			"type": "npm",
+			"script": "esbuild",
+			"group": "build",
+			"problemMatcher": "$esbuild",
+			"label": "npm: esbuild"
 		}
 	]
 }
