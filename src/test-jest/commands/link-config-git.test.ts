@@ -1,21 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
-import * as utility from '../../commands/utility';
+import * as utility from '../../lib/utility';
+jest.mock('../../lib/utility');
 import {CommandRunner} from '../../lib/command-runner';
 import {LinkConfigGit} from '../../commands/link-config-git';
 import {MultiStepInput} from '../../external/multi-step-input';
-import {outputChannel} from '../../lib/outputPane';
-
-jest.mock('../../commands/utility');
+import {OutputPaneSpy} from '../utility';
 
 describe('LinkConfigGit', () => {
 
-  const spyAppendLine = jest.spyOn(outputChannel, 'appendLine');
+  const spy = new OutputPaneSpy();
 
   beforeEach(() => {
     jest.resetModules();
     // almost all tests want checkStartup to succeed
-    (utility.checkStartup as unknown as jest.MockInstance<any, any>).mockImplementation(() => true);
+    (utility.checkStartup as unknown as jest.MockInstance<any, any>).mockResolvedValue(true);
   });
 
   [
@@ -24,37 +22,56 @@ describe('LinkConfigGit', () => {
   ].forEach(([succeeds, description]) => {
 
     test(`command ${description} when checkStartup returns ${succeeds}`, async () => {
-      (utility.checkStartup as unknown as jest.MockInstance<any, any>).mockImplementation(() => succeeds);
-      const runnerMock = commandRunnerMock();
-      MultiStepInput.prototype.showQuickPick = jest.fn().mockImplementation(() => ({label: 'no'}));
+      (utility.checkStartup as unknown as jest.MockInstance<any, any>).mockResolvedValue(succeeds);
+      const runnerQuietMock = jest.fn().mockResolvedValue('git@dummyUrlHere.git');
+      CommandRunner.prototype.runStyraCmdQuietly = runnerQuietMock;
+      MultiStepInput.prototype.showQuickPick = jest.fn().mockResolvedValue(({label: 'no'}));
 
       await new LinkConfigGit().run();
 
-      expect(runnerMock.mock.calls.length).toBe(succeeds ? 1 : 0); // reached the check-git step or not
+      expect(runnerQuietMock.mock.calls.length).toBe(succeeds ? 1 : 0); // reached the check-git step or not
+      if (succeeds) {
+        expect(spy.content).toMatch(/Styra Link Config Git terminated/);
+      }
     });
   });
 
   test('command TERMINATES when previous git config present and user chooses NOT to overwrite', async () => {
     const runnerMock = commandRunnerMock();
-    MultiStepInput.prototype.showQuickPick = jest.fn().mockImplementation(() => ({label: 'no'}));
+    MultiStepInput.prototype.showQuickPick = jest.fn().mockResolvedValue({label: 'no'});
 
     await new LinkConfigGit().run();
 
-    expect(runnerMock.mock.calls.length).toBe(1); // just 1 for checking git
-    expectOutputPaneContains(/Styra Link Config Git terminated/);
+    expect(runnerMock.mock.calls.length).toBe(0);
+    expect(spy.content).toMatch(/Styra Link Config Git terminated/);
   });
 
   test('command COMPLETES when previous git config present and user chooses TO overwrite', async () => {
     const runnerMock = commandRunnerMock();
     MultiStepInput.prototype.showQuickPick = jest.fn()
-      .mockImplementationOnce(() => ({label: 'yes'})) // prompt on overwriting
-      .mockImplementation(() => ({label: 'do not care'})); // any further prompts
-    MultiStepInput.prototype.showInputBox = jest.fn().mockImplementation(() => 'do not care');
+      .mockResolvedValueOnce({label: 'yes'}) // prompt on overwriting
+      .mockResolvedValue({label: 'do not care'}); // any further prompts
+    MultiStepInput.prototype.showInputBox = jest.fn().mockResolvedValue('do not care');
 
     await new LinkConfigGit().run();
 
-    expect(runnerMock.mock.calls.length).toBe(2); // 1 for checking git AND 1 for executing command
-    expectOutputPaneContains(/Styra Link Config Git completed/);
+    expect(runnerMock.mock.calls.length).toBe(1);
+    expect(spy.content).toMatch(/Styra Link Config Git completed/);
+  });
+
+  test('nominally makes one reported call to runStyraCmd and one internal call to runStyraCmdQuietly', async () => {
+    const runnerMock = jest.fn();
+    CommandRunner.prototype.runStyraCmd = runnerMock;
+    const runnerQuietMock = jest.fn().mockResolvedValue('yo! source_control is not found');
+    CommandRunner.prototype.runStyraCmdQuietly = runnerQuietMock;
+
+    MultiStepInput.prototype.showQuickPick = jest.fn().mockResolvedValue({label: 'do not care'});
+    MultiStepInput.prototype.showInputBox = jest.fn().mockResolvedValue('do not care');
+
+    await new LinkConfigGit().run();
+
+    expect(runnerQuietMock.mock.calls.length).toBe(1);
+    expect(runnerMock.mock.calls.length).toBe(1);
   });
 
   [
@@ -66,15 +83,15 @@ describe('LinkConfigGit', () => {
       const runnerMock = commandRunnerMock(hasPreviousConfig as boolean);
       MultiStepInput.prototype.showQuickPick = hasPreviousConfig ?
       // with previous git config, there is an additional question about overwrite to answer
-        jest.fn().mockImplementationOnce(() => ({label: 'yes'}))
-          .mockImplementationOnce(() => ({label: 'branch'}))
-        : jest.fn().mockImplementationOnce(() => ({label: 'branch'}));
+        jest.fn().mockResolvedValueOnce({label: 'yes'})
+          .mockResolvedValueOnce({label: 'branch'})
+        : jest.fn().mockResolvedValueOnce({label: 'branch'});
       MultiStepInput.prototype.showInputBox = jest.fn()
-      .mockImplementation(inputBoxMock(false));
+        .mockImplementation(inputBoxMock(false));
 
       await new LinkConfigGit().run();
 
-      expect(runnerMock).nthCalledWith(2,
+      expect(runnerMock).toHaveBeenCalledWith(
         ['link', 'config', 'git', 'git@my.url.git', '--branch', 'my-branch',
           hasPreviousConfig ? '--force' : '',
           '--password-stdin', '--key-file', 'my key file path'],
@@ -91,14 +108,14 @@ describe('LinkConfigGit', () => {
     test(`correct prompt is used for ${syncStyle.toUpperCase()} sync style`, async () => {
       const runnerMock = commandRunnerMock();
       MultiStepInput.prototype.showQuickPick = jest.fn()
-      .mockImplementationOnce(() => ({label: 'yes'}))
-      .mockImplementationOnce(() => ({label: syncStyle}));
+      .mockResolvedValueOnce({label: 'yes'})
+      .mockResolvedValueOnce({label: syncStyle});
       MultiStepInput.prototype.showInputBox = jest.fn()
       .mockImplementation(inputBoxMock(false));
 
       await new LinkConfigGit().run();
 
-      expect(runnerMock).nthCalledWith(2,
+      expect(runnerMock).toHaveBeenCalledWith(
         ['link', 'config', 'git', 'git@my.url.git', `--${syncStyle}`, syncValue, '--force', '--password-stdin', '--key-file', 'my key file path'],
         {stdinData: 'my key passphrase'});
     });
@@ -118,7 +135,7 @@ describe('LinkConfigGit', () => {
 
       await new LinkConfigGit().run();
 
-      expect(runnerMock).nthCalledWith(2,
+      expect(runnerMock).toHaveBeenCalledWith(
         ['link', 'config', 'git', url, '--branch', 'my-branch', '--force', '--password-stdin',
           useTLS ? '--username' : '--key-file',
           useTLS ? 'my-username' : 'my key file path'],
@@ -126,15 +143,13 @@ describe('LinkConfigGit', () => {
     });
   });
 
-  function expectOutputPaneContains(regexp: RegExp) {
-    const output = spyAppendLine.mock.calls.join(',');
-    expect(output).toMatch(regexp);
-  }
-
   const commandRunnerMock = (hasPreviousConfig = true) => {
     // responds to query to fetch existing git url, if any
-    const runnerMock = jest.fn().mockImplementation(
-      () => hasPreviousConfig ? 'git@dummyUrlHere.git' : 'yo! source_control is not found');
+    const runnerQuietMock = jest.fn().mockResolvedValue(
+      hasPreviousConfig ? 'git@dummyUrlHere.git' : 'yo! source_control is not found');
+    CommandRunner.prototype.runStyraCmdQuietly = runnerQuietMock;
+    // responds to primary styra link command
+    const runnerMock = jest.fn();
     CommandRunner.prototype.runStyraCmd = runnerMock;
     return runnerMock;
   };

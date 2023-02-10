@@ -4,9 +4,14 @@ import * as os from 'os';
 import {default as fetch} from 'node-fetch';
 import moveFile = require('move-file');
 import {sync as commandExistsSync} from 'command-exists';
+import {compare} from 'semver';
 
+import {CommandRunner} from './command-runner';
+import {DAS} from './das-query';
 import {IDE} from './vscode-api';
 import {info, infoFromUserAction, teeError, teeInfo} from './outputPane';
+import {LocalStorageService, Workspace} from './local-storage-service';
+import {VersionType} from './types';
 
 export const STYRA_CLI_CMD = 'styra';
 
@@ -22,7 +27,11 @@ export class StyraInstall {
   }
 
   static isInstalled(): boolean {
-    const styraPath = IDE.getConfigValue('styra', 'path');
+    // TODO The `path` here is slightly bogus.
+    // It will check for installed file existing here, but it will not install / update to there.
+    // Either support it or remove it.
+    const styraPath = IDE.getConfigValue<string>('styra', 'path');
+
     const existsOnPath = commandExistsSync(STYRA_CLI_CMD);
     const existsInUserSettings =
       styraPath !== undefined && styraPath !== null && fs.existsSync(styraPath);
@@ -36,25 +45,55 @@ export class StyraInstall {
     }
     info('Styra CLI is not installed');
 
+    return await StyraInstall.promptForInstall('is not installed', 'installation');
+  }
+
+  private static async promptForInstall(description: string, operation: string): Promise<boolean> {
     const selection = await IDE.showInformationMessage(
-      'Styra CLI is not installed. Would you like to install it now?',
+      `Styra CLI ${description}. Would you like to install it now?`,
       'Install',
       'Cancel'
     );
 
     if (selection === 'Install') {
-      teeInfo('Installing Styra CLI. This may take a few minutes...');
+      info('Installing Styra CLI. This may take a few minutes...');
       try {
         await this.installStyra();
-        teeInfo('Styra CLI installed.');
+        teeInfo(`CLI ${operation} completed.`);
         return true;
       } catch (err) {
-        teeError(`CLI installation failed: ${err}`);
+        teeError(`CLI ${operation} failed: ${err}`);
         return false;
       }
     } else {
-      infoFromUserAction('Installation cancelled');
+      infoFromUserAction(`CLI ${operation} cancelled`);
       return false;
+    }
+  }
+
+  static async checkForUpdates(): Promise<void> {
+    const localStorage = LocalStorageService.instance;
+    const last = localStorage.getValue<string>(Workspace.UpdateCheckDate);
+    const interval = IDE.getConfigValue<number>('styra', 'checkUpdateInterval') ?? 1;
+    const currentDate = new Date(Date.now());
+
+    // run check periodically based on user preference in VSCode settings
+    if (!last || (currentDate.getDate() - new Date(last).getDate() >= interval)) {
+
+      localStorage.setValue(Workspace.UpdateCheckDate, currentDate.toDateString());
+
+      try {
+        const available = await DAS.runQuery('/v1/system/version') as VersionType;
+        const installedVersion = await new CommandRunner().runStyraCmdQuietly(
+          'version -o jsonpath {.version}'.split(' '));
+
+        if (compare(available.cliVersion, installedVersion) === 1) {
+          await StyraInstall.promptForInstall(
+            `has an update available (installed=${installedVersion}, available=${available.cliVersion})`, 'update');
+        }
+      } catch ({message}) {
+        teeError(message as string);
+      }
     }
   }
 
@@ -77,10 +116,16 @@ export class StyraInstall {
             ? 'https://docs.styra.com/v1/docs/bin/darwin/arm64/styra'
             : 'https://docs.styra.com/v1/docs/bin/darwin/amd64/styra'; // otherwise target "x64"
 
-    await this.getBinary(url, tempFileLocation);
-    info(`    Executable: ${exeFile}`);
-    fs.chmodSync(tempFileLocation, '755');
-    moveFile(tempFileLocation, exeFile);
+    return await IDE.withProgress({
+      location: IDE.ProgressLocation.Notification,
+      title: 'Installing Styra CLI',
+      cancellable: false
+    }, async () => {
+      await this.getBinary(url, tempFileLocation);
+      info(`    Executable: ${exeFile}`);
+      fs.chmodSync(tempFileLocation, '755');
+      moveFile(tempFileLocation, exeFile);
+    });
   }
 
   private static async getBinary(url: string, tempFileLocation: string): Promise<void> {

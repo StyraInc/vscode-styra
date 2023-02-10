@@ -16,9 +16,10 @@ Brings the capabilities of Styra Link into VSCode for streamlining your workflow
 
 ## Extension Settings
 
-| Field | Default | Description |
+| Setting | Default | Description |
 | --- | --- | --- |
-| `styra.path` | `null` | Set path of the Styra CLI executable (if not on your `$PATH`). If the path contains the string `${workspaceFolder}` it will be replaced with the current workspace root. E.g., if the path is set to `${workspaceFolder}/bin/styra` and the current workspace root is `/home/alice/project`, the executable path will resolve to `/home/alice/project/bin/styra`. |
+| `Styra > Check Update Interval` | 1 | How often to check for updates to the Styra CLI (in days). |
+| `Styra > Path` | `null` | Set path of the Styra CLI executable (if not on your `$PATH`). If the path contains the string `${workspaceFolder}` it will be replaced with the current workspace root. E.g., if the path is set to `${workspaceFolder}/bin/styra` and the current workspace root is `/home/alice/project`, the executable path will resolve to `/home/alice/project/bin/styra`. |
 
 ## Known Issues
 

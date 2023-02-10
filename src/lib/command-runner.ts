@@ -52,6 +52,11 @@ export class CommandRunner {
     return await this.runShellCmd(STYRA_CLI_CMD, args, options);
   }
 
+  // Same as runStyraCmd except does not reveal the command to the user
+  async runStyraCmdQuietly(args: string[], possibleError = ''): Promise<string> {
+    return await this.runShellCmd(STYRA_CLI_CMD, args, {progressTitle: '', quiet: true, possibleError});
+  }
+
   // This can be used for any other (non `styra ...`) commands.
   // If options.progressTitle is truthy, it will show a progress bar with that as a prefix.
   // Upon success returns the command's output.

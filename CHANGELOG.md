@@ -9,9 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Commands now check for newer CLI version periodically and allow user to update with a click. Interval between checks is configurable from 0 to 30 days.
+
 ### Fixed
 
-The workflow for `Styra Link: Config Git` was awkward/confusing with respect to the "overwrite" question at the end of the dialog. Now the system first checks
+- The workflow for `Styra Link: Config Git` was awkward/confusing with respect to the "overwrite" question at the end of the dialog. Now the system first checks
 whether there is anything to overwrite, then asks that first, mirroring the CLI flow.
 
 ## [0.0.4-alpha] - 2023-02-01

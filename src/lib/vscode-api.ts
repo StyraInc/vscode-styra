@@ -28,8 +28,8 @@ export class IDE {
     return vscode.workspace.workspaceFolders;
   }
 
-  static getConfigValue(path: string, key: string): string | undefined {
-    return vscode.workspace.getConfiguration(path).get<string>(key);
+  static getConfigValue<P>(path: string, key: string): P | undefined {
+    return vscode.workspace.getConfiguration(path).get<P>(key);
   }
 
   static showInformationMessage<T extends string>(msg: string, ...items: T[]): Thenable<string | undefined> {

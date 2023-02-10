@@ -1,4 +1,4 @@
-import {checkStartup} from './utility';
+import {checkStartup} from '../lib/utility';
 import {CommandNotifier} from '../lib/command-notifier';
 import {CommandRunner} from '../lib/command-runner';
 import {ICommand} from '../lib/types';
