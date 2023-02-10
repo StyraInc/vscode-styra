@@ -1,12 +1,35 @@
 # Developer Notes
 
-## General Notes
+## Debugging
 
-### Unit Tests
+You can easily launch and debug this extension within VSCode (of course!).
+
+1. Open this project in VSCode.
+2. In the "Run and Debug" pane, choose the `Run Extension` mode from the dropdown at the top.
+3. Launch (via either the "Start Debugging" button adjacent to that mode selector or via F5).
+
+What you should see:
+
+1. The standard debug toolbar will pop-up giving you controls for stepping, pausing, etc.
+2. In the Terminal window you should see a new task launched: `npm esbuild-watch` with some nominal output.
+3. A new VSCode window opens ("Extension Development Host").
+
+The Styra extension how acts almost exactly as if you had installed it through normal means, with a couple exceptions:
+(a) You will not find it listed in the "Extensions" pane (unless you previously installed it like a normal extension!).
+(b) Since VSCode is built with Electron, you can open the same DevTools panel in VSCode that you are familiar with from Chrome!
+Use `Help > Toggle Developer Tools` or the shortcut `⌥ + ⌘ + I`.
+
+Get friendly with the `Console` tab of the Developer Tools. Just like in Chrome, any `console.log` statements in your code will send there—NOT to the standard VSCode "Debug Console"! Also any exceptions that your code throws will appear there.
+
+While you will find local storage and session storage under the Developer Tools "Application" tab just like Chrome,
+that is NOT where VSCode local storage persists. Rather it is stored via the Memento API (see <https://stackoverflow.com/a/51822055>).
+You can use the VSCode "Memento Explorer" extension to view and modify that local storage. See extension.ts for details.
+
+## Unit Tests
 
 The project boilerplate provides unit tests in a vscode-hosted container of sorts (see /src/tests);
 however, those tests are not being used nor developed.
-Instead conventional unit tests are actively developed and used in CI with the Jest framework;
+Instead, conventional unit tests are actively developed and used in CI with the Jest framework;
 this provides the additional advantage of being supported by wallabyJS, the continuous-testing runner.
 
 On the command-line, you can run Jest tests in a few ways (per scripts in package.json):
