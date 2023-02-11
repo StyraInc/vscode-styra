@@ -1,3 +1,5 @@
+import {CommandNotifier} from './command-notifier';
+
 // partial definition
 export type System = {
   id: string;
@@ -7,7 +9,8 @@ export type System = {
 export type GenericJson = Record<string, unknown>;
 
 export interface ICommand {
-  run: () => Promise<void>;
+  run: (notifier: CommandNotifier) => Promise<void>;
+  title: string;
 }
 
 export type VersionType = {

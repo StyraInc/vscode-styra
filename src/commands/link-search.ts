@@ -1,4 +1,3 @@
-import {checkStartup} from '../lib/utility';
 import {CommandNotifier} from '../lib/command-notifier';
 import {CommandRunner} from '../lib/command-runner';
 import {generatePickList, shouldResume, StepType, validateNoop} from './utility';
@@ -33,13 +32,7 @@ export class LinkSearch implements ICommand {
                    └───────────────────────┘
 `;
 
-  async run(): Promise<void> {
-
-    if (!(await checkStartup())) {
-      return;
-    }
-    const notifier = new CommandNotifier(this.title);
-    notifier.markStart();
+  async run(notifier: CommandNotifier): Promise<void> {
 
     const state = await this.collectInputs();
 

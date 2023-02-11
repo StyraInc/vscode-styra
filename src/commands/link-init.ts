@@ -1,6 +1,5 @@
 import {MultiStepInput} from '../external/multi-step-input';
 
-import {checkStartup} from '../lib/utility';
 import {CommandNotifier} from '../lib/command-notifier';
 import {CommandRunner} from '../lib/command-runner';
 import {generatePickList, shouldResume, StepType, validateNonEmpty} from './utility';
@@ -36,13 +35,7 @@ export class LinkInit implements ICommand {
                  └───────────────┘   └───────────────┘
 `;
 
-  async run(): Promise<void> {
-
-    if (!(await checkStartup())) {
-      return;
-    }
-    const notifier = new CommandNotifier(this.title);
-    notifier.markStart();
+  async run(notifier: CommandNotifier): Promise<void> {
 
     try {
       this.systemTypes = JSON.parse(

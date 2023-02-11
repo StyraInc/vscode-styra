@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 
+import {Executor} from './commands/executor';
 import {ICommand} from './lib/types';
 import {info, outputChannel} from './lib/outputPane';
 import {LinkConfigGit} from './commands/link-config-git';
@@ -35,7 +36,7 @@ export function activate(context: vscode.ExtensionContext): IMementoExplorerExte
   Object.entries(styraCommands).forEach(([cmd, target]) =>
     context.subscriptions.push(
       vscode.commands.registerCommand(cmd, () => {
-        target.run();
+        Executor.run(target);
       })
     )
   );

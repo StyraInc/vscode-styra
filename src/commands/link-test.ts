@@ -1,4 +1,3 @@
-import {checkStartup} from '../lib/utility';
 import {CommandNotifier} from '../lib/command-notifier';
 import {CommandRunner} from '../lib/command-runner';
 import {ICommand} from '../lib/types';
@@ -8,13 +7,7 @@ export class LinkTest implements ICommand {
 
   title = 'Styra Link Test';
 
-  async run(): Promise<void> {
-
-    if (!(await checkStartup())) {
-      return;
-    }
-    const notifier = new CommandNotifier(this.title);
-    notifier.markStart();
+  async run(notifier: CommandNotifier): Promise<void> {
 
     try {
       const result = await new CommandRunner().runStyraCmd(['link', 'test']);
