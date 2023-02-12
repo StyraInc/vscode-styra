@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Support for creating projects of Terraform or Custom type.
 - Commands now check for newer CLI version periodically and allow user to update with a click. Interval between checks is configurable from 0 to 30 days.
 
 ### Fixed
