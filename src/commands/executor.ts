@@ -1,6 +1,7 @@
 import {checkStartup} from '../lib/utility';
 import {CommandNotifier} from '../lib/command-notifier';
-import {ICommand} from '../lib/types';
+import {ICommand, ReturnValue} from '../lib/types';
+import {infoFromUserAction, teeError} from '../lib/outputPane';
 
 export class Executor {
 
@@ -13,9 +14,14 @@ export class Executor {
     notifier.markStart();
 
     try {
-      await command.run();
-      notifier.markHappyFinish();
-    } catch {
+      const result = await command.run();
+      if (result === ReturnValue.Terminated) {
+        infoFromUserAction(`${command.title} terminated`);
+      } else {
+        notifier.markHappyFinish();
+      }
+    } catch ({message}) {
+      teeError(message as string);
       notifier.markSadFinish();
     }
   }

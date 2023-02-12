@@ -124,7 +124,6 @@ export class CommandRunner {
       }
       // if not an expected possible error, treat it like, well, a regular error
       info(data);
-      teeError(error);
       throw new Error(error);
     }
     return data;

@@ -2,8 +2,8 @@ import {MultiStepInput} from '../external/multi-step-input';
 
 import {CommandRunner} from '../lib/command-runner';
 import {generatePickList, shouldResume, StepType, validateNonEmpty} from './utility';
-import {ICommand} from '../lib/types';
-import {info, infoDiagram, teeError} from '../lib/outputPane';
+import {ICommand, ReturnValue} from '../lib/types';
+import {info, infoDiagram} from '../lib/outputPane';
 import {QuickPickItem} from '../lib/vscode-api';
 
 interface State {
@@ -34,16 +34,11 @@ export class LinkInit implements ICommand {
                  └───────────────┘   └───────────────┘
 `;
 
-  async run(): Promise<void> {
+  async run(): Promise<ReturnValue> {
 
-    try {
-      this.systemTypes = JSON.parse(
-        await new CommandRunner().runStyraCmdQuietly(
-          'link global-config read -s internal -o json systemTypes.#.name'.split(' '))) as string[];
-    } catch ({message}) {
-      teeError(message as string);
-      return;
-    }
+    this.systemTypes = JSON.parse(
+      await new CommandRunner().runStyraCmdQuietly(
+        'link global-config read -s internal -o json systemTypes.#.name'.split(' '))) as string[];
 
     const state = await this.collectInputs();
     const styraArgs = [
@@ -61,6 +56,7 @@ export class LinkInit implements ICommand {
     const result = await new CommandRunner().runStyraCmd(styraArgs);
     info(result);
     info('\n*** Be sure to run "Styra Link: Config Git" next');
+    return ReturnValue.Completed;
   }
 
   private async collectInputs(): Promise<State> {

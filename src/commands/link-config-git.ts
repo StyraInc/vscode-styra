@@ -2,8 +2,8 @@ import {MultiStepInput} from '../external/multi-step-input';
 
 import {CommandRunner} from '../lib/command-runner';
 import {generatePickList, shouldResume, StepType, validateNonEmpty, validateNoop} from './utility';
-import {ICommand} from '../lib/types';
-import {info, infoDiagram, infoFromUserAction, infoInput} from '../lib/outputPane';
+import {ICommand, ReturnValue} from '../lib/types';
+import {info, infoDiagram, infoInput} from '../lib/outputPane';
 import {QuickPickItem} from '../lib/vscode-api';
 
 interface State {
@@ -53,14 +53,13 @@ export class LinkConfigGit implements ICommand {
                                                                   └──────────────┘
 `;
 
-  async run(): Promise<void> {
+  async run(): Promise<ReturnValue> {
 
     this.existingGitConfigURL = await this.getExistingGitURL();
 
     const state = await this.collectInputs();
     if (state.forceGitOverwrite?.label === 'no') {
-      infoFromUserAction(`${this.title} terminated`);
-      return;
+      return ReturnValue.Terminated;
     }
     let variantArgs = [] as string[];
     let secret = '';
@@ -84,6 +83,7 @@ export class LinkConfigGit implements ICommand {
     ].concat(variantArgs);
     const result = await new CommandRunner().runStyraCmd(styraArgs, {stdinData: secret});
     info(result);
+    return ReturnValue.Completed;
   }
 
   private async getExistingGitURL() {

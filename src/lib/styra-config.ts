@@ -57,11 +57,7 @@ export class StyraConfig {
       IDE.showInformationMessage('Styra CLI configured.');
       info('Configuration complete');
     } catch ({message}) { // invalid URL or TOKEN will typically trigger this
-      if ((message as string).startsWith('code error')) {
-        teeError(message as string);
-      } else {
-        // err already displayed for runtime errors
-      }
+      teeError(message as string);
       info('Configuration failed');
       return false;
     }
