@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as utility from '../../lib/utility';
 jest.mock('../../lib/utility');
-import {CommandNotifier} from '../../lib/command-notifier';
 import {CommandRunner} from '../../lib/command-runner';
 import {LinkConfigGit} from '../../commands/link-config-git';
 import {MultiStepInput} from '../../external/multi-step-input';
@@ -10,11 +9,9 @@ import {OutputPaneSpy} from '../utility';
 describe('LinkConfigGit', () => {
 
   const spy = new OutputPaneSpy();
-  let notifier: CommandNotifier;
 
   beforeEach(() => {
     jest.resetModules();
-    notifier = new CommandNotifier('Styra Link Config Git');
     // almost all tests want checkStartup to succeed
     (utility.checkStartup as unknown as jest.MockInstance<any, any>).mockResolvedValue(true);
   });
@@ -23,7 +20,7 @@ describe('LinkConfigGit', () => {
     const runnerMock = commandRunnerMock();
     MultiStepInput.prototype.showQuickPick = jest.fn().mockResolvedValue({label: 'no'});
 
-    await new LinkConfigGit().run(notifier);
+    await new LinkConfigGit().run();
 
     expect(runnerMock.mock.calls.length).toBe(0);
     expect(spy.content).toMatch(/Styra Link Config Git terminated/);
@@ -36,7 +33,7 @@ describe('LinkConfigGit', () => {
       .mockResolvedValue({label: 'do not care'}); // any further prompts
     MultiStepInput.prototype.showInputBox = jest.fn().mockResolvedValue('do not care');
 
-    await new LinkConfigGit().run(notifier);
+    await new LinkConfigGit().run();
 
     expect(runnerMock.mock.calls.length).toBe(1);
     expect(spy.content).toMatch(/Styra Link Config Git completed/);
@@ -51,7 +48,7 @@ describe('LinkConfigGit', () => {
     MultiStepInput.prototype.showQuickPick = jest.fn().mockResolvedValue({label: 'do not care'});
     MultiStepInput.prototype.showInputBox = jest.fn().mockResolvedValue('do not care');
 
-    await new LinkConfigGit().run(notifier);
+    await new LinkConfigGit().run();
 
     expect(runnerQuietMock.mock.calls.length).toBe(1);
     expect(runnerMock.mock.calls.length).toBe(1);
@@ -72,7 +69,7 @@ describe('LinkConfigGit', () => {
       MultiStepInput.prototype.showInputBox = jest.fn()
         .mockImplementation(inputBoxMock(false));
 
-      await new LinkConfigGit().run(notifier);
+      await new LinkConfigGit().run();
 
       expect(runnerMock).toHaveBeenCalledWith(
         ['link', 'config', 'git', 'git@my.url.git', '--branch', 'my-branch',
@@ -96,7 +93,7 @@ describe('LinkConfigGit', () => {
       MultiStepInput.prototype.showInputBox = jest.fn()
       .mockImplementation(inputBoxMock(false));
 
-      await new LinkConfigGit().run(notifier);
+      await new LinkConfigGit().run();
 
       expect(runnerMock).toHaveBeenCalledWith(
         ['link', 'config', 'git', 'git@my.url.git', `--${syncStyle}`, syncValue, '--force', '--password-stdin', '--key-file', 'my key file path'],
@@ -116,7 +113,7 @@ describe('LinkConfigGit', () => {
       MultiStepInput.prototype.showInputBox = jest.fn()
       .mockImplementation(inputBoxMock(useTLS as boolean));
 
-      await new LinkConfigGit().run(notifier);
+      await new LinkConfigGit().run();
 
       expect(runnerMock).toHaveBeenCalledWith(
         ['link', 'config', 'git', url, '--branch', 'my-branch', '--force', '--password-stdin',

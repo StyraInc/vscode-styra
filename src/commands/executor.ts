@@ -12,7 +12,12 @@ export class Executor {
     const notifier = new CommandNotifier(command.title);
     notifier.markStart();
 
-    await command.run(notifier);
+    try {
+      await command.run();
+      notifier.markHappyFinish();
+    } catch {
+      notifier.markSadFinish();
+    }
   }
 
 }

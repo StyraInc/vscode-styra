@@ -1,6 +1,5 @@
 import {MultiStepInput} from '../external/multi-step-input';
 
-import {CommandNotifier} from '../lib/command-notifier';
 import {CommandRunner} from '../lib/command-runner';
 import {generatePickList, shouldResume, StepType, validateNonEmpty} from './utility';
 import {ICommand} from '../lib/types';
@@ -35,7 +34,7 @@ export class LinkInit implements ICommand {
                  └───────────────┘   └───────────────┘
 `;
 
-  async run(notifier: CommandNotifier): Promise<void> {
+  async run(): Promise<void> {
 
     try {
       this.systemTypes = JSON.parse(
@@ -59,14 +58,9 @@ export class LinkInit implements ICommand {
       state.systemType.label,
       '--skip-git'
     ];
-    try {
-      const result = await new CommandRunner().runStyraCmd(styraArgs);
-      info(result);
-      notifier.markHappyFinish();
-      info('\n*** Be sure to run "Styra Link: Config Git" next');
-    } catch {
-      notifier.markSadFinish();
-    }
+    const result = await new CommandRunner().runStyraCmd(styraArgs);
+    info(result);
+    info('\n*** Be sure to run "Styra Link: Config Git" next');
   }
 
   private async collectInputs(): Promise<State> {

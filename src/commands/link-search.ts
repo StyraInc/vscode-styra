@@ -1,4 +1,3 @@
-import {CommandNotifier} from '../lib/command-notifier';
 import {CommandRunner} from '../lib/command-runner';
 import {generatePickList, shouldResume, StepType, validateNoop} from './utility';
 import {ICommand} from '../lib/types';
@@ -32,7 +31,7 @@ export class LinkSearch implements ICommand {
                    └───────────────────────┘
 `;
 
-  async run(notifier: CommandNotifier): Promise<void> {
+  async run(): Promise<void> {
 
     const state = await this.collectInputs();
 
@@ -48,13 +47,8 @@ export class LinkSearch implements ICommand {
     }
     styraArgs.push('-o', state.format.label.toLowerCase());
 
-    try {
-      const result = await new CommandRunner().runStyraCmd(styraArgs);
-      info(result);
-      notifier.markHappyFinish();
-    } catch {
-      notifier.markSadFinish();
-    }
+    const result = await new CommandRunner().runStyraCmd(styraArgs);
+    info(result);
   }
 
   private async collectInputs(): Promise<State> {
