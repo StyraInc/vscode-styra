@@ -5,7 +5,7 @@ import {CommandNotifier} from '../lib/command-notifier';
 import {CommandRunner} from '../lib/command-runner';
 import {generatePickList, shouldResume, StepType, validateNonEmpty} from './utility';
 import {ICommand} from '../lib/types';
-import {info, infoDiagram} from '../lib/outputPane';
+import {info, infoDiagram, teeError} from '../lib/outputPane';
 import {QuickPickItem} from '../lib/vscode-api';
 
 interface State {
@@ -20,6 +20,7 @@ export class LinkInit implements ICommand {
 
   title = 'Styra Link Init';
   totalSteps = 4;
+  systemTypes: string[] = [];
   // For complex editing, just copy the lines here and paste into https://asciiflow.com/#/
   flow = `
                   ┌──────────┐         ┌─────────────┐
@@ -42,6 +43,15 @@ export class LinkInit implements ICommand {
     }
     const notifier = new CommandNotifier(this.title);
     notifier.markStart();
+
+    try {
+      this.systemTypes = JSON.parse(
+        await new CommandRunner().runStyraCmdQuietly(
+          'link global-config read -s internal -o json systemTypes.#.name'.split(' '))) as string[];
+    } catch ({message}) {
+      teeError(message as string);
+      return;
+    }
 
     const state = await this.collectInputs();
     const styraArgs = [
@@ -115,7 +125,7 @@ export class LinkInit implements ICommand {
       step: 3,
       totalSteps: this.totalSteps,
       placeholder: 'Pick a system type',
-      items: generatePickList(['kubernetes', 'envoy']),
+      items: generatePickList(this.systemTypes),
       activeItem: state.systemType,
       shouldResume,
     });
