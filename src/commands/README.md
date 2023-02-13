@@ -87,13 +87,7 @@ export class Link<CMD> implements ICommand {
   `;
   */
 
-  async run(): Promise<void> {
-
-    if (!(await checkStartup())) {
-      return;
-    }
-    const notifier = new CommandNotifier(this.title);
-    notifier.markStart();
+  async run(): Promise<ReturnValue> {
 
     /* uncomment if you need to collect input */
     // const state = await this.collectInputs();
@@ -105,14 +99,9 @@ export class Link<CMD> implements ICommand {
     ];
     */
 
-    try {
-      const result = await new CommandRunner().runStyraCmd(styraArgs)
-      info(result);
-      notifier.markHappyFinish();
-    } catch {
-      notifier.markSadFinish();
-    }
- 
+    const result = await new CommandRunner().runStyraCmd(styraArgs)
+    info(result);
+    return ReturnValue.Completed;
   }
 
   /* if you need to collect input uncomment-and customize-this block:
