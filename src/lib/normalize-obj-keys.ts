@@ -8,7 +8,7 @@ import {GenericJson} from './types';
 // keys annotated with the `_COLLISION` suffix.
 // - In the even more rare event of multiple collisions on the same key,
 // the collisions are all coalesced to a single such `_COLLISION` suffix.
-export function normalizeJsonProperties(json: GenericJson): GenericJson {
+export function normalizeObjKeys(json: GenericJson): GenericJson {
   return Object.keys(json).reduce((result: GenericJson, key: string) => {
     let newKey = camelCase(key);
     // trim leading and trailing UNLESS the key is all whitespace, then leave it alone
