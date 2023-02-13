@@ -1,7 +1,8 @@
-import {checkStartup} from '../lib/utility';
 import {ICommand, ReturnValue} from '../lib/types';
-import {info, infoFromUserAction, teeError} from '../lib/outputPane';
+import {info, infoFromUserAction, outputChannel, teeError} from '../lib/outputPane';
 import {LocalStorageService, Workspace} from '../lib/local-storage-service';
+import {StyraConfig} from '../lib/styra-config';
+import {StyraInstall} from '../lib/styra-install';
 
 export class Executor {
 
@@ -9,7 +10,7 @@ export class Executor {
 
   static async run(command: ICommand): Promise<void> {
 
-    if (!(await checkStartup())) {
+    if (!(await this.checkStartup())) {
       return;
     }
     this.StorageManager.setValue(Workspace.CmdName, command.title);
@@ -27,6 +28,24 @@ export class Executor {
       info(`====> ${command.title} failed`);
     }
     this.StorageManager.setValue<string>(Workspace.CmdName, '');
+  }
+
+  // TODO: be quiet about the output on subsequent runs...?
+  static async checkStartup(): Promise<boolean> {
+
+    outputChannel.show(true);
+
+    if (!StyraInstall.checkWorkspace()) {
+      return false;
+    }
+    if (!(await StyraInstall.checkCliInstallation())) {
+      return false;
+    }
+    if (!(await StyraConfig.checkCliConfiguration())) {
+      return false;
+    }
+    await StyraInstall.checkForUpdates();
+    return true;
   }
 
   static announce(name: string): void {

@@ -1,5 +1,3 @@
-import * as utility from '../../lib/utility';
-jest.mock('../../lib/utility');
 import {Executor} from '../../commands/executor';
 import {ICommand, ReturnValue} from '../../lib/types';
 import {mockType, OutputPaneSpy} from '../utility';
@@ -24,6 +22,7 @@ describe('Executor', () => {
 
   const spy = new OutputPaneSpy();
   const spyAppendLine = jest.spyOn(outputChannel, 'appendLine');
+  Executor.checkStartup = jest.fn();
 
   [
     [true, 'CONTINUES'],
@@ -31,7 +30,7 @@ describe('Executor', () => {
   ].forEach(([succeeds, description]) => {
 
     test(`command ${description} when checkStartup returns ${succeeds}`, async () => {
-      mockType(utility.checkStartup).mockResolvedValue(succeeds);
+      mockType(Executor.checkStartup).mockResolvedValue(succeeds);
 
       await Executor.run(new MockCompletedCommand());
 
@@ -50,7 +49,7 @@ describe('Executor', () => {
     {description: 'command fails', command: new MockFailedCommand(), regex: /====> MockCommand failed/},
   ].forEach(({description, command, regex}) => {
     test(`reports correct info to user when ${description}`, async () => {
-      mockType(utility.checkStartup).mockResolvedValue(true);
+      mockType(Executor.checkStartup).mockResolvedValue(true);
 
       await Executor.run(command);
 
