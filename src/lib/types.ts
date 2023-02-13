@@ -6,8 +6,15 @@ export type System = {
 
 export type GenericJson = Record<string, unknown>;
 
+export enum ReturnValue {
+  Completed = 'Completed',
+  TerminatedByUser = 'TerminatedByUser'
+  // Failed is implicit by an error being thrown
+}
+
 export interface ICommand {
-  run: () => Promise<void>;
+  run: () => Promise<ReturnValue>;
+  title: string;
 }
 
 export type VersionType = {
@@ -19,3 +26,4 @@ export type VersionType = {
   cliVersion: string;
   datasourcesAgentVersion: string;
 }
+

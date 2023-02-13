@@ -1,8 +1,6 @@
-import {checkStartup} from '../lib/utility';
-import {CommandNotifier} from '../lib/command-notifier';
 import {CommandRunner} from '../lib/command-runner';
 import {generatePickList, shouldResume, StepType, validateNoop} from './utility';
-import {ICommand} from '../lib/types';
+import {ICommand, ReturnValue} from '../lib/types';
 import {info, infoDiagram} from '../lib/outputPane';
 import {MultiStepInput} from '../external/multi-step-input';
 import {QuickPickItem} from 'vscode';
@@ -33,13 +31,7 @@ export class LinkSearch implements ICommand {
                    └───────────────────────┘
 `;
 
-  async run(): Promise<void> {
-
-    if (!(await checkStartup())) {
-      return;
-    }
-    const notifier = new CommandNotifier(this.title);
-    notifier.markStart();
+  async run(): Promise<ReturnValue> {
 
     const state = await this.collectInputs();
 
@@ -55,13 +47,9 @@ export class LinkSearch implements ICommand {
     }
     styraArgs.push('-o', state.format.label.toLowerCase());
 
-    try {
-      const result = await new CommandRunner().runStyraCmd(styraArgs);
-      info(result);
-      notifier.markHappyFinish();
-    } catch {
-      notifier.markSadFinish();
-    }
+    const result = await new CommandRunner().runStyraCmd(styraArgs);
+    info(result);
+    return ReturnValue.Completed;
   }
 
   private async collectInputs(): Promise<State> {

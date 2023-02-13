@@ -1,11 +1,9 @@
 import {MultiStepInput} from '../external/multi-step-input';
 
-import {checkStartup} from '../lib/utility';
-import {CommandNotifier} from '../lib/command-notifier';
 import {CommandRunner} from '../lib/command-runner';
 import {generatePickList, shouldResume, StepType, validateNonEmpty, validateNoop} from './utility';
-import {ICommand} from '../lib/types';
-import {info, infoDiagram, infoFromUserAction, infoInput} from '../lib/outputPane';
+import {ICommand, ReturnValue} from '../lib/types';
+import {info, infoDiagram, infoInput} from '../lib/outputPane';
 import {QuickPickItem} from '../lib/vscode-api';
 
 interface State {
@@ -55,26 +53,13 @@ export class LinkConfigGit implements ICommand {
                                                                   └──────────────┘
 `;
 
-  async run(): Promise<void> {
+  async run(): Promise<ReturnValue> {
 
-    if (!(await checkStartup())) {
-      return;
-    }
-    const notifier = new CommandNotifier(this.title);
-    notifier.markStart();
-
-    try {
-      this.existingGitConfigURL = await this.getExistingGitURL();
-    } catch ({message}) {
-      // testing: can arrive here by deleting the project's .styra folder before running this cmd
-      notifier.markSadFinish();
-      return;
-    }
+    this.existingGitConfigURL = await this.getExistingGitURL();
 
     const state = await this.collectInputs();
     if (state.forceGitOverwrite?.label === 'no') {
-      infoFromUserAction(`${this.title} terminated`);
-      return;
+      return ReturnValue.TerminatedByUser;
     }
     let variantArgs = [] as string[];
     let secret = '';
@@ -96,13 +81,9 @@ export class LinkConfigGit implements ICommand {
       state.forceGitOverwrite?.label === 'yes' ? '--force' : '',
       '--password-stdin',
     ].concat(variantArgs);
-    try {
-      const result = await new CommandRunner().runStyraCmd(styraArgs, {stdinData: secret});
-      info(result);
-      notifier.markHappyFinish();
-    } catch {
-      notifier.markSadFinish();
-    }
+    const result = await new CommandRunner().runStyraCmd(styraArgs, {stdinData: secret});
+    info(result);
+    return ReturnValue.Completed;
   }
 
   private async getExistingGitURL() {
