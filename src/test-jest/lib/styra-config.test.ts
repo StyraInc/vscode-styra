@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import * as fs from 'fs';
 jest.mock('fs');
 import {CommandRunner} from '../../lib/command-runner';
+import {mockType} from '../utility';
 import {MultiStepInput} from '../../external/multi-step-input';
 import {outputChannel} from '../../lib/outputPane';
 import {StyraConfig} from '../../lib/styra-config';
@@ -13,7 +12,7 @@ describe('StyraConfig', () => {
   MultiStepInput.prototype.showInputBox = jest.fn();
 
   test('checkCliConfiguration returns true when already configured', async () => {
-    (fs.existsSync as unknown as jest.MockInstance<any, any>).mockReturnValue(true);
+    mockType(fs.existsSync).mockReturnValue(true);
 
     expect(await StyraConfig.checkCliConfiguration()).toBe(true);
 
@@ -22,7 +21,7 @@ describe('StyraConfig', () => {
   });
 
   test('checkCliConfiguration returns true when NOT configured and config succeeds', async () => {
-    (fs.existsSync as unknown as jest.MockInstance<any, any>).mockReturnValue(false);
+    mockType(fs.existsSync).mockReturnValue(false);
     CommandRunner.prototype.runStyraCmd = jest.fn().mockReturnValue('');
 
     expect(await StyraConfig.checkCliConfiguration()).toBe(true);
@@ -33,7 +32,7 @@ describe('StyraConfig', () => {
   });
 
   test('checkCliConfiguration returns false and reports failure when NOT configured but config fails', async () => {
-    (fs.existsSync as unknown as jest.MockInstance<any, any>).mockReturnValue(false);
+    mockType(fs.existsSync).mockReturnValue(false);
     CommandRunner.prototype.runStyraCmd = jest.fn().mockRejectedValue(new Error('foo'));
 
     expect(await StyraConfig.checkCliConfiguration()).toBe(false);

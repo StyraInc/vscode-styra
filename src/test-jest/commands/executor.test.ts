@@ -2,8 +2,8 @@ import * as utility from '../../lib/utility';
 jest.mock('../../lib/utility');
 import {Executor} from '../../commands/executor';
 import {ICommand, ReturnValue} from '../../lib/types';
+import {mockType, OutputPaneSpy} from '../utility';
 import {outputChannel} from '../../lib/outputPane';
-import {OutputPaneSpy} from '../utility';
 
 class MockCompletedCommand implements ICommand {
   run = () => Promise.resolve(ReturnValue.Completed);
@@ -31,8 +31,7 @@ describe('Executor', () => {
   ].forEach(([succeeds, description]) => {
 
     test(`command ${description} when checkStartup returns ${succeeds}`, async () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (utility.checkStartup as unknown as jest.MockInstance<any, any>).mockResolvedValue(succeeds);
+      mockType(utility.checkStartup).mockResolvedValue(succeeds);
 
       await Executor.run(new MockCompletedCommand());
 
@@ -51,8 +50,7 @@ describe('Executor', () => {
     {description: 'command fails', command: new MockFailedCommand(), regex: /====> MockCommand failed/},
   ].forEach(({description, command, regex}) => {
     test(`reports correct info to user when ${description}`, async () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (utility.checkStartup as unknown as jest.MockInstance<any, any>).mockResolvedValue(true);
+      mockType(utility.checkStartup).mockResolvedValue(true);
 
       await Executor.run(command);
 
