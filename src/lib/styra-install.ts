@@ -49,11 +49,10 @@ export class StyraInstall {
   }
 
   private static async promptForInstall(description: string, operation: string): Promise<boolean> {
-    const selection = await IDE.showInformationMessage(
-      `Styra CLI ${description}. Would you like to install it now?`,
-      'Install',
-      'Cancel'
-    );
+    // "Cancel" is always shown as the last choice by default
+    // Here, just using it ot cancel the install itself; the command the user initiated will continue either way.
+    const selection = await IDE.showInformationMessageModal(
+      `Styra CLI ${description}. Would you like to install it now?`, 'Install');
 
     if (selection === 'Install') {
       info('Installing Styra CLI. This may take a few minutes...');

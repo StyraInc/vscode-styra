@@ -36,6 +36,10 @@ export class IDE {
     return vscode.window.showInformationMessage(msg, ...items);
   }
 
+  static showInformationMessageModal<T extends string>(msg: string, ...items: T[]): Thenable<string | undefined> {
+    return vscode.window.showInformationMessage(msg, {modal: true}, ...items);
+  }
+
   static showWarningMessage<T extends string>(msg: string, ...items: T[]): Thenable<string | undefined> {
     return vscode.window.showWarningMessage(msg, ...items);
   }
