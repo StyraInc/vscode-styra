@@ -32,20 +32,22 @@ export class IDE {
     return vscode.workspace.getConfiguration(path).get<P>(key);
   }
 
-  static showInformationMessage<T extends string>(msg: string, ...items: T[]): Thenable<string | undefined> {
-    return vscode.window.showInformationMessage(msg, ...items);
+  // while this family of methods could take an items array for button choices,
+  // it times out after 30 seconds and the code just... stops!
+  static showInformationMessage(msg: string): Thenable<string | undefined> {
+    return vscode.window.showInformationMessage(msg);
   }
 
   static showInformationMessageModal<T extends string>(msg: string, ...items: T[]): Thenable<string | undefined> {
     return vscode.window.showInformationMessage(msg, {modal: true}, ...items);
   }
 
-  static showWarningMessage<T extends string>(msg: string, ...items: T[]): Thenable<string | undefined> {
-    return vscode.window.showWarningMessage(msg, ...items);
+  static showWarningMessage(msg: string): Thenable<string | undefined> {
+    return vscode.window.showWarningMessage(msg);
   }
 
-  static showErrorMessage<T extends string>(msg: string, ...items: T[]): Thenable<T | undefined> {
-    return vscode.window.showErrorMessage(msg, ...items);
+  static showErrorMessage<T extends string>(msg: string): Thenable<T | undefined> {
+    return vscode.window.showErrorMessage(msg);
   }
 
   static showInputBox(options: vscode.InputBoxOptions | undefined): Thenable<string | undefined> {
