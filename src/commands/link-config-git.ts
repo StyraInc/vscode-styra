@@ -59,7 +59,7 @@ export class LinkConfigGit implements ICommand {
 
     const state = await this.collectInputs();
     if (state.forceGitOverwrite?.label === 'no') {
-      return ReturnValue.Terminated;
+      return ReturnValue.TerminatedByUser;
     }
     let variantArgs = [] as string[];
     let secret = '';

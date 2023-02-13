@@ -8,7 +8,7 @@ export type GenericJson = Record<string, unknown>;
 
 export enum ReturnValue {
   Completed = 'Completed',
-  Terminated = 'Terminated'
+  TerminatedByUser = 'TerminatedByUser'
   // Failed is implicit by an error being thrown
 }
 

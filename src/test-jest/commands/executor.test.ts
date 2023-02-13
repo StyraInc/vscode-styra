@@ -11,7 +11,7 @@ class MockCompletedCommand implements ICommand {
 }
 
 class MockTerminatedCommand implements ICommand {
-  run = () => Promise.resolve(ReturnValue.Terminated);
+  run = () => Promise.resolve(ReturnValue.TerminatedByUser);
   title = 'MockCommand'
 }
 

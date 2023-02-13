@@ -16,7 +16,7 @@ describe('LinkConfigGit', () => {
 
     const result = await new LinkConfigGit().run();
 
-    expect(result).toBe(ReturnValue.Terminated);
+    expect(result).toBe(ReturnValue.TerminatedByUser);
   });
 
   test('command COMPLETES when previous git config present and user chooses TO overwrite', async () => {

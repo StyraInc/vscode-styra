@@ -17,7 +17,7 @@ export class Executor {
 
     try {
       const result = await command.run();
-      if (result === ReturnValue.Terminated) {
+      if (result === ReturnValue.TerminatedByUser) {
         infoFromUserAction(`${command.title} terminated`);
       } else {
         info(`====> ${command.title} completed`);
