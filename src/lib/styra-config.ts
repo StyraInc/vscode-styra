@@ -98,7 +98,7 @@ export class StyraConfig {
       step: 2,
       totalSteps: 2,
       placeholder: 'We will send you to Styra.com to sign-up for a free tenant, OK?',
-      items: generatePickList(['OK', 'Cancel']),
+      items: generatePickList(['OK', 'cancel']),
       activeItem: state.transferToStyra,
       shouldResume,
     });
