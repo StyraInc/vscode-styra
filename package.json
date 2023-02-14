@@ -8,7 +8,7 @@
     "url": "https://github.com/styraInc/vscode-styra/"
   },
   "publisher": "styra",
-  "version": "0.0.4-alpha",
+  "version": "0.0.5-alpha",
   "private": true,
   "engines": {
     "vscode": "^1.74.0"
