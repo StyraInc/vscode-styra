@@ -1,4 +1,3 @@
-jest.mock('../../lib/utility');
 import {CommandRunner} from '../../lib/command-runner';
 import {LinkConfigGit} from '../../commands/link-config-git';
 import {MultiStepInput} from '../../external/multi-step-input';

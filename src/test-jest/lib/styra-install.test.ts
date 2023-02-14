@@ -87,7 +87,7 @@ describe('StyraInstall', () => {
 
       test(`returns ${expected} for ${choice} selection`, async () => {
         IDE.getConfigValue = jest.fn().mockReturnValue(undefined);
-        IDE.showInformationMessage = jest.fn().mockReturnValue(choice);
+        IDE.showInformationMessageModal = jest.fn().mockReturnValue(choice);
         StyraInstall.installStyra = jest.fn().mockResolvedValue('');
 
         expect(await StyraInstall.checkCliInstallation()).toBe(expected as boolean);
@@ -97,7 +97,7 @@ describe('StyraInstall', () => {
 
     test('returns false if installStyra throws an error', async () => {
       IDE.getConfigValue = jest.fn().mockReturnValue(undefined);
-      IDE.showInformationMessage = jest.fn().mockReturnValue('Install');
+      IDE.showInformationMessageModal = jest.fn().mockReturnValue('Install');
       StyraInstall.installStyra = jest.fn().mockRejectedValue('error');
 
       expect(await StyraInstall.checkCliInstallation()).toBe(false);
@@ -135,7 +135,7 @@ describe('StyraInstall', () => {
       CommandRunner.prototype.runShellCmd = jest.fn().mockResolvedValue(installed);
       IDE.getConfigValue = jest.fn().mockReturnValue(undefined);
       const showInfoMock = jest.fn().mockReturnValue(undefined);
-      IDE.showInformationMessage = showInfoMock;
+      IDE.showInformationMessageModal = showInfoMock;
       StyraInstall.installStyra = jest.fn().mockResolvedValue('');
 
       await StyraInstall.checkForUpdates();
@@ -188,7 +188,7 @@ describe('StyraInstall', () => {
           DAS.runQuery = jest.fn().mockResolvedValue({cliVersion: available});
           CommandRunner.prototype.runShellCmd = jest.fn().mockResolvedValue(installed);
           IDE.getConfigValue = jest.fn().mockReturnValue(undefined);
-          IDE.showInformationMessage = jest.fn().mockReturnValue(choice);
+          IDE.showInformationMessageModal = jest.fn().mockReturnValue(choice);
           StyraInstall.installStyra = jest.fn().mockResolvedValue('');
 
           await StyraInstall.checkForUpdates();

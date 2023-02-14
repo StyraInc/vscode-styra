@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import {GenericJson} from '../../lib/types';
-import {normalizeJsonProperties} from '../../lib/utility';
+import {normalizeObjKeys} from '../../lib/normalize-obj-keys';
 
 describe('normalizeJsonProperties', () => {
 
@@ -23,9 +23,9 @@ describe('normalizeJsonProperties', () => {
       description: 'MULTIPLE COLLISION case', input: {TermOne: 'value', termOne: 5, term_one: 0, 'term-one': 'foobar'},
       expectedKeys: ['termOne', 'termOne_COLLISION'] // rare multiple collisions still coalesce to single occurrence
     },
-  ].forEach(({description, input, expectedKeys}: {description: string, input: GenericJson, expectedKeys: string[]}) => {
+  ].forEach(({description, input, expectedKeys}: { description: string, input: GenericJson, expectedKeys: string[] }) => {
     test(`${description}: keys[${Object.keys(input).join(', ')}] => ${expectedKeys.join(', ')} `, () => {
-      expect(Object.keys(normalizeJsonProperties(input)).sort()).toEqual(expectedKeys.sort());
+      expect(Object.keys(normalizeObjKeys(input)).sort()).toEqual(expectedKeys.sort());
     });
   });
 });
