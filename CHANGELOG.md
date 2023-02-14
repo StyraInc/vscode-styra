@@ -9,10 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.5-alpha] - 2023-02-13
+
 ### Added
 
 - Support for creating projects of Terraform or Custom type.
 - Commands now check for newer CLI version periodically and allow user to update with a click. Interval between checks is configurable from 0 to 30 days.
+- Any time you initiate a Styra Link command, the Styra output pane will immediately be brought to the foreground.
+- When installing the CLI, the plugin now shows an active progress bar for the duration rather than just a one-time (vanishing) notification.
 
 ### Fixed
 
@@ -70,6 +74,7 @@ whether there is anything to overwrite, then asks that first, mirroring the CLI 
 
 <!-- Be sure to add an entry here for each release! -->
 [unreleased]: https://github.com/StyraInc/vscode-styra/compare/v0.0.4-alpha...HEAD
+[0.0.5-alpha]: https://github.com/StyraInc/vscode-styra/compare/v0.0.4-alpha...v0.0.5-alpha
 [0.0.4-alpha]: https://github.com/StyraInc/vscode-styra/compare/v0.0.3-alpha...v0.0.4-alpha
 [0.0.3-alpha]: https://github.com/StyraInc/vscode-styra/compare/v0.0.2-alpha...v0.0.3-alpha
 [0.0.2-alpha]: https://github.com/StyraInc/vscode-styra/compare/v0.0.1-alpha...v0.0.2-alpha
