@@ -13,6 +13,7 @@ Brings the capabilities of Styra Link into VSCode for streamlining your workflow
 ## Requirements
 
 * [Styra CLI](https://docs.styra.com/reference/cli/install-use-cli) executable (`styra`) must be installed on your `$PATH`.  If you do not have Styra CLI installed, the plugin will prompt you to install it when you run any command.
+* A [Styra DAS](https://www.styra.com/styra-das/) tenant; you can get one for free at <https://signup.styra.com>; the VSCode plugin will check for this when you run any command; if not found, it will offer to take you to the same URL so you can get one. It only takes a moment!
 
 ## Extension Settings
 
