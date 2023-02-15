@@ -27,7 +27,7 @@ export class StyraConfig {
     const configData = <ConfigData>{};
     return await fs.promises.readFile(CONFIG_FILE_PATH, 'utf8').then((data) => {
       data.split(/\r?\n/).forEach((line) => {
-        const {key, value} = line.match(/(?<key>\w+):\s*(?<value>.+)/)?.groups ?? {};
+        const {key, value} = line.match(/(?<key>\w+)\s*:\s*(?<value>.*\S)/)?.groups ?? {};
         if (key === 'url') {
           configData.url = value;
         }
