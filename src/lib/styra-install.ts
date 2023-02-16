@@ -26,20 +26,8 @@ export class StyraInstall {
     return inWorkspace;
   }
 
-  static isInstalled(): boolean {
-    // TODO The `path` here is slightly bogus.
-    // It will check for installed file existing here, but it will not install / update to there.
-    // Either support it or remove it.
-    const styraPath = IDE.getConfigValue<string>('styra', 'path');
-
-    const existsOnPath = commandExistsSync(STYRA_CLI_CMD);
-    const existsInUserSettings =
-      styraPath !== undefined && styraPath !== null && fs.existsSync(styraPath);
-    return existsOnPath || existsInUserSettings;
-  }
-
   static async checkCliInstallation(): Promise<boolean> {
-    if (this.isInstalled()) {
+    if (commandExistsSync(STYRA_CLI_CMD)) {
       info('Styra CLI is installed');
       return true;
     }
