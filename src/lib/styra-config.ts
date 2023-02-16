@@ -2,10 +2,10 @@ import * as fs from 'fs';
 import * as os from 'os';
 
 import {CommandRunner} from './command-runner';
-import {IDE} from './vscode-api';
+import {generatePickList, shouldResume, StepType, validateNonEmpty} from '../commands/utility';
+import {IDE, QuickPickItem} from './vscode-api';
 import {info, infoInput, teeError} from './outputPane';
 import {MultiStepInput} from '../external/multi-step-input';
-import {shouldResume, StepType, validateNonEmpty} from '../commands/utility';
 
 export type ConfigData = {
   url: string;
@@ -15,6 +15,8 @@ export type ConfigData = {
 const CONFIG_FILE_PATH = `${os.homedir}/.styra/config`;
 
 interface State {
+  hasTenant: QuickPickItem;
+  transferToStyra: QuickPickItem;
   token: string;
   url: string;
 }
@@ -25,7 +27,7 @@ export class StyraConfig {
     const configData = <ConfigData>{};
     return await fs.promises.readFile(CONFIG_FILE_PATH, 'utf8').then((data) => {
       data.split(/\r?\n/).forEach((line) => {
-        const {key, value} = line.match(/(?<key>\w+):\s*(?<value>.+)/)?.groups ?? {};
+        const {key, value} = line.match(/(?<key>\w+)\s*:\s*(?<value>.*\S)/)?.groups ?? {};
         if (key === 'url') {
           configData.url = value;
         }
@@ -48,6 +50,9 @@ export class StyraConfig {
 
     info('Styra CLI is not configured');
     const state = await this.collectInputs();
+    if (state.hasTenant.label === 'no') {
+      return false; // whether chose to create to get one or not, abort this command
+    }
     info('\nConfiguring Styra CLI...');
     try {
       await runner.runStyraCmd( // no output upon success
@@ -66,16 +71,48 @@ export class StyraConfig {
 
   private static async collectInputs(): Promise<State> {
     const state = {} as Partial<State>;
-    await MultiStepInput.run((input) => this.inputURL(input, state));
+    await MultiStepInput.run((input) => this.pickAlreadyHaveTenant(input, state));
     return state as State;
+  }
+
+  private static async pickAlreadyHaveTenant(input: MultiStepInput, state: Partial<State>): Promise<StepType | void> {
+    state.hasTenant = await input.showQuickPick({
+      ignoreFocusOut: true,
+      title: 'Styra CLI Configuration',
+      step: 1,
+      totalSteps: 3,
+      placeholder: 'Do you already have a DAS tenant?',
+      items: generatePickList(['yes', 'no']),
+      activeItem: state.hasTenant,
+      shouldResume,
+    });
+    return state.hasTenant.label === 'yes'
+      ? (input: MultiStepInput) => this.inputURL(input, state)
+      : (input: MultiStepInput) => this.pickOkToGetTenant(input, state);
+  }
+
+  private static async pickOkToGetTenant(input: MultiStepInput, state: Partial<State>): Promise<StepType | void> {
+    state.transferToStyra = await input.showQuickPick({
+      ignoreFocusOut: true,
+      title: 'Styra CLI Configuration',
+      step: 2,
+      totalSteps: 2,
+      placeholder: 'We will send you to Styra.com to sign-up for a free tenant, OK?',
+      items: generatePickList(['OK', 'cancel']),
+      activeItem: state.transferToStyra,
+      shouldResume,
+    });
+    if (state.transferToStyra.label === 'OK') {
+      IDE.openUrl('https://signup.styra.com/');
+    }
   }
 
   private static async inputURL(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
     state.url = await input.showInputBox({
       ignoreFocusOut: true,
       title: 'Styra CLI Configuration',
-      step: 1,
-      totalSteps: 2,
+      step: 2,
+      totalSteps: 3,
       value: state.url ?? '',
       placeholder: 'https://test.YOUR-DOMAIN.com',
       prompt: 'Enter base URL to Styra DAS Tenant',
@@ -91,8 +128,8 @@ export class StyraConfig {
       ignoreFocusOut: true,
       password: true,
       title: 'Styra CLI Configuration',
-      step: 2,
-      totalSteps: 2,
+      step: 3,
+      totalSteps: 3,
       value: state.token ?? '',
       prompt: 'Enter API token for Styra DAS Tenant',
       validate: validateNonEmpty,

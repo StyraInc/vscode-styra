@@ -53,4 +53,8 @@ export class IDE {
   static showInputBox(options: vscode.InputBoxOptions | undefined): Thenable<string | undefined> {
     return vscode.window.showInputBox(options);
   }
+
+  static openUrl(url: string): void {
+    vscode.env.openExternal(vscode.Uri.parse(url));
+  }
 }
