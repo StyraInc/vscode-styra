@@ -75,7 +75,6 @@ export class LinkConfigGit implements ICommand {
       'config',
       'git',
       state.url,
-      // '--debug', // TODO: Wire up a VSCode setting to toggle this
       `--${state.syncStyleType.label}`,
       state.syncStyleValue,
       state.forceGitOverwrite?.label === 'yes' ? '--force' : '',
