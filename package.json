@@ -45,13 +45,7 @@
       "type": "object",
       "title": "Styra DAS Configuration",
       "properties": {
-        "styra.path": {
-          "type": "string",
-          "title": "Styra CLI Path",
-          "description": "Path to the Styra CLI executable",
-          "default": null
-        },
-         "styra.checkUpdateInterval": {
+        "styra.checkUpdateInterval": {
           "type": "number",
           "minimum": 0,
           "maximum": 30,

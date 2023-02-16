@@ -2,15 +2,13 @@
 import {IDE} from '../../lib/vscode-api';
 import {StyraInstall} from '../../lib/styra-install';
 
-import * as fs from 'fs';
-jest.mock('fs');
 import {sync as commandExistsSync} from 'command-exists';
 jest.mock('command-exists');
 import {CommandRunner} from '../../lib/command-runner';
 import {DAS} from '../../lib/das-query';
 import {LocalStorageService, Workspace} from '../../lib/local-storage-service';
 import {Memento} from 'vscode';
-import {OutputPaneSpy} from '../utility';
+import {mockType, OutputPaneSpy} from '../utility';
 
 // copied from local-storage-service.test.ts; importing it fails!?!
 class TestMemento implements Memento {
@@ -58,35 +56,29 @@ describe('StyraInstall', () => {
     });
   });
 
-  describe('isInstalled', () => {
+  describe('checkCLIInstallation', () => {
+
     [
-      [true, 'a', true, true, 'on path, in settings, setting exists'],
-      [true, 'a', false, true, 'on path, in settings, setting does not exist'],
-      [true, undefined, undefined, true, 'on path, not in settings'],
-      [false, 'a', true, true, 'not on path, in settings, setting exists'],
-      [false, 'a', false, false, 'not on path, in settings, setting does not exist'],
-      [false, undefined, undefined, false, 'not on path, not in settings with undefined'],
-      [false, null, undefined, false, 'not on path, not in settings with null'],
-    ].forEach(([existsOnPath, settingValue, existsFromSettings, expected, description]) => {
+      [true, /is installed/, 'on path'],
+      [false, /is not installed/, 'not on path'],
+    ].forEach(([expected, postedOutput, description]) => {
 
-      test(`returns ${expected} when ${description}`, () => {
-        (commandExistsSync as unknown as jest.MockInstance<any, any>).mockReturnValue(existsOnPath);
-        (fs.existsSync as unknown as jest.MockInstance<any, any>).mockReturnValue(existsFromSettings);
-        IDE.getConfigValue = jest.fn().mockReturnValue(settingValue);
+      test(`yields ${expected} when ${description}`, async () => {
+        mockType(commandExistsSync).mockReturnValue(expected);
 
-        expect(StyraInstall.isInstalled()).toBe(expected);
+        expect(await StyraInstall.checkCliInstallation()).toBe(expected as boolean);
+
+        expect(spy.content).toMatch(postedOutput as RegExp);
       });
     });
-  });
 
-  describe('checkCLIInstallation', () => {
     [
       ['Cancel', false, /CLI installation cancelled/],
       ['Install', true, /CLI installation completed/]
     ].forEach(([choice, expected, postedOutput]) => {
 
       test(`returns ${expected} for ${choice} selection`, async () => {
-        IDE.getConfigValue = jest.fn().mockReturnValue(undefined);
+        mockType(commandExistsSync).mockReturnValue(false);
         IDE.showInformationMessageModal = jest.fn().mockReturnValue(choice);
         StyraInstall.installStyra = jest.fn().mockResolvedValue('');
 
@@ -96,7 +88,7 @@ describe('StyraInstall', () => {
     });
 
     test('returns false if installStyra throws an error', async () => {
-      IDE.getConfigValue = jest.fn().mockReturnValue(undefined);
+      mockType(commandExistsSync).mockReturnValue(false);
       IDE.showInformationMessageModal = jest.fn().mockReturnValue('Install');
       StyraInstall.installStyra = jest.fn().mockRejectedValue('error');
 
@@ -114,6 +106,7 @@ describe('StyraInstall', () => {
 
       test(`checked date is advanced to today when ${description}`, async () => {
         DAS.runQuery = jest.fn().mockResolvedValue({cliVersion: '1.2.4'});
+        IDE.getConfigValue = jest.fn().mockReturnValue(undefined);
         CommandRunner.prototype.runShellCmd = jest.fn().mockResolvedValue('1.2.3');
         const storageMgr = LocalStorageService.instance;
         const storage = new TestMemento();
