@@ -1,6 +1,8 @@
 import {IDE} from './vscode-api';
 
 export const outputChannel = IDE.createOutputChannel('Styra');
+export const footnoteMsg = '(*) See output pane (*)';
+const footnoteSymbol = '(*)';
 
 // the workhorse that interacts with outputChanel
 export function info(msg: string): void {
@@ -14,7 +16,7 @@ export function info(msg: string): void {
 // Use this to provide supplemental description for an input box or pick box.
 export function infoInput(msg: string): void {
   info('');
-  info(`*** Input note: ${msg}`);
+  info(`${footnoteSymbol} ${msg}`);
 }
 
 // Use this to introduce a multi-step dialog whenever you use one.
@@ -25,6 +27,7 @@ export function infoDiagram(title: string, flow: string): void {
 
 // Use this when emitting a message directly caused by an action from the user.
 export function infoFromUserAction(msg: string): void {
+  info('');
   info(`[USER]: ${msg}`);
 }
 

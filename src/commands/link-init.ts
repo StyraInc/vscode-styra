@@ -122,6 +122,7 @@ export class LinkInit implements ICommand {
       step: 4,
       totalSteps: this.totalSteps,
       value: state.folder ?? '',
+      placeholder: 'authorization',
       prompt: 'Where should policies be stored in the project?',
       validate: validateNonEmpty,
       shouldResume,

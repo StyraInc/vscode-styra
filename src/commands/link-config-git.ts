@@ -1,9 +1,9 @@
 import {MultiStepInput} from '../external/multi-step-input';
 
 import {CommandRunner} from '../lib/command-runner';
+import {footnoteMsg, info, infoDiagram, infoInput} from '../lib/outputPane';
 import {generatePickList, shouldResume, StepType, validateNonEmpty, validateNoop} from './utility';
 import {ICommand, ReturnValue} from '../lib/types';
-import {info, infoDiagram, infoInput} from '../lib/outputPane';
 import {QuickPickItem} from '../lib/vscode-api';
 
 interface State {
@@ -117,7 +117,7 @@ export class LinkConfigGit implements ICommand {
       title: this.title,
       step: 1,
       totalSteps: this.step.total,
-      placeholder: 'Do you want to overwrite this configuration?',
+      placeholder: `Do you want to overwrite this configuration? ${footnoteMsg}`,
       items: generatePickList(['yes', 'no']),
       activeItem: state.forceGitOverwrite,
       shouldResume,
@@ -134,6 +134,7 @@ export class LinkConfigGit implements ICommand {
       step: 2 + this.step.delta,
       totalSteps: this.step.total,
       value: state.url ?? '',
+      placeholder: 'git@... or https://...',
       prompt: 'Enter remote Git URL',
       validate: this.validateProtocol,
       shouldResume,
@@ -170,7 +171,7 @@ export class LinkConfigGit implements ICommand {
       step: 4 + this.step.delta,
       totalSteps: this.step.total,
       value: state.pwdOrToken ?? '',
-      prompt: 'Enter Git access token or password',
+      prompt: `Enter Git access token or password ${footnoteMsg}`,
       validate: validateNonEmpty,
       shouldResume,
     });
@@ -186,8 +187,8 @@ export class LinkConfigGit implements ICommand {
       step: 3 + this.step.delta,
       totalSteps: this.step.total,
       value: state.keyFilePath ?? '',
-      placeholder: 'e.g. /Users/YOU/.ssh/id_ALGORITHM',
-      prompt: 'Enter SSH private key file path',
+      placeholder: '/Users/YOU/.ssh/id_ALGORITHM',
+      prompt: `Enter SSH private key file path ${footnoteMsg}`,
       validate: validateNonEmpty,
       shouldResume,
     });
@@ -203,7 +204,7 @@ export class LinkConfigGit implements ICommand {
       step: 4 + this.step.delta,
       totalSteps: this.step.total,
       value: state.keyPassphrase ?? '',
-      prompt: 'Enter SSH private key passphrase',
+      prompt: `Enter SSH private key passphrase ${footnoteMsg}`,
       validate: validateNoop,
       shouldResume,
     });
@@ -217,7 +218,7 @@ export class LinkConfigGit implements ICommand {
       title: this.title,
       step: 5 + this.step.delta,
       totalSteps: this.step.total,
-      placeholder: 'How would you like to sync your policies?',
+      placeholder: `How would you like to sync your policies? ${footnoteMsg}`,
       items: generatePickList(['commit', 'branch', 'tag']),
       activeItem: state.syncStyleType,
       shouldResume,
@@ -233,10 +234,14 @@ export class LinkConfigGit implements ICommand {
       step: 6 + this.step.delta,
       totalSteps: this.step.total,
       value: state.syncStyleValue ?? '',
+      placeholder:
+        syncType === 'branch' ? 'main'
+          : syncType === 'tag' ? ''
+            : 'HEAD (or commit hash)', // syncType === 'commit'
       prompt:
-        syncType === 'branch' ? 'Enter Git branch (e.g. main)'
+        syncType === 'branch' ? 'Enter Git branch'
           : syncType === 'tag' ? 'Enter Git tag'
-            : 'Enter Git commit hash (or HEAD)', // syncType === 'commit'
+            : 'Enter Git commit hash',
       validate: validateNonEmpty,
       shouldResume,
     });

@@ -2,9 +2,9 @@ import * as fs from 'fs';
 import * as os from 'os';
 
 import {CommandRunner} from './command-runner';
+import {footnoteMsg, info, infoInput, teeError} from './outputPane';
 import {generatePickList, shouldResume, StepType, validateNonEmpty} from '../commands/utility';
 import {IDE, QuickPickItem} from './vscode-api';
-import {info, infoInput, teeError} from './outputPane';
 import {MultiStepInput} from '../external/multi-step-input';
 
 export type ConfigData = {
@@ -131,7 +131,7 @@ export class StyraConfig {
       step: 3,
       totalSteps: 3,
       value: state.token ?? '',
-      prompt: 'Enter API token for Styra DAS Tenant',
+      prompt: `Enter API token for Styra DAS Tenant ${footnoteMsg}`,
       validate: validateNonEmpty,
       shouldResume,
     });
