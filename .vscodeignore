@@ -11,6 +11,7 @@ cspell.json
 Makefile
 packaging/**
 src/**
+START_HERE.md
 vsc-extension-quickstart.md
 *.config.js
 **/tsconfig.json
