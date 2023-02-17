@@ -49,12 +49,14 @@ On the command-line, you can run Jest tests in a few ways (per scripts in packag
 
 1. Add release to top of /CHANGELOG.md, following "Keep a Changelog" conventions.
 2. Add release tag to bottom of /CHANGELOG.md, to make the title a hyperlink to a version diff.
-3. Update version in package.json
-4. Update version also in package-lock.json.
-5. Run `npm run package`.
-6. Create a new release in GitHub [Releases](https://github.com/StyraInc/vscode-styra/releases) page.
-7. Upload package (`vscode-styra-n.n.n.vsix`) to the release; once we publish to VSCode marketplace, this will change.
-8. Post notice of release in `#proj-link` channel.
+3. Update the URL for the "unreleased" tag at the bottom of the file, too.
+4. Update version n.n.n in package.json.
+5. Update version n.n.n also in package-lock.json.
+6. Post a pull request with the above changes. Title should be "release: n.n.n" and description should be "Bookkeeping for release n.n.n.".
+7. Run `npm run package`.
+8. Create a new release in GitHub [Releases](https://github.com/StyraInc/vscode-styra/releases) page, tagging the commit for the merged PR done in (6).
+9. Upload package (`vscode-styra-n.n.n.vsix`) to the release. (Once we publish to VSCode marketplace, this will change.)
+10. Post notice of release in `#proj-link` channel.
 
 ## Adding a New Command
 

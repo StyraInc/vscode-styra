@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.6-alpha] - 2023-02-17
+
+### Added
+
+- During startup checks, if the Styra CLI is not yet configured, we add a new peremptory question asking if the user has a DAS tenant. If not, offer to take the user to the sign-up page.
+- Surface the global `--debug` option from the Styra Link CLI, letting the user see the API calls in the Styra output pane. There is a new boolean VSCode setting `Styra > Debug` that controls the visibility of this.
+
+### Fixed
+
+- Adjusted command names that require user inputs to include a trailing ellipsis to give a visual indicator to the user before running the command.
+- Because of the physical separation of user prompts and messages in the output pane, improved the visibility indicating such "footnotes".
+
+### Removed
+
+- `styra.path` removed from VSCode settings, as it still needed more work and is non-vital at this stage.
+
 ## [0.0.5-alpha] - 2023-02-13
 
 ### Added
@@ -73,7 +89,8 @@ whether there is anything to overwrite, then asks that first, mirroring the CLI 
 - `Styra Link: Config Git` command added.
 
 <!-- Be sure to add an entry here for each release! -->
-[unreleased]: https://github.com/StyraInc/vscode-styra/compare/v0.0.4-alpha...HEAD
+[unreleased]: https://github.com/StyraInc/vscode-styra/compare/v0.0.6-alpha...HEAD
+[0.0.6-alpha]: https://github.com/StyraInc/vscode-styra/compare/v0.0.5-alpha...v0.0.6-alpha
 [0.0.5-alpha]: https://github.com/StyraInc/vscode-styra/compare/v0.0.4-alpha...v0.0.5-alpha
 [0.0.4-alpha]: https://github.com/StyraInc/vscode-styra/compare/v0.0.3-alpha...v0.0.4-alpha
 [0.0.3-alpha]: https://github.com/StyraInc/vscode-styra/compare/v0.0.2-alpha...v0.0.3-alpha
