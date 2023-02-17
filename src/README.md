@@ -5,7 +5,7 @@
 As a developer you likely want to know what lies ahead.
 Whenever you run a Styra Link command, before it even thinks about running a command, it goes through this startup protocol.
 
-![startup flow diagram](https://github.com/StyraInc/vscode-styra/blob/msorens/sty-15658/startup-flow.png?raw=true)
+![startup flow diagram](https://github.com/StyraInc/vscode-styra/blob/main/startup-flow.png)
 
 ## Debugging
 
