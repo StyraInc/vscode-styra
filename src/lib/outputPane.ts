@@ -28,6 +28,11 @@ export function infoFromUserAction(msg: string): void {
   info(`[USER]: ${msg}`);
 }
 
+// Use this to report debug-level messages
+export function infoDebug(msg: string): void {
+  info(`[DEBUG]: ${msg}`);
+}
+
 export function teeInfo(msg: string): void {
   info(msg);
   IDE.showInformationMessage(msg);

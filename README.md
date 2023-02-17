@@ -20,6 +20,7 @@ Brings the capabilities of Styra Link into VSCode for streamlining your workflow
 | Setting | Default | Description |
 | --- | --- | --- |
 | `Styra > Check Update Interval` | 1 | How often to check for updates to the Styra CLI (in days). |
+| `Styra > Debug` | false | Reveal API calls in the Styra output pane. |
 
 ## Known Issues
 

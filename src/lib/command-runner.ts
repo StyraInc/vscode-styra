@@ -2,7 +2,7 @@ import {ChildProcessWithoutNullStreams, spawn} from 'child_process';
 import shellEscape = require('shell-escape');
 
 import {IDE} from './vscode-api';
-import {info, teeError} from './outputPane';
+import {info, infoDebug, teeError} from './outputPane';
 import {LocalStorageService, Workspace} from './local-storage-service';
 import {STYRA_CLI_CMD, StyraInstall} from './styra-install';
 
@@ -48,13 +48,32 @@ export class CommandRunner {
     if (cmd == null) {
       throw new Error('code error: progressTitle required: use CommandNotifier or pass explicit value');
     }
-    options = {...options, progressTitle: cmd};
-    return await this.runShellCmd(STYRA_CLI_CMD, args, options);
+    return await this.runWithOptionalDebug(args, {...options, progressTitle: cmd});
   }
 
   // Same as runStyraCmd except does not reveal the command to the user
   async runStyraCmdQuietly(args: string[], possibleError = ''): Promise<string> {
-    return await this.runShellCmd(STYRA_CLI_CMD, args, {progressTitle: '', quiet: true, possibleError});
+    return await this.runWithOptionalDebug(args, {progressTitle: '', quiet: true, possibleError});
+  }
+
+  // One minor inconsistency with diagnostic lines sent to infoDebug here:
+  // if the styra link command errors, the entirety of the output
+  // has already been logged before returning from `runShellCmd` here,
+  // so in that case the diagnostic lines will NOT be prefixed with `[DEBUG]`.
+  // Bug? Feature? You decide :-).
+  private async runWithOptionalDebug(args: string[], options?: CommandRunnerOptions): Promise<string> {
+    if (IDE.getConfigValue<boolean>('styra', 'debug') ?? false) {
+      args.push('--debug');
+      let result = (await this.runShellCmd(STYRA_CLI_CMD, args, options)).split('\n');
+      result.filter(this.isDebugLine).forEach(infoDebug);
+      result = result.filter((line) => !this.isDebugLine(line));
+      return result.join('\n');
+    }
+    return await this.runShellCmd(STYRA_CLI_CMD, args, options);
+  }
+
+  private isDebugLine(line: string): boolean {
+    return ['GET', 'PUT', 'POST', 'DELETE', 'PATCH'].filter((debugFlag) => line.startsWith(debugFlag)).length > 0;
   }
 
   // This can be used for any other (non `styra ...`) commands.
