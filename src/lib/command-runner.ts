@@ -61,16 +61,19 @@ export class CommandRunner {
   // has already been logged before returning from `runShellCmd` here,
   // so in that case the diagnostic lines will NOT be prefixed with `[DEBUG]`.
   // Bug? Feature? You decide :-).
-  async runWithOptionalDebug(args: string[], options?: CommandRunnerOptions): Promise<string> {
+  private async runWithOptionalDebug(args: string[], options?: CommandRunnerOptions): Promise<string> {
     if (IDE.getConfigValue<boolean>('styra', 'debug') ?? false) {
       args.push('--debug');
       let result = (await this.runShellCmd(STYRA_CLI_CMD, args, options)).split('\n');
-      result.filter((line) => line.startsWith('GET') || line.startsWith('PUT') || line.startsWith('POST'))
-        .forEach(infoDebug);
-      result = result.filter((line) => !line.startsWith('GET') && !line.startsWith('PUT') && !line.startsWith('POST'));
+      result.filter(this.isDebugLine).forEach(infoDebug);
+      result = result.filter((line) => !this.isDebugLine(line));
       return result.join('\n');
     }
     return await this.runShellCmd(STYRA_CLI_CMD, args, options);
+  }
+
+  private isDebugLine(line: string): boolean {
+    return ['GET', 'PUT', 'POST', 'DELETE', 'PATCH'].filter((debugFlag) => line.startsWith(debugFlag)).length > 0;
   }
 
   // This can be used for any other (non `styra ...`) commands.
