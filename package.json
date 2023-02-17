@@ -22,11 +22,11 @@
     "commands": [
       {
         "command": "styra.link.init",
-        "title": "Styra Link: Initialize"
+        "title": "Styra Link: Initialize..."
       },
       {
         "command": "styra.link.config-git",
-        "title": "Styra Link: Config Git"
+        "title": "Styra Link: Configure Git..."
       },
       {
         "command": "styra.link.test",
@@ -38,7 +38,7 @@
       },
       {
         "command": "styra.link.search",
-        "title": "Styra Link: Search"
+        "title": "Styra Link: Search..."
       }
     ],
     "configuration": {

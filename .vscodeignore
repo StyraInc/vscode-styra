@@ -3,6 +3,7 @@
 .github/**
 out/test/**
 out/test-jest/**
+startup-flow.png
 
 .gitignore
 .yarnrc

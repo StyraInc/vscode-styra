@@ -1,14 +1,22 @@
 # vscode-styra Visual Studio Code Extension
 
-Brings the capabilities of Styra Link into VSCode for streamlining your workflow!
+**Styra Link** is a new way of working with [Styra DAS](https://www.styra.com/styra-das/).
+It allows you to create a new Styra DAS system or connect with an existing one.
+Once connected you can write, test, validate, and publish policy all within your normal development workflow.
+If you prefer the command line, that is where Styra Link started.
+But now, this extension also brings the capabilities of Styra Link right into VSCode to streamline your workflow!
 
-## Features
+## Commands
 
-* `Styra Link: Initialize` — create (or connect to) a system in DAS.
-* `Styra Link: Config Git` — configure Styra Link with a Git connection.
+Some of the commands execute immediately but those with a trailing ellipsis ask you to enter several inputs.
+Be on the lookout! When you see the footnote indicator next to the prompt `(*) See output pane (*)` look
+for the latest footnote in the Styra output pane to provide further context on what you need to supply.
+
+* `Styra Link: Initialize...` — create (or connect to) a system in DAS.
+* `Styra Link: Configure Git...` — configure Styra Link with a Git connection.
 * `Styra Link: Test` — run your unit tests using the latest authored policies.
 * `Styra Link: Validate Decisions` — replay prior decisions against your latest authored polices to see how decisions will change.
-* `Styra Link: Search` — find available library rules for the current Styra Link project.
+* `Styra Link: Search...` — find available library rules for the current Styra Link project.
 
 ## Requirements
 
