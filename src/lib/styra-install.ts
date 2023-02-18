@@ -3,6 +3,7 @@ import * as fse from 'fs-extra';
 import * as os from 'os';
 import {default as fetch} from 'node-fetch';
 import moveFile = require('move-file');
+import path = require('path');
 import {sync as commandExistsSync} from 'command-exists';
 import {compare} from 'semver';
 
@@ -91,8 +92,8 @@ export class StyraInstall {
     info(`    Architecture: ${targetArch}`);
 
     const binaryFile = targetOS === 'win32' ? STYRA_CLI_CMD + '.exe' : STYRA_CLI_CMD;
-    const exeFile = targetOS === 'win32' ? 'C:\\Program Files\\styra\\' + binaryFile : '/usr/local/bin/' + binaryFile;
-    const tempFileLocation = os.homedir() + '/' + binaryFile;
+    const exeFile = targetOS === 'win32' ? path.join('C:', 'Program Files', 'styra', binaryFile) : path.join('/usr/local/bin/', binaryFile);
+    const tempFileLocation = path.join(os.homedir(), binaryFile);
 
     const url =
       targetOS === 'win32'
