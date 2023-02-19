@@ -5,27 +5,35 @@ import {info, teeError} from './outputPane';
 
 export class SnippetInstaller {
 
-  addSnippetsToProject(): void {
+  async addSnippetsToProject(): Promise<void> {
 
     const vsix = IDE.getExtension('styra.vscode-styra');
     if (!vsix) {
       teeError('unable to find Styra extension');
       return;
     }
-    // Get file path from the plugin package
     const snippetFile = 'styra-snippets.code-snippets';
-    const srcPath = path.join(vsix.extensionPath, 'snippets', snippetFile);
 
-    // Get the path to the destination folder
-    const destPath = path.join(IDE.cwd() ?? '/', '.vscode');
+    // Get snippet file path from the plugin package
+    const srcPath = path.join(vsix.extensionPath, 'snippets', snippetFile);
+    const destDir = IDE.dotFolderForExtension();
+    const destPath = path.join(destDir, snippetFile);
+
+    if (fs.existsSync(destPath) && await SnippetInstaller.compareFiles(srcPath, destPath)) {
+      return;
+    }
 
     info(`Installing snippets...\nfrom: ${srcPath}\n  to: ${destPath}`);
 
-    // Copy the file
-    if (!fs.existsSync(destPath)) {
-      fs.mkdirSync(destPath);
+    if (!fs.existsSync(destDir)) {
+      fs.mkdirSync(destDir);
     }
-    fs.copyFileSync(srcPath, path.join(destPath, snippetFile));
+    fs.copyFileSync(srcPath, destPath);
+  }
 
+  static async compareFiles(file1: string, file2: string): Promise<boolean> {
+    const contents1 = await fs.promises.readFile(file1, 'utf8');
+    const contents2 = await fs.promises.readFile(file2, 'utf8');
+    return contents1 === contents2;
   }
 }

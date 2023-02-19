@@ -1,3 +1,4 @@
+import path = require('path');
 import * as vscode from 'vscode';
 
 // The IDE interface for VSCode.
@@ -26,6 +27,10 @@ export class IDE {
 
   static cwd(): string | undefined {
     return vscode.workspace.workspaceFolders?.[0].uri.fsPath;
+  }
+
+  static dotFolderForExtension(): string {
+    return path.join(IDE.cwd() ?? '.', '.vscode');
   }
 
   static workspaceFolders(): readonly vscode.WorkspaceFolder[] | undefined {

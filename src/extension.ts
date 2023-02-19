@@ -9,6 +9,7 @@ import {LinkSearch} from './commands/link-search';
 import {LinkTest} from './commands/link-test';
 import {LinkValidateDecisions} from './commands/link-validate-decisions';
 import {LocalStorageService} from './lib/local-storage-service';
+import {SnippetInstaller} from './lib/snippet-installer';
 
 // reference: https://github.com/bwateratmsft/memento-explorer
 interface IMementoExplorerExtension {
@@ -19,7 +20,7 @@ interface IMementoExplorerExtension {
 }
 
 // extension entry point
-export function activate(context: vscode.ExtensionContext): IMementoExplorerExtension {
+export async function activate(context: vscode.ExtensionContext): Promise<IMementoExplorerExtension> {
   outputChannel.show(true);
   info('Styra extension active!');
   LocalStorageService.instance.storage = context.workspaceState;
@@ -40,6 +41,8 @@ export function activate(context: vscode.ExtensionContext): IMementoExplorerExte
       })
     )
   );
+
+  await new SnippetInstaller().addSnippetsToProject();
 
   // Check the env context at the time VSCode is launched.
   // Will only expose the persistent storage if this env var is set as shown.
