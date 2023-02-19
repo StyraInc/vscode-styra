@@ -24,12 +24,21 @@ export class IDE {
     return vscode.window.createOutputChannel(name);
   }
 
+  static cwd(): string | undefined {
+    return vscode.workspace.workspaceFolders?.[0].uri.fsPath;
+  }
+
   static workspaceFolders(): readonly vscode.WorkspaceFolder[] | undefined {
     return vscode.workspace.workspaceFolders;
   }
 
   static getConfigValue<P>(path: string, key: string): P | undefined {
     return vscode.workspace.getConfiguration(path).get<P>(key);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  static getExtension(id: string): vscode.Extension<any> | undefined {
+    return vscode.extensions.getExtension(id);
   }
 
   // while this family of methods could take an items array for button choices,

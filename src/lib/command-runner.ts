@@ -89,9 +89,7 @@ export class CommandRunner {
       teeError('Something is wrong! Did you forget to run checkWorkspace in your command?');
       return '';
     }
-    // above check guarantees workspaceFolder exists so lint override OK
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const cwd = IDE.workspaceFolders()![0].uri.toString().substring('file://'.length);
+    const cwd = IDE.cwd();
     if (!quiet) {
       info('\nSpawning child process:');
       info(`    project path: ${cwd}`);
