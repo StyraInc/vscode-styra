@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 
 import {Executor} from './commands/executor';
 import {ICommand} from './lib/types';
-import {info, outputChannel} from './lib/outputPane';
+import {infoDebug, outputChannel} from './lib/outputPane';
 import {LinkConfigGit} from './commands/link-config-git';
 import {LinkInit} from './commands/link-init';
 import {LinkSearch} from './commands/link-search';
@@ -22,7 +22,7 @@ interface IMementoExplorerExtension {
 // extension entry point
 export async function activate(context: vscode.ExtensionContext): Promise<IMementoExplorerExtension> {
   outputChannel.show(true);
-  info('Styra extension active!');
+  infoDebug('Styra extension active!');
   LocalStorageService.instance.storage = context.workspaceState;
 
   // commands come from package.json::contribute.commands
@@ -33,6 +33,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IMemen
     'styra.link.validate-decisions': new LinkValidateDecisions(),
     'styra.link.search': new LinkSearch(),
   };
+  infoDebug(`Registering ${Object.keys(styraCommands).length} commands`);
 
   Object.entries(styraCommands).forEach(([cmd, target]) =>
     context.subscriptions.push(

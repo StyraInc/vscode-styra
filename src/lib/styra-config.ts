@@ -6,6 +6,7 @@ import {footnoteMsg, info, infoInput, teeError} from './outputPane';
 import {generatePickList, shouldResume, StepType, validateNonEmpty} from '../commands/utility';
 import {IDE, QuickPickItem} from './vscode-api';
 import {MultiStepInput} from '../external/multi-step-input';
+import path = require('path');
 
 export class DASConfigData {
   url = '';
@@ -14,10 +15,11 @@ export class DASConfigData {
 
 export class ProjectConfigData {
   projectType = '';
+  name = '';
 }
 
-export const CONFIG_FILE_PATH = '.styra/config';
-export const DAS_CONFIG_FILE_PATH = `${os.homedir}/${CONFIG_FILE_PATH}`;
+const CONFIG_FILE_PATH = '.styra/config';
+const DAS_CONFIG_FILE_PATH = `${os.homedir}/${CONFIG_FILE_PATH}`;
 
 interface State {
   hasTenant: QuickPickItem;
@@ -27,6 +29,14 @@ interface State {
 }
 
 export class StyraConfig {
+
+  static async getProjectConfig(): Promise<ProjectConfigData> {
+    return await StyraConfig.read(path.join(IDE.projectDir() ?? '.', CONFIG_FILE_PATH), new ProjectConfigData());
+  }
+
+  static async getDASConfig(): Promise<DASConfigData> {
+    return await StyraConfig.read(DAS_CONFIG_FILE_PATH, new DASConfigData());
+  }
 
   // TODO: get rid of "any" with appropriate index type
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any

@@ -33,7 +33,9 @@ export function infoFromUserAction(msg: string): void {
 
 // Use this to report debug-level messages
 export function infoDebug(msg: string): void {
-  info(`[DEBUG]: ${msg}`);
+  if (IDE.getConfigValue<boolean>('styra', 'debug')) {
+    info(`[DEBUG]: ${msg}`);
+  }
 }
 
 export function teeInfo(msg: string): void {
