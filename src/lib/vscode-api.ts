@@ -25,12 +25,12 @@ export class IDE {
     return vscode.window.createOutputChannel(name);
   }
 
-  static cwd(): string | undefined {
+  static projectDir(): string | undefined {
     return vscode.workspace.workspaceFolders?.[0].uri.fsPath;
   }
 
   static dotFolderForExtension(): string {
-    return path.join(IDE.cwd() ?? '.', '.vscode');
+    return path.join(IDE.projectDir() ?? '.', '.vscode');
   }
 
   static workspaceFolders(): readonly vscode.WorkspaceFolder[] | undefined {

@@ -89,15 +89,15 @@ export class CommandRunner {
       teeError('Something is wrong! Did you forget to run checkWorkspace in your command?');
       return '';
     }
-    const cwd = IDE.cwd();
+    const projectDir = IDE.projectDir();
     if (!quiet) {
       info('\nSpawning child process:');
-      info(`    project path: ${cwd}`);
+      info(`    project path: ${projectDir}`);
       info(`    ${path} ${shellEscape(args)}`);
     }
 
     // https://nodejs.org/api/child_process.html#child_processspawncommand-args-options
-    const proc = spawn(path, args, {cwd});
+    const proc = spawn(path, args, {cwd: projectDir});
     proc.stdin.write(stdinData.endsWith('\n') ? stdinData : stdinData + '\n');
     proc.stdin.end();
 

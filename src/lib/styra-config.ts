@@ -16,7 +16,8 @@ export class ProjectConfigData {
   projectType = '';
 }
 
-export const CONFIG_FILE_PATH = `${os.homedir}/.styra/config`;
+export const CONFIG_FILE_PATH = '.styra/config';
+export const DAS_CONFIG_FILE_PATH = `${os.homedir}/${CONFIG_FILE_PATH}`;
 
 interface State {
   hasTenant: QuickPickItem;
@@ -47,8 +48,8 @@ export class StyraConfig {
   static async checkCliConfiguration(): Promise<boolean> {
     const runner = new CommandRunner();
 
-    if (fs.existsSync(CONFIG_FILE_PATH)) {
-      info(`Using existing Styra CLI configuration: ${CONFIG_FILE_PATH}`);
+    if (fs.existsSync(DAS_CONFIG_FILE_PATH)) {
+      info(`Using existing Styra CLI configuration: ${DAS_CONFIG_FILE_PATH}`);
       return true;
     }
 

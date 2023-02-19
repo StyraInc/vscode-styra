@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import path = require('path');
+import {CONFIG_FILE_PATH, ProjectConfigData, StyraConfig} from './styra-config';
 import {IDE} from './vscode-api';
 import {info, teeError} from './outputPane';
 
@@ -12,12 +13,14 @@ export class SnippetInstaller {
       teeError('unable to find Styra extension');
       return;
     }
-    const snippetFile = 'styra-snippets.code-snippets';
+    const snippetDir = vsix.extensionPath; // Get snippet file path from the plugin package
+    const destSnippetFile = 'styra-snippets.code-snippets';
 
-    // Get snippet file path from the plugin package
-    const srcPath = path.join(vsix.extensionPath, 'snippets', snippetFile);
-    const destDir = IDE.dotFolderForExtension();
-    const destPath = path.join(destDir, snippetFile);
+    const dotDir = IDE.dotFolderForExtension();
+    info(`dotDir = ${dotDir}`);
+    const srcPath = path.join(snippetDir, 'snippets', await SnippetInstaller.getSnippetFileName(IDE.projectDir()));
+    const destPath = path.join(dotDir, destSnippetFile);
+    info(`from: ${srcPath}\n  to: ${destPath}`);
 
     if (fs.existsSync(destPath) && await SnippetInstaller.compareFiles(srcPath, destPath)) {
       return;
@@ -25,10 +28,16 @@ export class SnippetInstaller {
 
     info(`Installing snippets...\nfrom: ${srcPath}\n  to: ${destPath}`);
 
-    if (!fs.existsSync(destDir)) {
-      fs.mkdirSync(destDir);
+    if (!fs.existsSync(dotDir)) {
+      fs.mkdirSync(dotDir);
     }
     fs.copyFileSync(srcPath, destPath);
+  }
+
+  static async getSnippetFileName(projectDir = '.'): Promise<string> {
+    const configData: ProjectConfigData = await StyraConfig.read(path.join(projectDir, CONFIG_FILE_PATH), new ProjectConfigData());
+    info(`identified ${configData.projectType} system type`);
+    return `${configData.projectType}.json`;
   }
 
   static async compareFiles(file1: string, file2: string): Promise<boolean> {

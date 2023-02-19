@@ -1,0 +1,11 @@
+{
+	"Sample print to console": {
+		"scope": "javascript,typescript",
+		"prefix": "styra",
+		"body": [
+			"console.log('envoy $1');",
+			"$2"
+		],
+		"description": "Log output to console"
+	}
+}
