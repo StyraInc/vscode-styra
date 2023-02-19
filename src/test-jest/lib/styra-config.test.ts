@@ -1,10 +1,10 @@
 import * as fs from 'fs';
 import * as fspromises from 'fs/promises';
 import {CommandRunner} from '../../lib/command-runner';
+import {DASConfigData, ProjectConfigData, StyraConfig} from '../../lib/styra-config';
 import {IDE} from '../../lib/vscode-api';
 import {MultiStepInput} from '../../external/multi-step-input';
 import {OutputPaneSpy} from '../utility';
-import {StyraConfig} from '../../lib/styra-config';
 
 describe('StyraConfig', () => {
 
@@ -139,11 +139,38 @@ describe('StyraConfig', () => {
 
       test(description, async () => {
         jest.spyOn(fspromises, 'readFile').mockResolvedValue(data);
-        const {url, token} = await StyraConfig.read();
+        const {url, token} = await StyraConfig.read('any file name', new DASConfigData());
         expect(url).toBe('https://my.url.com');
         expect(['token_value', 'token value']).toContain(token);
       });
 
+    });
+
+    test('reading the same data with different objects fills in the appropriate fields', async () => {
+      const data = `
+        url: https://my.url.com
+        token: token_value
+        projectType: envoy
+        `;
+      jest.spyOn(fspromises, 'readFile').mockResolvedValue(data);
+      const result1 = await StyraConfig.read('any file name', new DASConfigData()) as DASConfigData;
+      expect(result1.url).toBe('https://my.url.com');
+      expect(result1.token).toBe('token_value');
+      const result2 = await StyraConfig.read('any file name', new ProjectConfigData()) as ProjectConfigData;
+      expect(result2.projectType).toBe('envoy');
+    });
+
+    test('reading data with a different object harmlessly returns that object empty', async () => {
+      const data = `
+        url: https://my.url.com
+        token: token_value
+        `;
+      jest.spyOn(fspromises, 'readFile').mockResolvedValue(data);
+      const result1 = await StyraConfig.read('any file name', new DASConfigData()) as DASConfigData;
+      expect(result1.url).toBe('https://my.url.com');
+      expect(result1.token).toBe('token_value');
+      const result2 = await StyraConfig.read('any file name', new ProjectConfigData()) as ProjectConfigData;
+      expect(result2.projectType).toBe('');
     });
   });
 });

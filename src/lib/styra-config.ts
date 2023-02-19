@@ -7,12 +7,16 @@ import {generatePickList, shouldResume, StepType, validateNonEmpty} from '../com
 import {IDE, QuickPickItem} from './vscode-api';
 import {MultiStepInput} from '../external/multi-step-input';
 
-export type ConfigData = {
-  url: string;
-  token: string;
-};
+export class DASConfigData {
+  url = '';
+  token = '';
+}
 
-const CONFIG_FILE_PATH = `${os.homedir}/.styra/config`;
+export class ProjectConfigData {
+  projectType = '';
+}
+
+export const CONFIG_FILE_PATH = `${os.homedir}/.styra/config`;
 
 interface State {
   hasTenant: QuickPickItem;
@@ -23,18 +27,18 @@ interface State {
 
 export class StyraConfig {
 
-  static async read(): Promise<ConfigData> {
-    const configData = <ConfigData>{};
-    return await fs.promises.readFile(CONFIG_FILE_PATH, 'utf8').then((data) => {
+  // TODO: get rid of "any" with appropriate index type
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any
+  static async read(filename: string, configData: any): Promise<any> {
+    const fields = Object.keys(configData);
+
+    return await fs.promises.readFile(filename, 'utf8').then((data) => {
       data.split(/\r?\n/).forEach((line) => {
         const {key, value} = line.match(/(?<key>\w+)\s*:\s*(?<value>.*\S)/)?.groups ?? {};
-        if (key === 'url') {
-          configData.url = value;
+        if (fields.includes(key)) {
+          configData[key] = value;
         }
-        if (key === 'token') {
-          configData.token = value;
-        }
-        // silently ignore any other properties in the config, valid or not
+        // silently ignore anything else in the config, valid property or otherwise
       });
       return configData;
     });
