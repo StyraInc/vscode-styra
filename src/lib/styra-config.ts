@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 
 import {CommandRunner} from './command-runner';
-import {footnoteMsg, info, infoInput, teeError} from './outputPane';
+import {footnoteMsg, info, infoDebug, infoInput, teeError} from './outputPane';
 import {generatePickList, shouldResume, StepType, validateNonEmpty} from '../commands/utility';
 import {IDE, QuickPickItem} from './vscode-api';
 import {MultiStepInput} from '../external/multi-step-input';
@@ -59,7 +59,7 @@ export class StyraConfig {
     const runner = new CommandRunner();
 
     if (fs.existsSync(DAS_CONFIG_FILE_PATH)) {
-      info(`Using existing Styra CLI configuration: ${DAS_CONFIG_FILE_PATH}`);
+      infoDebug(`Using existing Styra CLI configuration: ${DAS_CONFIG_FILE_PATH}`);
       return true;
     }
 

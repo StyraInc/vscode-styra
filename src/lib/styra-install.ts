@@ -10,7 +10,7 @@ import {compare} from 'semver';
 import {CommandRunner} from './command-runner';
 import {DAS} from './das-query';
 import {IDE} from './vscode-api';
-import {info, infoFromUserAction, teeError, teeInfo} from './outputPane';
+import {info, infoDebug, infoFromUserAction, teeError, teeInfo} from './outputPane';
 import {LocalStorageService, Workspace} from './local-storage-service';
 import {VersionType} from './types';
 
@@ -29,7 +29,7 @@ export class StyraInstall {
 
   static async checkCliInstallation(): Promise<boolean> {
     if (commandExistsSync(STYRA_CLI_CMD)) {
-      info('Styra CLI is installed');
+      infoDebug('Styra CLI is installed');
       return true;
     }
     info('Styra CLI is not installed');

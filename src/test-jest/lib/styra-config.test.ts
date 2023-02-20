@@ -14,6 +14,7 @@ describe('StyraConfig', () => {
 
     test('returns true when already configured', async () => {
       jest.spyOn(fs, 'existsSync').mockReturnValue(true);
+      IDE.getConfigValue = jest.fn().mockReturnValue(true); // getConfigValue('styra', 'debug')
 
       expect(await StyraConfig.checkCliConfiguration()).toBe(true);
 
