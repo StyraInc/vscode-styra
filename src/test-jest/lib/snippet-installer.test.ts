@@ -6,6 +6,10 @@ import {SnippetInstaller} from '../../lib/snippet-installer';
 
 describe('SnippetInstaller', () => {
 
+  // NB: While this file IS following the best practice of testing behavior rather than implementation,
+  // it needs to bother with details of the implementation to do so. Sigh.
+  // But it is better than not having the tests at all.
+
   const spy = new OutputPaneSpy();
 
   test('reports error if IDE does not find extension details', async () => {
@@ -48,7 +52,8 @@ describe('SnippetInstaller', () => {
       jest.spyOn(fs, 'mkdirSync').mockImplementation(() => '');
       const copySpy = jest.spyOn(fs, 'copyFileSync').mockImplementation(() => '');
 
-      jest.spyOn(fs, 'existsSync').mockReturnValue(fileExists as boolean);
+      jest.spyOn(fs, 'existsSync').mockImplementation((path) =>
+        path === '/ext/root/dir/snippets/kubernetes.json' ? true : fileExists as boolean);
       // eslint-disable-next-line dot-notation
       SnippetInstaller['compareFiles'] = jest.fn().mockResolvedValue(false);
 
@@ -73,7 +78,9 @@ describe('SnippetInstaller', () => {
       const mkdirSpy = jest.spyOn(fs, 'mkdirSync').mockImplementation(() => '');
 
       jest.spyOn(fs, 'existsSync').mockImplementation((path) =>
-        path === '/my/project/dir/.vscode/styra-snippets.code-snippets' ? false : dirExists as boolean
+        path === '/ext/root/dir/snippets/kubernetes.json' ? true :
+          path === '/my/project/dir/.vscode/styra-snippets.code-snippets' ? false
+            : dirExists as boolean
       );
 
       await new SnippetInstaller().addSnippetsToProject();
@@ -94,14 +101,30 @@ describe('SnippetInstaller', () => {
       IDE.getConfigValue = jest.fn().mockReturnValue(true); // getConfigValue('styra', 'debug')
       const config: ProjectConfigData = {projectType: 'kubernetes', name: 'my_project'};
       StyraConfig.read = jest.fn().mockResolvedValue(config);
-      jest.spyOn(fs, 'existsSync').mockReturnValue(false);
       jest.spyOn(fs, 'mkdirSync').mockImplementation(() => '');
       jest.spyOn(fs, 'copyFileSync').mockImplementation(() => '');
+      jest.spyOn(fs, 'existsSync').mockImplementation((path) =>
+        path === '/ext/root/dir/snippets/kubernetes.json'
+      );
 
       await new SnippetInstaller().addSnippetsToProject();
 
       expect(spy.content).toMatch(postedOutput as RegExp);
     });
+  });
+
+  test('when no snippets for given system type, skips install', async () => {
+    IDE.getExtension = jest.fn().mockReturnValue({extensionPath: '/ext/root/dir'});
+    IDE.projectDir = jest.fn().mockReturnValue('/my/project/dir');
+    IDE.getConfigValue = jest.fn().mockReturnValue(true); // getConfigValue('styra', 'debug')
+    const config: ProjectConfigData = {projectType: 'foobar', name: 'my_project'};
+    StyraConfig.read = jest.fn().mockResolvedValue(config);
+
+    jest.spyOn(fs, 'existsSync').mockReturnValue(false); // srcPath exists?
+
+    await new SnippetInstaller().addSnippetsToProject();
+
+    expect(spy.content).toMatch(/no snippets foobar.json available/);
   });
 
 });

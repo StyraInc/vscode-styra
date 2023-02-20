@@ -17,9 +17,14 @@ export class SnippetInstaller {
     const destSnippetFile = 'styra-snippets.code-snippets';
 
     const dotDir = IDE.dotFolderForExtension();
-    const srcPath = path.join(extensionRootDir, 'snippets', await SnippetInstaller.getSnippetFileName());
-    // TODO: check if srcPath exists
+    const srcName = await SnippetInstaller.getSnippetFileName();
+    const srcPath = path.join(extensionRootDir, 'snippets', srcName);
     const destPath = path.join(dotDir, destSnippetFile);
+
+    if (!fs.existsSync(srcPath)) {
+      infoDebug(`no snippets ${srcName} available`);
+      return;
+    }
 
     if (fs.existsSync(destPath) && await SnippetInstaller.compareFiles(srcPath, destPath)) {
       infoDebug('Snippets up-to-date; skipping snippet installation.');
