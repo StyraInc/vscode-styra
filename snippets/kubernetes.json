@@ -2,6 +2,7 @@
     "Containers: Add Default CPU Limit": {
         "prefix": "add_default_cpu_limit",
         "description": "Ensures that the container memory limit is set to a default value unless otherwise specified.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"cpu_limit\": \"\"}\n\tdata.library.v1.kubernetes.mutating.v1.add_default_cpu_limit[decision] with data.library.parameters as parameters\n}\n"
         ]
@@ -9,6 +10,7 @@
     "Containers: Add Default Memory Limit": {
         "prefix": "add_default_memory_limit",
         "description": "Ensures that the container memory limit is set to a default value unless otherwise specified.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"memory_limit\": \"\"}\n\tdata.library.v1.kubernetes.mutating.v1.add_default_memory_limit[decision] with data.library.parameters as parameters\n}\n"
         ]
@@ -16,6 +18,7 @@
     "Inject Missing Labels": {
         "prefix": "add_missing_labels",
         "description": "Ensures that the named set of labels exist; any missing label will be added with its corresponding default value.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"labels\": {}}\n\tdata.library.v1.kubernetes.mutating.v1.add_missing_labels[decision] with data.library.parameters as parameters\n}\n"
         ]
@@ -23,6 +26,7 @@
     "Role-Based Access Control (RBAC): Restrict Roles to Protect OPA Webhook": {
         "prefix": "allow_whitelist_roles_of_webhook_editors",
         "description": "Allow an approved list of ClusterRoles with permissions of create, update, or delete `validatingwebhookconfigurations`, `mutatingwebhookconfigurations` kinds.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"approved_roles\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.rbac.v1.allow_whitelist_roles_of_webhook_editors[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -30,6 +34,7 @@
     "Service Accounts: Prohibit Namespaces": {
         "prefix": "blacklist_namespace_serviceaccounts",
         "description": "Prevent service accounts from being created or updated in prohibited namespaces.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"prohibited_namespaces\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.rbac.v1.blacklist_namespace_serviceaccounts[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -37,6 +42,7 @@
     "Containers: Prohibit `:latest` Image Tag": {
         "prefix": "block_latest_image_tag",
         "description": "Prohibit container images that use the `:latest` tag.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.workload.v1.block_latest_image_tag[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -44,6 +50,7 @@
     "Nodes: Prohibit Master Workloads": {
         "prefix": "block_master_toleration",
         "description": "Prevent workloads from being deployed to master nodes.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.workload.v1.block_master_toleration[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -51,6 +58,7 @@
     "Nodes: Prohibit nodeName-based Workload Assignment": {
         "prefix": "block_nodename_assignment",
         "description": "Prevent workloads from specifying nodeName to exploit direct scheduling",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.workload.v1.block_nodename_assignment[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -58,6 +66,7 @@
     "Containers: Prohibit Privileged Mode": {
         "prefix": "block_privileged_mode",
         "description": "Prevent containers from running in privileged mode.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.workload.v1.block_privileged_mode[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -65,6 +74,7 @@
     "Containers: Prohibit Privileged Mode for Init Containers": {
         "prefix": "block_privileged_mode_init_containers",
         "description": "Prevent init containers from running in privileged mode.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.workload.v1.block_privileged_mode_init_containers[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -72,6 +82,7 @@
     "Containers: Prohibit Privileged Mode for Regular Containers": {
         "prefix": "block_privileged_mode_regular_containers",
         "description": "Prevent Regular containers from running in privileged mode.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.workload.v1.block_privileged_mode_regular_containers[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -79,6 +90,7 @@
     "Containers: Prohibit Images (Blocklist - Exact)": {
         "prefix": "block_repository_exact",
         "description": "Prohibit container images from specified registries (Host) and (optionally) from specified repository image paths.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"blocklist\": {}}\n\tdata.library.v1.kubernetes.admission.workload.v1.block_repository_exact[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -86,6 +98,7 @@
     "Containers: Prohibit Images (Blocklist - Globs)": {
         "prefix": "block_repository_glob",
         "description": "Prohibit container images from specified registries (Host) and repository paths specified as a path with optional wildcard globs.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"blocklist\": {}}\n\tdata.library.v1.kubernetes.admission.workload.v1.block_repository_glob[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -93,6 +106,7 @@
     "Audits: Restrict Groups": {
         "prefix": "check_audit_sink_group",
         "description": "Allow dynamic audit webhook backends (`AuditSink` resources) to be created only by approved groups.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"approved_groups\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.rbac.v1.check_audit_sink_group[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -100,6 +114,7 @@
     "Audits: Restrict Users": {
         "prefix": "check_audit_sink_user",
         "description": "Allow dynamic audit webhook backends (`AuditSink` resources) to be created only by approved users.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"approved_users\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.rbac.v1.check_audit_sink_user[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -107,6 +122,7 @@
     "Encryption: Restrict Configuration to Specific Groups": {
         "prefix": "check_encryptionconfig_group",
         "description": "Allow encryption to be configured only by approved groups.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"approved_groups\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.rbac.v1.check_encryptionconfig_group[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -114,6 +130,7 @@
     "Encryption: Restrict Configuration to Specific Users": {
         "prefix": "check_encryptionconfig_user",
         "description": "Allow encryption to be configured only by approved users.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"approved_users\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.rbac.v1.check_encryptionconfig_user[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -121,6 +138,7 @@
     "Containers: Always Pull Images": {
         "prefix": "check_image_pull_policy",
         "description": "Ensure every container sets its `imagePullPolicy` to `Always`.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.workload.v1.check_image_pull_policy[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -128,6 +146,7 @@
     "Encryption: Restrict Key Management Service Providers": {
         "prefix": "check_kms_encryptionconfig",
         "description": "Allow only key management service (KMS) providers with approved names and corresponding endpoints.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"approved_kms_configs\": {}}\n\tdata.library.v1.kubernetes.admission.encryption.v1.check_kms_encryptionconfig[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -135,6 +154,7 @@
     "Pods: Prohibit All Host Paths": {
         "prefix": "deny_all_host_paths",
         "description": "Ensure pods don't have access on the host node’s file system.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.workload.v1.deny_all_host_paths[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -142,6 +162,7 @@
     "Containers: Prohibit Insecure Baseline Profile Capabilities": {
         "prefix": "deny_baseline_capabilities",
         "description": "Restrict unauthorized capabilities set in the `securityContext.capabilities.add` section.  ",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.workload.v1.deny_baseline_capabilities[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -149,6 +170,7 @@
     "Containers: Prohibit Insecure Capabilities": {
         "prefix": "deny_capabilities_in_blacklist",
         "description": "Ensure that unauthorized capabilities _aren’t_ set in any container’s `securityContext.capabilities.add` section and _are_ set in the corresponding `drop` section.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"capabilities\": {\"\"}, \"exclude\": {}}\n\tdata.library.v1.kubernetes.admission.workload.v1.deny_capabilities_in_blacklist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -156,6 +178,7 @@
     "Services: Prohibit IP Addresses": {
         "prefix": "deny_cluster_ip_in_blacklist",
         "description": "Prevent any service’s `clusterIP` address from being defined within a prohibited IP range.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"blacklist\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.network.v1.deny_cluster_ip_in_blacklist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -163,6 +186,7 @@
     "Services: Restrict IP Addresses": {
         "prefix": "deny_cluster_ip_not_in_whitelist",
         "description": "Require every service’s `clusterIP` address to be included in the approved IP address range.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"whitelist\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.network.v1.deny_cluster_ip_not_in_whitelist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -170,6 +194,7 @@
     "Cluster Role Bindings: Prohibit Built-In Role Modifications": {
         "prefix": "deny_cluster_role_binding_sensitive_roles",
         "description": "Prevent privileged built-in roles, such as `admin` and `cluster-admin`, from being modified.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.rbac.v1.deny_cluster_role_binding_sensitive_roles[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -177,6 +202,7 @@
     "Cluster Roles: Prohibit Updates from Specified Users": {
         "prefix": "deny_clusterrole_create_blacklist_userinfo",
         "description": "Prevent the specified users from creating or updating cluster roles.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"prohibited_users\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.rbac.v1.deny_clusterrole_create_blacklist_userinfo[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -184,6 +210,7 @@
     "Cluster Roles: Restrict Updates to Approved Users": {
         "prefix": "deny_clusterrole_create_non_whitelist_userinfo",
         "description": "Allow only the approved users to create or update cluster roles.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"approved_users\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.rbac.v1.deny_clusterrole_create_non_whitelist_userinfo[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -191,6 +218,7 @@
     "Cluster Roles: Prohibit Wildcard API Groups": {
         "prefix": "deny_clusterrole_create_wildcard_api_groups",
         "description": "Require cluster roles to be granted access to specific API groups without using wildcards.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.rbac.v1.deny_clusterrole_create_wildcard_api_groups[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -198,6 +226,7 @@
     "Cluster Roles: Prohibit Wildcard Resources": {
         "prefix": "deny_clusterrole_create_wildcard_resources",
         "description": "Require cluster roles to be granted access to each resource without using wildcards.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.rbac.v1.deny_clusterrole_create_wildcard_resources[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -205,6 +234,7 @@
     "Cluster Roles: Prohibit Wildcard Verbs": {
         "prefix": "deny_clusterrole_create_wildcard_verbs",
         "description": "Require cluster roles to be granted access to each API verb without using wildcards.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.rbac.v1.deny_clusterrole_create_wildcard_verbs[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -212,6 +242,7 @@
     "Cluster Role Bindings: Prohibit Cluster Roles": {
         "prefix": "deny_clusterrolebinding_create_blacklist_rolename",
         "description": "Prevent cluster role bindings from using prohibited roles.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"prohibited_roles\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.rbac.v1.deny_clusterrolebinding_create_blacklist_rolename[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -219,6 +250,7 @@
     "Cluster Role Bindings: Prohibit Wildcard User/Group Names": {
         "prefix": "deny_clusterrolebinding_create_deny_subject_wildcard",
         "description": "Require cluster roles to have each user and group assigned without using wildcards.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.rbac.v1.deny_clusterrolebinding_create_deny_subject_wildcard[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -226,6 +258,7 @@
     "Pods: Prohibit Mounting of `ConfigMap` Resources": {
         "prefix": "deny_configmap_items_in_blacklist",
         "description": "Prevent pods from referencing `ConfigMap` resources that contain the restricted keys you specify.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"prohibited_keys\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.workload.v1.deny_configmap_items_in_blacklist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -233,6 +266,7 @@
     "Containers: Require Non-default Namespace": {
         "prefix": "deny_default_namespace",
         "description": "Ensure that a container cannot be started in the Kubernetes `default` namespace.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.workload.v1.deny_default_namespace[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -240,6 +274,7 @@
     "Containers: Deny workloads which are using default service account": {
         "prefix": "deny_default_service_account",
         "description": "Ensure all containers must not use `default` service account.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.workload.v1.deny_default_service_account[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -247,6 +282,7 @@
     "Egresses: Prohibit IP Blocks": {
         "prefix": "deny_egress_ip_block_in_blacklist",
         "description": "Prevent `NetworkPolicy` resources from defining any egress rules within prohibited IP address ranges.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"blacklist\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.network.v1.deny_egress_ip_block_in_blacklist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -254,6 +290,7 @@
     "Egresses: Restrict IP Blocks": {
         "prefix": "deny_egress_ip_block_not_in_whitelist",
         "description": "Require that `NetworkPolicy` resources define egress rules only within approved IP address ranges.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"whitelist\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.network.v1.deny_egress_ip_block_not_in_whitelist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -261,6 +298,7 @@
     "Pod: Prohibit Containers From Sharing HostPID or HostIPC Namespace": {
         "prefix": "deny_host_namespace_sharing",
         "description": "Expect hostPID and hostIPC to be set to false.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.network.v1.deny_host_namespace_sharing[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -268,6 +306,7 @@
     "Pods: Prohibit Host Network Access": {
         "prefix": "deny_host_network",
         "description": "Prevent pods from accessing the host network, including the host loopback device.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.workload.v1.deny_host_network[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -275,6 +314,7 @@
     "Pods: Prohibit Specified Host Paths": {
         "prefix": "deny_host_path_in_blacklist",
         "description": "Prevent volumes from accessing prohibited paths on the host node’s file system.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"prohibited_host_paths\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.workload.v1.deny_host_path_in_blacklist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -282,6 +322,7 @@
     "Containers: Restrict Host Paths": {
         "prefix": "deny_host_path_not_in_whitelist",
         "description": "Ensure every container’s `volumeMounts.mountPath` property includes only an approved host path.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"allowed\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.workload.v1.deny_host_path_not_in_whitelist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -289,6 +330,7 @@
     "Containers: Prohibit windowsOptions HostProcess": {
         "prefix": "deny_host_process",
         "description": "Restrict containers which contains windowsOptions HostProcess.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.workload.v1.deny_host_process[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -296,6 +338,7 @@
     "Encryption: Require Secrets to be Encrypted": {
         "prefix": "deny_identity_provider",
         "description": "Prohibit the `identity` provider from being used to store secret data.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.encryption.v1.deny_identity_provider[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -303,6 +346,7 @@
     "Ingresses: Restrict Hostnames": {
         "prefix": "deny_ingress_hostname_not_in_whitelist",
         "description": "Require ingress hostnames to match one of the globs you specify.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"whitelist\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.network.v1.deny_ingress_hostname_not_in_whitelist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -310,6 +354,7 @@
     "Ingresses: Prohibit IP Blocks": {
         "prefix": "deny_ingress_ip_block_in_blacklist",
         "description": "Prevent `NetworkPolicy` resources from defining any ingress rules that allow traffic on IP addresses in the prohibited ranges you specify.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"blacklist\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.network.v1.deny_ingress_ip_block_in_blacklist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -317,6 +362,7 @@
     "Ingresses: Restrict IP Blocks": {
         "prefix": "deny_ingress_ip_block_not_in_whitelist",
         "description": "Require `NetworkPolicy` resources to define ingress rules that only allow traffic within the IP address ranges you specify.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"whitelist\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.network.v1.deny_ingress_ip_block_not_in_whitelist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -324,6 +370,7 @@
     "Ingresses: Deny custom snippet annotations.": {
         "prefix": "deny_ingress_with_custom_snippet_annotation",
         "description": "Prevent Ingress resources with a custom snippet annotation from being created or updated. In multi-tenant clusters, a custom snippet annotation can be used by people with limited permissions to retrieve clusterwide secrets.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.network.v1.deny_ingress_with_custom_snippet_annotation[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -331,6 +378,7 @@
     "Ingresses: Restrict Ingress with default Ingress-class.": {
         "prefix": "deny_ingress_with_default_or_no_ingress_class",
         "description": "Ensure that every Ingress reource is created with an ingress-class other than the default eg. use annotation `kubernetes.io/ingress.class: nginx-internal`.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.network.v1.deny_ingress_with_default_or_no_ingress_class[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -338,6 +386,7 @@
     "Resources: Require Valid Replicas": {
         "prefix": "deny_invalid_replicas",
         "description": "Expect Resources to specify a minimum valid replica count (default: 1). The default minimum count can be changed by specifying it in the parameter.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"replica_count\": 0}\n\tdata.library.v1.kubernetes.admission.workload.v1.deny_invalid_replicas[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -345,6 +394,7 @@
     "Loadbalancer: Prohibit loadBalancerSourceRanges": {
         "prefix": "deny_loadbalancersourceranges_in_blacklist",
         "description": "`Loadbalancer` resources must not allow traffic from the provided IP ranges.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"blacklist\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.network.v1.deny_loadbalancersourceranges_in_blacklist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -352,6 +402,7 @@
     "Loadbalancer: Restrict loadBalancerSourceRanges": {
         "prefix": "deny_loadbalancersourceranges_not_in_whitelist",
         "description": "`Loadbalancer` resources should only allow traffic from the provided IP ranges.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"whitelist\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.network.v1.deny_loadbalancersourceranges_not_in_whitelist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -359,6 +410,7 @@
     "Namespace: Prohibit Namespace Changes": {
         "prefix": "deny_namespace_in_blacklist",
         "description": "Prevent changes from being made to a list of specified namespaces.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"prohibited_namespaces\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.workload.v1.deny_namespace_in_blacklist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -366,6 +418,7 @@
     "Configmaps: Restrict nginx ingress configmap with snippet annotations allowed.": {
         "prefix": "deny_nginx_ingress_configmap_with_snippet_annotation_enabled",
         "description": "Prevent Nginx Ingress configmaps with `allow-snippet-annotations` as `true`. In multi-tenant clusters, a custom snippet annotation can be used by people with limited permissions to retrieve clusterwide secrets.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.metadata.v1.deny_nginx_ingress_configmap_with_snippet_annotation_enabled[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -373,6 +426,7 @@
     "Pods: Restrict Priority": {
         "prefix": "deny_pod_with_priority_out_of_bounds",
         "description": "Ensure pods use approved minimum and maximum priority values.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"max\": 0, \"min\": 0}\n\tdata.library.v1.kubernetes.admission.workload.v1.deny_pod_with_priority_out_of_bounds[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -380,6 +434,7 @@
     "Containers: Disallow privilege escalation": {
         "prefix": "deny_privilege_escalation",
         "description": "Expect `allowPrivilegeEscalation` to be set to false",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.workload.v1.deny_privilege_escalation[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -387,6 +442,7 @@
     "Containers: Prohibit Insecure Capabilities (Restricted Profile)": {
         "prefix": "deny_restricted_capabilities",
         "description": "Ensure containers drop 'ALL' capabilities and  only add the 'NET_BIND_SERVICE' capability  in the `securityContext.capabilities.add` and  `securityContext.capabilities.drop` sections.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.workload.v1.deny_restricted_capabilities[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -394,6 +450,7 @@
     "Storage Classes: Prohibit `Retain` Reclaim Policy": {
         "prefix": "deny_retain_policy",
         "description": "Prevent storage classes from using `Retain` as a reclaim policy.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.workload.v1.deny_retain_policy[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -401,6 +458,7 @@
     "Roles: Prohibit Pod Shell Access": {
         "prefix": "deny_role_create_exec_pods",
         "description": "Prohibit roles and cluster roles from being created with the capability to access pod shells.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.rbac.v1.deny_role_create_exec_pods[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -408,6 +466,7 @@
     "Roles: Prohibit Wildcard API Groups": {
         "prefix": "deny_role_create_wildcard_api_groups",
         "description": "Require roles to be granted access to specific API groups without using wildcards.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.rbac.v1.deny_role_create_wildcard_api_groups[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -415,6 +474,7 @@
     "Roles: Prohibit Wildcard Resources": {
         "prefix": "deny_role_create_wildcard_resources",
         "description": "Require roles to be granted access to each resource without using wildcards.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.rbac.v1.deny_role_create_wildcard_resources[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -422,6 +482,7 @@
     "Roles: Prohibit Wildcard Verbs": {
         "prefix": "deny_role_create_wildcard_verbs",
         "description": "Require roles to be granted access to each API verb without using wildcards.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.rbac.v1.deny_role_create_wildcard_verbs[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -429,6 +490,7 @@
     "Cluster Roles: Prohibit Name Prefixes": {
         "prefix": "deny_role_name_blacklist_prefix",
         "description": "Prevent cluster roles from being created with specific name prefixes such as `system`.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"prohibited_name_prefixes\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.rbac.v1.deny_role_name_blacklist_prefix[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -436,6 +498,7 @@
     "Role Bindings: Prohibit Cluster Roles": {
         "prefix": "deny_rolebinding_create_blacklist_rolename",
         "description": "Prevent role bindings from using prohibited ClusterRoles.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"prohibited_roles\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.rbac.v1.deny_rolebinding_create_blacklist_rolename[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -443,6 +506,7 @@
     "Containers: Restrict Unapproved Seccomp Profiles": {
         "prefix": "deny_seccomp_profiles",
         "description": "Ensure that no resources are set to unapproved Seccomp Profiles",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.workload.v1.deny_seccomp_profiles[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -450,6 +514,7 @@
     "Containers: Deny workloads which are mounting service account token": {
         "prefix": "deny_service_account_token_mount",
         "description": "Ensure all containers must not mount 'service account token'.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.workload.v1.deny_service_account_token_mount[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -457,6 +522,7 @@
     "Nodes: Prohibit Toleration Keys (Exact)": {
         "prefix": "deny_toleration_keys_in_blacklist",
         "description": "Prevent workloads with blacklisted toleration keys from being deployed to specific dedicated nodes.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"prohibited_keys\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.workload.v1.deny_toleration_keys_in_blacklist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -464,6 +530,7 @@
     "Containers: Restrict Reclaim Policies": {
         "prefix": "deny_unexpected_reclaim_policy",
         "description": "Ensure containers requesting persistent storage do so with an approved reclaim policy.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"reclaim_policy\": \"\"}\n\tdata.library.v1.kubernetes.admission.workload.v1.deny_unexpected_reclaim_policy[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -471,6 +538,7 @@
     "Pod: Restrict sysctls used": {
         "prefix": "deny_unsafe_and_forbidden_sysctls",
         "description": "Ensure every container uses only allowed sysctls.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"allowed_unsafe_sysctls\": {\"\"}, \"forbidden_sysctls\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.workload.v1.deny_unsafe_and_forbidden_sysctls[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -478,6 +546,7 @@
     "Pod: Restrict Approved AppArmor Profiles": {
         "prefix": "enforce_app_armor_profile_whitelist",
         "description": "Ensure resources use AppArmor profiles from an approved list.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"whitelist\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.workload.v1.enforce_app_armor_profile_whitelist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -485,6 +554,7 @@
     "Containers: Must run as non-root": {
         "prefix": "enforce_container_mustrunasnonroot",
         "description": "Ensure containers must not run as root (MustRunAsNonRoot).",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.workload.v1.enforce_container_mustrunasnonroot[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -492,6 +562,7 @@
     "Storage: Require Persistent Volume Encryption": {
         "prefix": "enforce_encrypt",
         "description": "Require persistent volume claims to request storage only from an encrypting storage class.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.storage.v1.enforce_encrypt[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -499,6 +570,7 @@
     "Storage: Restrict Network File System (NFS) Mount Points": {
         "prefix": "enforce_nfs_mount_point_whitelist",
         "description": "Require every NFS mount to use an approved mount path.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"approved_mount_points\": {}}\n\tdata.library.v1.kubernetes.admission.storage.v1.enforce_nfs_mount_point_whitelist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -506,6 +578,7 @@
     "Pod: Restrict FlexVolumes": {
         "prefix": "enforce_pod_flex_volume_drivers_whitelist",
         "description": "Ensure resources use FlexVolume drivers from an approved list.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"whitelist\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.storage.v1.enforce_pod_flex_volume_drivers_whitelist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -513,6 +586,7 @@
     "Pod: Restrict FsGroup": {
         "prefix": "enforce_pod_fsgroup_rule_whitelist",
         "description": "Ensure resources use FsGroup from an approved whitelist.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"fs_group_ranges\": {\"\"}, \"fs_group_rule\": \"\"}\n\tdata.library.v1.kubernetes.admission.storage.v1.enforce_pod_fsgroup_rule_whitelist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -520,6 +594,7 @@
     "Pod: Restrict hostPorts": {
         "prefix": "enforce_pod_hostports_whitelist",
         "description": "Ensure containers access allowed hostPorts only.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"host_port_ranges\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.network.v1.enforce_pod_hostports_whitelist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -527,6 +602,7 @@
     "Pod: Restrict Group IDs": {
         "prefix": "enforce_pod_runas_groupid_rule_whitelist",
         "description": "Ensure containers run with an approved group ID or, if `run_as_group_rule` is `MayRunAs`, no group ID.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"group_id_ranges\": {\"\"}, \"run_as_group_rule\": \"\"}\n\tdata.library.v1.kubernetes.admission.workload.v1.enforce_pod_runas_groupid_rule_whitelist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -534,6 +610,7 @@
     "Pod: Restrict User IDs": {
         "prefix": "enforce_pod_runas_userid_rule_whitelist",
         "description": "Ensure containers run with an approved user ID (MustRunAs).",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"user_id_ranges\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.workload.v1.enforce_pod_runas_userid_rule_whitelist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -541,6 +618,7 @@
     "Pod: Restrict Types of Volumes": {
         "prefix": "enforce_pod_volume_type_whitelist",
         "description": "Ensure resources use volume types from an approved list.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"whitelist\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.storage.v1.enforce_pod_volume_type_whitelist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -548,6 +626,7 @@
     "Containers: Restrict Approved ProcMount Type": {
         "prefix": "enforce_proc_mount_type_whitelist",
         "description": "Ensure containers use an approved `procMount` type.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"whitelist\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.workload.v1.enforce_proc_mount_type_whitelist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -555,6 +634,7 @@
     "Pod: Restrict Seccomp Profiles": {
         "prefix": "enforce_seccomp_profile_whitelist",
         "description": "Ensure resources use Seccomp profiles from an approved list.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"whitelist\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.workload.v1.enforce_seccomp_profile_whitelist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -562,6 +642,7 @@
     "Pod: Restrict SeLinuxOptions": {
         "prefix": "enforce_selinux_options_whitelist",
         "description": "Ensure resources use only approved `SeLinuxOptions`.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"level\": \"\", \"role\": \"\", \"type\": \"\", \"user\": \"\"}\n\tdata.library.v1.kubernetes.admission.workload.v1.enforce_selinux_options_whitelist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -569,6 +650,7 @@
     "Containers: Require CPU Limits": {
         "prefix": "ensure_container_cpu_limits",
         "description": "Ensure all containers specify CPU limits.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"maximum_cpu_limit\": \"\", \"minimum_cpu_limit\": \"\"}\n\tdata.library.v1.kubernetes.admission.workload.v1.ensure_container_cpu_limits[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -576,6 +658,7 @@
     "Containers: Require Memory Limits": {
         "prefix": "ensure_container_memory_limits",
         "description": "Ensure all containers specify memory limits. Note: Memory limits are specified in units from bytes (example: 512) to exabytes (example: 1.2E or 1.2Ei).",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"maximum_memory_limit\": \"\", \"minimum_memory_limit\": \"\"}\n\tdata.library.v1.kubernetes.admission.workload.v1.ensure_container_memory_limits[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -583,6 +666,7 @@
     "Containers: Check For Liveness Probe": {
         "prefix": "ensure_liveness_probe",
         "description": "Ensure every container sets a liveness probe.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"periodSecondsMin\": 0}\n\tdata.library.v1.kubernetes.admission.workload.v1.ensure_liveness_probe[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -590,6 +674,7 @@
     "Containers: Prohibit Running as `root`": {
         "prefix": "ensure_no_run_as_root",
         "description": "Prevent all containers from running as `root` (user ID 0).",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"exclude\": {}}\n\tdata.library.v1.kubernetes.admission.workload.v1.ensure_no_run_as_root[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -597,6 +682,7 @@
     "Containers: Check For readiness Probe": {
         "prefix": "ensure_readiness_probe",
         "description": "Ensure every container sets a readiness probe.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"periodSecondsMin\": 0}\n\tdata.library.v1.kubernetes.admission.workload.v1.ensure_readiness_probe[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -604,6 +690,7 @@
     "Containers: Require Resource Requests": {
         "prefix": "expect_container_resource_requests",
         "description": "Ensure all containers specify both CPU and memory requests.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.workload.v1.expect_container_resource_requests[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -611,6 +698,7 @@
     "Containers: Verify CPU and Memory Requirements": {
         "prefix": "expect_container_resource_requirements",
         "description": "Ensure all containers specify both CPU and memory requirements.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.workload.v1.expect_container_resource_requirements[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -618,6 +706,7 @@
     "Service: Prohibit `NodePort` Setting": {
         "prefix": "expect_no_nodeport",
         "description": "Prevents exposing a `NodePort` (Node IP addresses) for a service.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.workload.v1.expect_no_nodeport[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -625,6 +714,7 @@
     "Ingresses: Prohibit Host Conflicts": {
         "prefix": "ingress_host_conflict",
         "description": "Ensure that no two ingresses are configured to use the same hostname. This rule is not compatible with mock OPAs.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.network.v1.ingress_host_conflict[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -632,6 +722,7 @@
     "Ingresses: Prohibit Host Path Conflicts": {
         "prefix": "ingress_hostpath_conflict",
         "description": "Ensure that no two ingresses are configured to use the same hostname and overlapping paths. Path conflicts are detected using prefix matching. This rule is not compatible with mock OPAs.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.network.v1.ingress_hostpath_conflict[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -639,6 +730,7 @@
     "Ingresses: Require TLS": {
         "prefix": "ingress_missing_tls",
         "description": "Require all ingresses to have Transport Layer Security (TLS) configured.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.network.v1.ingress_missing_tls[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -646,6 +738,7 @@
     "Resources: Add Namespace Labels to Resource": {
         "prefix": "inherit_namespace_labels",
         "description": "Ensures that the designated namespace labels are copied to all resources.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"labels_to_add\": {\"\"}, \"labels_to_override\": {\"\"}}\n\tdata.library.v1.kubernetes.mutating.v1.inherit_namespace_labels[decision] with data.library.parameters as parameters\n}\n"
         ]
@@ -653,6 +746,7 @@
     "Resources: Restrict Names": {
         "prefix": "invalid_naming_convention",
         "description": "Resource names must match one of the list of regular expressions. This rule does not apply to names inside of templates.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"required\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.metadata.v1.invalid_naming_convention[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -660,6 +754,7 @@
     "Namespaces: Restrict Names": {
         "prefix": "invalid_naming_convention_namespace",
         "description": "Namespace names must match one of the specified regular expressions.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"approved_names\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.metadata.v1.invalid_naming_convention_namespace[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -667,6 +762,7 @@
     "Resources: Require Annotations": {
         "prefix": "missing_annotation",
         "description": "Resources must include specified annotations. This rule does not apply to annotations inside of templates.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"required\": {}}\n\tdata.library.v1.kubernetes.admission.metadata.v1.missing_annotation[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -674,6 +770,7 @@
     "Resources: Require Labels": {
         "prefix": "missing_label",
         "description": "Resources must include metadata labels specified as key-value pairs. This rule does not apply to labels in templates.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"required\": {}}\n\tdata.library.v1.kubernetes.admission.metadata.v1.missing_label[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -681,6 +778,7 @@
     "Containers: Require Read-Only File Systems": {
         "prefix": "missing_read_only_filesystem",
         "description": "Ensure every container’s root file system is read-only.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.workload.v1.missing_read_only_filesystem[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -688,6 +786,7 @@
     "Egresses: Prohibit Namespace Selectors": {
         "prefix": "netpol_egress_entity_src_namespace_not_in_blacklist",
         "description": "Prevent `NetworkPolicy` resources from defining any egress rules with prohibited namespace selectors.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"prohibited_namespace_selectors\": {}}\n\tdata.library.v1.kubernetes.admission.network.v1.netpol_egress_entity_src_namespace_not_in_blacklist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -695,6 +794,7 @@
     "Egresses: Prohibit Ports": {
         "prefix": "netpol_egress_entity_src_port_blacklist",
         "description": "Prevent `NetworkPolicy` resources from defining any egress rules with prohibited ports.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"prohibited_named_ports\": {}, \"prohibited_ports\": {}}\n\tdata.library.v1.kubernetes.admission.network.v1.netpol_egress_entity_src_port_blacklist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -702,6 +802,7 @@
     "Egresses: Restrict Ports": {
         "prefix": "netpol_egress_entity_src_port_whitelist",
         "description": "Expect every egress `ports` field to match the specified list of protocol-port pairs.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"approved_named_ports\": {}, \"approved_ports\": {}}\n\tdata.library.v1.kubernetes.admission.network.v1.netpol_egress_entity_src_port_whitelist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -709,6 +810,7 @@
     "Egresses: Restrict Selectors": {
         "prefix": "netpol_egress_label_selector_whitelist",
         "description": "Require `NetworkPolicy` resources to define egress rules with approved namespace and pod selectors.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"approved_namespace_selectors\": {}, \"approved_pod_selectors\": {}}\n\tdata.library.v1.kubernetes.admission.network.v1.netpol_egress_label_selector_whitelist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -716,6 +818,7 @@
     "Ingresses: Prohibit Namespace Selectors": {
         "prefix": "netpol_ingress_entity_src_namespace_not_in_blacklist",
         "description": "Prevent `NetworkPolicy` resources from defining any ingress rules with prohibited namespace selectors.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"prohibited_namespace_selectors\": {}}\n\tdata.library.v1.kubernetes.admission.network.v1.netpol_ingress_entity_src_namespace_not_in_blacklist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -723,6 +826,7 @@
     "Ingresses: Prohibit Ports": {
         "prefix": "netpol_ingress_entity_src_port_blacklist",
         "description": "Prevent `NetworkPolicy` resources from defining any inbound (ingress) rules that use prohibited ports.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"prohibited_named_ports\": {}, \"prohibited_ports\": {}}\n\tdata.library.v1.kubernetes.admission.network.v1.netpol_ingress_entity_src_port_blacklist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -730,6 +834,7 @@
     "Ingresses: Restrict Ports": {
         "prefix": "netpol_ingress_entity_src_port_whitelist",
         "description": "Require every ingress `ports` field to match the list of specified protocol-port pairs.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"approved_named_ports\": {}, \"approved_ports\": {}}\n\tdata.library.v1.kubernetes.admission.network.v1.netpol_ingress_entity_src_port_whitelist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -737,6 +842,7 @@
     "Ingresses: Restrict Namespace and Pod Selectors": {
         "prefix": "netpol_ingress_label_selector_whitelist",
         "description": "Require `NetworkPolicy` resources define ingress rules that include approved namespace selectors and pod selectors.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"approved_namespace_selectors\": {}, \"approved_pod_selectors\": {}}\n\tdata.library.v1.kubernetes.admission.network.v1.netpol_ingress_label_selector_whitelist[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -744,6 +850,7 @@
     "Pods: Require Exclusive Use of Labels": {
         "prefix": "pod_fails_to_match_exactly_one_label",
         "description": "Require each pod to use one label from a mutually exclusive set of labels. For example, you might define `priority: high` and `priority: low` as mutually-exclusive labels.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.metadata.v1.pod_fails_to_match_exactly_one_label[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -751,6 +858,7 @@
     "Pod: Restrict Bare Pods": {
         "prefix": "prohibit_bare_pods",
         "description": "Prohibit pods without a controller.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.workload.v1.prohibit_bare_pods[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -758,6 +866,7 @@
     "Containers: Restrict Images (Exact)": {
         "prefix": "repository_unsafe_exact",
         "description": "Restrict container images to images pulled from specified registries (Host) and (optionally) from specified repository image paths.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"whitelist\": {}}\n\tdata.library.v1.kubernetes.admission.workload.v1.repository_unsafe_exact[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -765,6 +874,7 @@
     "Containers: Restrict Images (Globs)": {
         "prefix": "repository_unsafe_glob",
         "description": "Restrict container images to images pulled from specified registries (Host) and repository paths specified as a path with optional wildcard globs.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"whitelist\": {}}\n\tdata.library.v1.kubernetes.admission.workload.v1.repository_unsafe_glob[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -772,6 +882,7 @@
     "Audits: Require HTTPS": {
         "prefix": "require_auditsink",
         "description": "Require HTTPS for dynamic audit webhook backends (`AuditSink` resources). Using HTTPS ensures network traffic is encrypted.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.audit.v1.require_auditsink[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -779,6 +890,7 @@
     "Containers: Require Liveness Probe": {
         "prefix": "require_liveness_probe",
         "description": "Ensure every container sets a liveness probe.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"min_period_seconds\": 0}\n\tdata.library.v1.kubernetes.admission.workload.v1.require_liveness_probe[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -786,6 +898,7 @@
     "Containers: Require Readiness Probe": {
         "prefix": "require_readiness_probe",
         "description": "Ensure every container sets a readiness probe.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"min_period_seconds\": 0}\n\tdata.library.v1.kubernetes.admission.workload.v1.require_readiness_probe[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -793,6 +906,7 @@
     "Deployment: Require Update Strategy": {
         "prefix": "require_update_strategy",
         "description": "Ensure that an approved update strategy is specified for every deployment.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"max_surge_min\": \"\", \"max_unavailable_min\": \"\", \"update_strategy\": \"\"}\n\tdata.library.v1.kubernetes.admission.workload.v1.require_update_strategy[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -800,6 +914,7 @@
     "Services: Prohibit External Load Balancers": {
         "prefix": "restrict_external_lbs",
         "description": "Prevent services from creating cloud network load balancers.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.network.v1.restrict_external_lbs[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -807,6 +922,7 @@
     "Container: Restrict Ports": {
         "prefix": "restricts_container_ports",
         "description": "Ensure containers listen only on allowed ports.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"container_port_numbers\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.network.v1.restricts_container_ports[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -814,6 +930,7 @@
     "Service: Restrict Ports": {
         "prefix": "restricts_service_ports",
         "description": "Ensure services listen only on allowed ports.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"port_numbers\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.network.v1.restricts_service_ports[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -821,6 +938,7 @@
     "Always Pull Images if Latest": {
         "prefix": "set_image_pull_policy_always_if_latest",
         "description": "If container image uses `:latest` tag, ensure its `imagePullPolicy` is set to `Always`.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.mutating.v1.set_image_pull_policy_always_if_latest[decision]\n}\n"
         ]
@@ -828,6 +946,7 @@
     "Resources: Require Pod Labels": {
         "prefix": "template_pod_missing_label",
         "description": "All pods must include metadata labels specified as key-value pairs.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"labels\": {}}\n\tdata.library.v1.kubernetes.admission.metadata.v1.template_pod_missing_label[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -835,6 +954,7 @@
     "kubectl exec: Restrict Commands": {
         "prefix": "whitelist_exec_commands",
         "description": "Allows users to whitelist commands that may be used with “kubectl exec”",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"allowed_commands\": {\"\"}}\n\tdata.library.v1.kubernetes.admission.network.v1.whitelist_exec_commands[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
         ]
@@ -842,8 +962,24 @@
     "NetworkPolicy: Restrict Operations to Specified Users": {
         "prefix": "whitelist_resource_owner_networkpolicy",
         "description": "Require that only specified users be allowed to perform specific operations.",
+        "scope": "rego",
         "body": [
             "monitor[decision] {\n\tparameters := {\"approved_users\": {}}\n\tdata.library.v1.kubernetes.admission.rbac.v1.whitelist_resource_owner_networkpolicy[message] with data.library.parameters as parameters\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"
+        ]
+    },
+    "Styra Link intro": {
+        "prefix": "help_rego",
+        "description": "Introductory remarks on rego, Styra Link, and VSCode",
+        "scope": "rego",
+        "body": [
+            "# Welcome to the world of rego!",
+            "# The VSCode plugin provides a wealth of ready-made snippets to jump start your rego journey.",
+            "# Note that whether you have any snippets depends on the system type of the DAS system",
+            "# that you have connected to your currently loaded VSCode project with Styra Link.",
+            "# Use the \"Styra Link: Initialize\" command to set that up if you you have not already.",
+            "# Some useful links:",
+            "#    Rego Language https://www.openpolicyagent.org/docs/latest/policy-reference/",
+            "#    Styra DAS https://docs.styra.com/das"
         ]
     }
 }
