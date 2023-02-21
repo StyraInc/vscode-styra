@@ -60,23 +60,6 @@ async function generateSnippets(inputSnippets: InputSnippetType[]): Promise<{ [k
     console.error(prefix); // report progress since it takes a couple seconds per snippet
   }
 
-  // Add a "help" snippet for good measure!
-  // TODO: put this in EVERY system type.
-  snippets['Styra Link intro'] = {
-    prefix: 'help_rego',
-    description: 'Introductory remarks on rego, Styra Link, and VSCode',
-    scope: 'rego',
-    body: [
-      '# Welcome to the world of rego!',
-      '# The VSCode plugin provides a wealth of ready-made snippets to jump start your rego journey.',
-      '# Note that whether you have any snippets depends on the system type of the DAS system',
-      '# that you have connected to your currently loaded VSCode project with Styra Link.',
-      '# Use the "Styra Link: Initialize" command to set that up if you you have not already.',
-      '# Some useful links:',
-      '#    Rego Language https://www.openpolicyagent.org/docs/latest/policy-reference/',
-      '#    Styra DAS https://docs.styra.com/das',
-    ]
-  };
   return snippets;
 }
 

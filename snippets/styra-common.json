@@ -1,0 +1,57 @@
+{
+    "Styra Link intro": {
+        "prefix": "rego__help",
+        "description": "Introductory remarks on rego, Styra Link, and VSCode",
+        "scope": "rego",
+        "body": [
+            "# Welcome to the world of rego!",
+            "# The VSCode plugin provides a wealth of ready-made snippets to jump start your rego journey.",
+            "# Note that whether you have any snippets depends on the system type of the DAS system",
+            "# that you have connected to your currently loaded VSCode project with Styra Link.",
+            "# Use the \"Styra Link: Initialize\" command to set that up if you you have not already.",
+            "# Some useful links:",
+            "#    Rego Language https://www.openpolicyagent.org/docs/latest/policy-reference/",
+            "#    Styra DAS https://docs.styra.com/das",
+            ""
+        ]
+    },
+    "Example: conjunction of rules": {
+        "prefix": "rego_example_AND",
+        "description": "Illustrates how to write a rule where all expressions must be satisfied",
+        "scope": "rego",
+        "body": [
+            "# Sample input:",
+            "# {",
+            "#     \"role\": \"admin\",",
+            "#     \"reputation\": 500",
+            "# }",
+            "",
+            "is_moderator {",
+            "  input.reputation >= 100",
+            "  input.role == \"admin\"",
+            "}",
+            ""
+        ]
+    },
+    "Example: disjunction of rules": {
+        "prefix": "rego_example_OR",
+        "description": "Illustrates how to write a rule where only one expression must be satisfied",
+        "scope": "rego",
+        "body": [
+            "# Sample input:",
+            "# {",
+            "#     \"role\": \"customer\",",
+            "#     \"reputation\": 100",
+            "# }",
+            "",
+            "is_moderator {",
+            "  input.reputation >= 100",
+            "}",
+            "",
+            "is_moderator {",
+            "  input.role == \"admin\"",
+            "}",
+            ""
+        ]
+    }
+}

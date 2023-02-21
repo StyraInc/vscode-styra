@@ -82,7 +82,11 @@
         "scopeName": "source.rego",
         "path": "./syntaxes/Rego.tmLanguage"
       }
-    ]
+    ],
+    "snippets": [{
+      "language": "rego",
+      "path": "./snippets/styra-common.json"
+    }]
   },
   "scripts": {
     "vscode:prepublish": "npm run esbuild-base -- --minify",
