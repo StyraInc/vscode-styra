@@ -5,6 +5,7 @@ import {generatePickList, shouldResume, StepType, validateNonEmpty} from './util
 import {ICommand, ReturnValue} from '../lib/types';
 import {info, infoDiagram} from '../lib/outputPane';
 import {QuickPickItem} from '../lib/vscode-api';
+import {SnippetInstaller} from '../lib/snippet-installer';
 
 interface State {
   folder: string;
@@ -55,6 +56,7 @@ export class LinkInit implements ICommand {
     ];
     const result = await new CommandRunner().runStyraCmd(styraArgs);
     info(result);
+    await new SnippetInstaller().addSnippetsToProject();
     info('\n*** Be sure to run "Styra Link: Config Git" next');
     return ReturnValue.Completed;
   }
