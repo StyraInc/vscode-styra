@@ -17,38 +17,46 @@ export class SnippetInstaller {
     const destSnippetFile = 'styra-snippets.code-snippets';
 
     const dotDir = IDE.dotFolderForExtension();
-    const srcName = await SnippetInstaller.getSnippetFileName();
+    const srcName = await this.getSnippetFileName();
     const srcPath = path.join(extensionRootDir, 'snippets', srcName);
     const destPath = path.join(dotDir, destSnippetFile);
 
-    if (!fs.existsSync(srcPath)) {
+    if (!this.srcFileExists(srcPath)) {
       infoDebug(`no snippets ${srcName} available`);
       return;
     }
 
-    if (fs.existsSync(destPath) && await SnippetInstaller.compareFiles(srcPath, destPath)) {
+    if (this.destFileExists(destPath) && await this.compareFiles(srcPath, destPath)) {
       infoDebug('Snippets up-to-date; skipping snippet installation.');
       return;
     }
 
-    infoDebug(fs.existsSync(destPath) ? 'Snippets changed; updating...' : 'Snippets not installed yet; installing...');
+    infoDebug(this.destFileExists(destPath)
+      ? 'Snippets changed; updating...' : 'Snippets not installed yet; installing...');
     infoDebug(`  from: ${srcPath}`);
     infoDebug(`    to: ${destPath}`);
 
-    if (!fs.existsSync(dotDir)) {
+    if (!this.destDirExists(dotDir)) {
       fs.mkdirSync(dotDir);
     }
     fs.copyFileSync(srcPath, destPath);
   }
 
-  private static async getSnippetFileName(): Promise<string> {
+  // Whoa what? These serve a dual purpose:
+  // (a) improve clarity of addSnippetsToProject some
+  // (b) improve clarity of unit tests tremendously
+  private srcFileExists = (path: string) => fs.existsSync(path);
+  private destFileExists = (path: string) => fs.existsSync(path);
+  private destDirExists = (path: string) => fs.existsSync(path);
+
+  private async getSnippetFileName(): Promise<string> {
     const config = await StyraConfig.getProjectConfig();
     infoDebug(`project: ${config.name}`);
     infoDebug(`system type: ${config.projectType}`);
     return `${config.projectType}.json`;
   }
 
-  private static async compareFiles(file1: string, file2: string): Promise<boolean> {
+  private async compareFiles(file1: string, file2: string): Promise<boolean> {
     const contents1 = await fs.promises.readFile(file1, 'utf8');
     const contents2 = await fs.promises.readFile(file2, 'utf8');
     return contents1 === contents2;

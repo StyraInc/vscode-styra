@@ -1,3 +1,5 @@
+/* eslint-disable dot-notation */
+
 import * as fs from 'fs';
 import {IDE} from '../../lib/vscode-api';
 import {OutputPaneSpy} from '../utility';
@@ -9,6 +11,7 @@ describe('SnippetInstaller', () => {
   const spy = new OutputPaneSpy();
   const copySpy = jest.spyOn(fs, 'copyFileSync').mockImplementation(() => '');
   const mkdirSpy = jest.spyOn(fs, 'mkdirSync').mockImplementation(() => '');
+  let installer: SnippetInstaller;
 
   beforeEach(() => {
     // NB: While this file IS following the best practice of testing behavior rather than implementation,
@@ -19,31 +22,32 @@ describe('SnippetInstaller', () => {
     IDE.getConfigValue = jest.fn().mockReturnValue(true); // getConfigValue('styra', 'debug')
     const config: ProjectConfigData = {projectType: 'kubernetes', name: 'my_project'};
     StyraConfig.read = jest.fn().mockResolvedValue(config);
+    installer = new SnippetInstaller();
   });
 
   test('reports error if IDE does not find extension details', async () => {
     IDE.getExtension = jest.fn().mockReturnValue(undefined);
-    new SnippetInstaller().addSnippetsToProject();
+    installer.addSnippetsToProject();
     expect(spy.content).toMatch(/unable to find Styra extension/);
   });
 
-  test('when snippet file in project matches source snippet file, reports up-to-date and skips install', async () => {
-    // eslint-disable-next-line dot-notation
-    SnippetInstaller['compareFiles'] = jest.fn().mockResolvedValue(true); // file is current
-    jest.spyOn(fs, 'existsSync').mockReturnValue(true); // srcPath exists
+  test('when no snippets for given system type, skips install', async () => {
+    installer['srcFileExists'] = jest.fn().mockReturnValue(false);
 
-    await new SnippetInstaller().addSnippetsToProject();
+    await installer.addSnippetsToProject();
 
-    expect(spy.content).toMatch(/up-to-date/);
+    expect(spy.content).toMatch(/no snippets kubernetes.json available/);
     expect(copySpy).not.toHaveBeenCalled();
   });
 
-  test('when no snippets for given system type, skips install', async () => {
-    jest.spyOn(fs, 'existsSync').mockReturnValue(false); // srcPath does not exist
+  test('when snippet file in project matches source snippet file, reports up-to-date and skips install', async () => {
+    installer['srcFileExists'] = jest.fn().mockReturnValue(true);
+    installer['destFileExists'] = jest.fn().mockReturnValue(true);
+    installer['compareFiles'] = jest.fn().mockResolvedValue(true);
 
-    await new SnippetInstaller().addSnippetsToProject();
+    await installer.addSnippetsToProject();
 
-    expect(spy.content).toMatch(/no snippets kubernetes.json available/);
+    expect(spy.content).toMatch(/up-to-date/);
     expect(copySpy).not.toHaveBeenCalled();
   });
 
@@ -53,12 +57,11 @@ describe('SnippetInstaller', () => {
   ].forEach(([fileExists, postedOutput, description]) => {
 
     test(description as string, async () => {
-      jest.spyOn(fs, 'existsSync').mockImplementation((path) =>
-        path === '/ext/root/dir/snippets/kubernetes.json' ? true : fileExists as boolean);
-      // eslint-disable-next-line dot-notation
-      SnippetInstaller['compareFiles'] = jest.fn().mockResolvedValue(false); // file is not current
+      installer['srcFileExists'] = jest.fn().mockReturnValue(true);
+      installer['destFileExists'] = jest.fn().mockReturnValue(fileExists);
+      installer['compareFiles'] = jest.fn().mockResolvedValue(false);
 
-      await new SnippetInstaller().addSnippetsToProject();
+      await installer.addSnippetsToProject();
 
       expect(spy.content).toMatch(postedOutput as RegExp);
       expect(copySpy).toHaveBeenCalled();
@@ -70,13 +73,11 @@ describe('SnippetInstaller', () => {
     [true, 'exists, does not create it']
   ].forEach(([dirExists, description]) => {
     test(`when .vscode dir ${description}`, async () => {
-      jest.spyOn(fs, 'existsSync').mockImplementation((path) =>
-        path === '/ext/root/dir/snippets/kubernetes.json' ? true :
-          path === '/my/project/dir/.vscode/styra-snippets.code-snippets' ? false
-            : dirExists as boolean
-      );
+      installer['srcFileExists'] = jest.fn().mockReturnValue(true);
+      installer['destFileExists'] = jest.fn().mockReturnValue(false);
+      installer['destDirExists'] = jest.fn().mockReturnValue(dirExists);
 
-      await new SnippetInstaller().addSnippetsToProject();
+      await installer.addSnippetsToProject();
 
       expect(mkdirSpy).toBeCalledTimes(dirExists ? 0 : 1);
     });
@@ -88,11 +89,9 @@ describe('SnippetInstaller', () => {
   ].forEach(([description, postedOutput]) => {
 
     test(description as string, async () => {
-      jest.spyOn(fs, 'existsSync').mockImplementation((path) =>
-        path === '/ext/root/dir/snippets/kubernetes.json'
-      );
+      installer['srcFileExists'] = jest.fn().mockReturnValue(true);
 
-      await new SnippetInstaller().addSnippetsToProject();
+      await installer.addSnippetsToProject();
 
       expect(spy.content).toMatch(postedOutput as RegExp);
     });
