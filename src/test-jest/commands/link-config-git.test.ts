@@ -5,10 +5,6 @@ import {ReturnValue} from '../../lib/types';
 
 describe('LinkConfigGit', () => {
 
-  beforeEach(() => {
-    jest.resetModules();
-  });
-
   test('command TERMINATES when previous git config present and user chooses NOT to overwrite', async () => {
     commandRunnerMock();
     MultiStepInput.prototype.showQuickPick = jest.fn().mockResolvedValue({label: 'no'});
