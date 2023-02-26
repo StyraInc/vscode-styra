@@ -5,9 +5,24 @@ import {ReturnValue} from '../../lib/types';
 
 describe('LinkConfigGit', () => {
 
+  // TODO: test just for params under test!
+
+  beforeEach(() => {
+
+    // responds to query to fetch existing git url, if any
+    CommandRunner.prototype.runStyraCmdQuietly =
+      jest.fn().mockResolvedValue('git@dummyUrlHere.git');
+
+    // responds to primary styra link command under test
+    CommandRunner.prototype.runStyraCmd = jest.fn().mockResolvedValue('any');
+
+    // provide responses to user inputs
+    MultiStepInput.prototype.showQuickPick = quickPickMock();
+    MultiStepInput.prototype.showInputBox = inputBoxMock();
+  });
+
   test('command TERMINATES when previous git config present and user chooses NOT to overwrite', async () => {
-    commandRunnerMock();
-    MultiStepInput.prototype.showQuickPick = jest.fn().mockResolvedValue({label: 'no'});
+    MultiStepInput.prototype.showQuickPick = quickPickMock({overwrite: false});
 
     const result = await new LinkConfigGit().run();
 
@@ -15,11 +30,7 @@ describe('LinkConfigGit', () => {
   });
 
   test('command COMPLETES when previous git config present and user chooses TO overwrite', async () => {
-    commandRunnerMock();
-    MultiStepInput.prototype.showQuickPick = jest.fn()
-      .mockResolvedValueOnce({label: 'yes'}) // prompt on overwriting
-      .mockResolvedValue({label: 'any'}); // any further prompts
-    MultiStepInput.prototype.showInputBox = jest.fn().mockResolvedValue('any');
+    MultiStepInput.prototype.showQuickPick = quickPickMock({overwrite: true});
 
     const result = await new LinkConfigGit().run();
 
@@ -27,13 +38,11 @@ describe('LinkConfigGit', () => {
   });
 
   test('nominally makes one reported call to runStyraCmd and one internal call to runStyraCmdQuietly', async () => {
-    const runnerMock = jest.fn().mockResolvedValue('any');
-    CommandRunner.prototype.runStyraCmd = runnerMock;
     const runnerQuietMock = jest.fn().mockResolvedValue('yo! source_control is not found');
     CommandRunner.prototype.runStyraCmdQuietly = runnerQuietMock;
 
-    MultiStepInput.prototype.showQuickPick = jest.fn().mockResolvedValue({label: 'any'});
-    MultiStepInput.prototype.showInputBox = jest.fn().mockResolvedValue('any');
+    const runnerMock = jest.fn().mockResolvedValue('some info here');
+    CommandRunner.prototype.runStyraCmd = runnerMock;
 
     await new LinkConfigGit().run();
 
@@ -47,18 +56,16 @@ describe('LinkConfigGit', () => {
   ].forEach(([hasPreviousConfig, description]) => {
 
     test(description as string, async () => {
-      const runnerMock = commandRunnerMock(hasPreviousConfig as boolean);
-      MultiStepInput.prototype.showQuickPick = hasPreviousConfig ?
-      // with previous git config, there is an additional question about overwrite to answer
-        jest.fn().mockResolvedValueOnce({label: 'yes'})
-          .mockResolvedValueOnce({label: 'branch'})
-        : jest.fn().mockResolvedValueOnce({label: 'branch'});
-      MultiStepInput.prototype.showInputBox = jest.fn()
-        .mockImplementation(inputBoxMock(false));
+
+      CommandRunner.prototype.runStyraCmdQuietly =
+        jest.fn().mockResolvedValue(
+          hasPreviousConfig ? 'git@dummyUrlHere.git' : 'yo! source_control is not found');
+
+      MultiStepInput.prototype.showInputBox = inputBoxMock({useTLS: false});
 
       await new LinkConfigGit().run();
 
-      expect(runnerMock).toHaveBeenCalledWith(
+      expect(CommandRunner.prototype.runStyraCmd).toHaveBeenCalledWith(
         ['link', 'config', 'git', 'git@my.url.git', '--branch', 'my-branch',
           hasPreviousConfig ? '--force' : '',
           '--password-stdin', '--key-file', 'my key file path'],
@@ -73,16 +80,12 @@ describe('LinkConfigGit', () => {
   ].forEach(([syncStyle, syncValue]) => {
 
     test(`correct prompt is used for ${syncStyle.toUpperCase()} sync style`, async () => {
-      const runnerMock = commandRunnerMock();
-      MultiStepInput.prototype.showQuickPick = jest.fn()
-      .mockResolvedValueOnce({label: 'yes'})
-      .mockResolvedValueOnce({label: syncStyle});
-      MultiStepInput.prototype.showInputBox = jest.fn()
-      .mockImplementation(inputBoxMock(false));
+      MultiStepInput.prototype.showQuickPick = quickPickMock({syncStyle});
+      MultiStepInput.prototype.showInputBox = inputBoxMock({useTLS: false});
 
       await new LinkConfigGit().run();
 
-      expect(runnerMock).toHaveBeenCalledWith(
+      expect(CommandRunner.prototype.runStyraCmd).toHaveBeenCalledWith(
         ['link', 'config', 'git', 'git@my.url.git', `--${syncStyle}`, syncValue, '--force', '--password-stdin', '--key-file', 'my key file path'],
         {stdinData: 'my key passphrase'});
     });
@@ -93,16 +96,11 @@ describe('LinkConfigGit', () => {
     [false, 'SSL', 'git@my.url.git'],
   ].forEach(([useTLS, protocol, url]) => {
     test(`correct params are passed for ${protocol} protocol`, async () => {
-      const runnerMock = commandRunnerMock();
-      MultiStepInput.prototype.showQuickPick = jest.fn()
-      .mockImplementationOnce(() => ({label: 'yes'}))
-      .mockImplementationOnce(() => ({label: 'branch'}));
-      MultiStepInput.prototype.showInputBox = jest.fn()
-      .mockImplementation(inputBoxMock(useTLS as boolean));
+      MultiStepInput.prototype.showInputBox = inputBoxMock({useTLS: useTLS as boolean});
 
       await new LinkConfigGit().run();
 
-      expect(runnerMock).toHaveBeenCalledWith(
+      expect(CommandRunner.prototype.runStyraCmd).toHaveBeenCalledWith(
         ['link', 'config', 'git', url, '--branch', 'my-branch', '--force', '--password-stdin',
           useTLS ? '--username' : '--key-file',
           useTLS ? 'my-username' : 'my key file path'],
@@ -110,38 +108,61 @@ describe('LinkConfigGit', () => {
     });
   });
 
-  const commandRunnerMock = (hasPreviousConfig = true) => {
-    // responds to query to fetch existing git url, if any
-    const runnerQuietMock = jest.fn().mockResolvedValue(
-      hasPreviousConfig ? 'git@dummyUrlHere.git' : 'yo! source_control is not found');
-    CommandRunner.prototype.runStyraCmdQuietly = runnerQuietMock;
-    // responds to primary styra link command
-    const runnerMock = jest.fn().mockResolvedValue('some info here');
-    CommandRunner.prototype.runStyraCmd = runnerMock;
-    return runnerMock;
-  };
+  // The `_inputMock` robustly makes tests independent of the order of prompts.
+  // It handles both showQuickPick (which uses `placeholder`) and showInputBox (which uses `prompt`).
+  // When reusing this, you should always have `isInputBox` to distinguish showQuickPick/showInputBox.
+  // Use `MockOptions` for any custom parameters needed for the test class.
 
-  // this mock robustly makes tests independent of the order of prompts
-  const inputBoxMock = (useTLS: boolean) => ({prompt}: {prompt: string}) => {
-    switch (prompt.replace(/ \(.*\)/, '')) { // ignore trailing parenthetical, if any
-      case 'Enter remote Git URL':
-        return useTLS ? 'https://my.url.git' : 'git@my.url.git';
-      case 'Enter Git user name':
-        return 'my-username';
-      case 'Enter Git access token or password':
-        return 'my token';
-      case 'Enter SSH private key file path':
-        return 'my key file path';
-      case 'Enter SSH private key passphrase':
-        return 'my key passphrase';
-      case 'Enter Git branch':
-        return 'my-branch';
-      case 'Enter Git tag':
-        return 'my-tag';
-      case 'Enter Git commit hash':
-        return 'my-hash';
-      default:
-        return 'UNKNOWN'; // should never happen
-    }
-  };
+  type InputMockOptions = {
+    useTLS?: boolean;
+    overwrite?: boolean;
+    syncStyle?: string;
+  }
+
+  const inputBoxMock = (options?: InputMockOptions) =>
+    _inputMock(true, {useTLS: true, ...options});
+  const quickPickMock = (options?: InputMockOptions) =>
+    _inputMock(false, {overwrite: true, syncStyle: 'branch', ...options});
+
+  const _inputMock = (isInputBox: boolean, options: InputMockOptions = {useTLS: false, overwrite: true, syncStyle: 'any'}) =>
+    jest.fn().mockImplementation(
+      ({prompt, placeholder}: { prompt: string, placeholder: string }) => {
+        let result: string;
+        const target = (isInputBox ? prompt : placeholder).replace(/\s*\(.*\)/, ''); // ignore trailing parenthetical, if any
+        switch (target) {
+          case 'Enter remote Git URL':
+            result = options.useTLS ? 'https://my.url.git' : 'git@my.url.git';
+            break;
+          case 'Enter Git user name':
+            result = 'my-username';
+            break;
+          case 'Enter Git access token or password':
+            result = 'my token';
+            break;
+          case 'Enter SSH private key file path':
+            result = 'my key file path';
+            break;
+          case 'Enter SSH private key passphrase':
+            result = 'my key passphrase';
+            break;
+          case 'Enter Git branch':
+            result = 'my-branch';
+            break;
+          case 'Enter Git tag':
+            result = 'my-tag';
+            break;
+          case 'Enter Git commit hash':
+            result = 'my-hash';
+            break;
+          case 'Do you want to overwrite this configuration?':
+            result = options.overwrite ? 'yes' : 'no';
+            break;
+          case 'How would you like to sync your policies?':
+            result = options.syncStyle ?? '';
+            break;
+          default:
+            result = 'UNKNOWN'; // should never happen
+        }
+        return isInputBox ? result : {label: result};
+      });
 });
