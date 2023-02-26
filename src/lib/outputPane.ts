@@ -6,7 +6,7 @@ const footnoteSymbol = '(*)';
 
 // the workhorse that interacts with outputChanel
 export function info(msg: string): void {
-  if (msg.endsWith('\n')) {
+  if (msg && msg.endsWith('\n')) {
     outputChannel.append(msg); // remove superfluous newline
   } else {
     outputChannel.appendLine(msg);

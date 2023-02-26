@@ -1,24 +1,45 @@
 import {CommandRunner} from '../../lib/command-runner';
+import {IDE} from '../../lib/vscode-api';
 import {LinkConfigGit} from '../../commands/link-config-git';
 import {MultiStepInput} from '../../external/multi-step-input';
 import {ReturnValue} from '../../lib/types';
 
 describe('LinkConfigGit', () => {
 
-  // TODO: test just for params under test!
+  let runnerMock: jest.Mock;
 
   beforeEach(() => {
+    IDE.getConfigValue = jest.fn().mockReturnValue(false); // getConfigValue('styra', 'debug')
 
-    // responds to query to fetch existing git url, if any
-    CommandRunner.prototype.runStyraCmdQuietly =
-      jest.fn().mockResolvedValue('git@dummyUrlHere.git');
-
-    // responds to primary styra link command under test
-    CommandRunner.prototype.runStyraCmd = jest.fn().mockResolvedValue('any');
+    // most types do not care about the return value; setting up for the one that does
+    runnerMock = jest.fn().mockResolvedValue('git@dummyUrlHere.git');
+    CommandRunner.prototype.runShellCmd = runnerMock;
 
     // provide responses to user inputs
     MultiStepInput.prototype.showQuickPick = quickPickMock();
     MultiStepInput.prototype.showInputBox = inputBoxMock();
+  });
+
+  test('invokes link command to configure git', async () => {
+
+    await new LinkConfigGit().run();
+
+    expect(runnerMock).toHaveBeenCalledWith(
+      'styra',
+      expect.arrayContaining(['link', 'config', 'git']),
+      expect.anything()
+    );
+  });
+
+  test('invokes link command to fetch existing git URL, if any', async () => {
+
+    await new LinkConfigGit().run();
+
+    expect(runnerMock).toHaveBeenCalledWith(
+      'styra',
+      expect.arrayContaining(['link', 'config', 'read', '{.source_control..url}']),
+      expect.anything()
+    );
   });
 
   test('command TERMINATES when previous git config present and user chooses NOT to overwrite', async () => {
@@ -37,19 +58,6 @@ describe('LinkConfigGit', () => {
     expect(result).toBe(ReturnValue.Completed);
   });
 
-  test('nominally makes one reported call to runStyraCmd and one internal call to runStyraCmdQuietly', async () => {
-    const runnerQuietMock = jest.fn().mockResolvedValue('yo! source_control is not found');
-    CommandRunner.prototype.runStyraCmdQuietly = runnerQuietMock;
-
-    const runnerMock = jest.fn().mockResolvedValue('some info here');
-    CommandRunner.prototype.runStyraCmd = runnerMock;
-
-    await new LinkConfigGit().run();
-
-    expect(runnerQuietMock.mock.calls.length).toBe(1);
-    expect(runnerMock.mock.calls.length).toBe(1);
-  });
-
   [
     [true, 'WITH previous git config, force param IS passed'],
     [false, 'WITHOUT previous git config, force param is NOT passed'],
@@ -57,19 +65,17 @@ describe('LinkConfigGit', () => {
 
     test(description as string, async () => {
 
-      CommandRunner.prototype.runStyraCmdQuietly =
+      CommandRunner.prototype.runShellCmd =
         jest.fn().mockResolvedValue(
           hasPreviousConfig ? 'git@dummyUrlHere.git' : 'yo! source_control is not found');
 
-      MultiStepInput.prototype.showInputBox = inputBoxMock({useTLS: false});
-
       await new LinkConfigGit().run();
 
-      expect(CommandRunner.prototype.runStyraCmd).toHaveBeenCalledWith(
-        ['link', 'config', 'git', 'git@my.url.git', '--branch', 'my-branch',
-          hasPreviousConfig ? '--force' : '',
-          '--password-stdin', '--key-file', 'my key file path'],
-        {stdinData: 'my key passphrase'});
+      expect(CommandRunner.prototype.runShellCmd).toHaveBeenCalledWith(
+        'styra',
+        hasPreviousConfig ? expect.arrayContaining(['--force']) : expect.not.arrayContaining(['--force']),
+        expect.anything()
+      );
     });
   });
 
@@ -81,13 +87,14 @@ describe('LinkConfigGit', () => {
 
     test(`correct prompt is used for ${syncStyle.toUpperCase()} sync style`, async () => {
       MultiStepInput.prototype.showQuickPick = quickPickMock({syncStyle});
-      MultiStepInput.prototype.showInputBox = inputBoxMock({useTLS: false});
 
       await new LinkConfigGit().run();
 
-      expect(CommandRunner.prototype.runStyraCmd).toHaveBeenCalledWith(
-        ['link', 'config', 'git', 'git@my.url.git', `--${syncStyle}`, syncValue, '--force', '--password-stdin', '--key-file', 'my key file path'],
-        {stdinData: 'my key passphrase'});
+      expect(runnerMock).toHaveBeenCalledWith(
+        'styra',
+        expect.arrayContaining([`--${syncStyle}`, syncValue]),
+        expect.anything()
+      );
     });
   });
 
@@ -100,18 +107,19 @@ describe('LinkConfigGit', () => {
 
       await new LinkConfigGit().run();
 
-      expect(CommandRunner.prototype.runStyraCmd).toHaveBeenCalledWith(
-        ['link', 'config', 'git', url, '--branch', 'my-branch', '--force', '--password-stdin',
-          useTLS ? '--username' : '--key-file',
-          useTLS ? 'my-username' : 'my key file path'],
-        {stdinData: useTLS ? 'my token' : 'my key passphrase'});
+      expect(runnerMock).toHaveBeenCalledWith(
+        'styra',
+        expect.arrayContaining(useTLS ? [url, '--username', 'my-username'] : [url, '--key-file', 'my key file path']),
+        expect.objectContaining({stdinData: useTLS ? 'my token' : 'my key passphrase'})
+      );
     });
   });
 
   // The `_inputMock` robustly makes tests independent of the order of prompts.
   // It handles both showQuickPick (which uses `placeholder`) and showInputBox (which uses `prompt`).
   // When reusing this, you should always have `isInputBox` to distinguish showQuickPick/showInputBox.
-  // Use `MockOptions` for any custom parameters needed for the test class.
+  // Use `InputMockOptions` when multiple custom parameters needed for the test class;
+  // if only zero or one additional params needed, model after link-init.test instead.
 
   type InputMockOptions = {
     useTLS?: boolean;

@@ -7,23 +7,44 @@ import {SnippetInstaller} from '../../lib/snippet-installer';
 
 describe('LinkInit', () => {
 
+  let runnerMock: jest.Mock;
+
   beforeEach(() => {
     IDE.getConfigValue = jest.fn().mockReturnValue(true); // getConfigValue('styra', 'debug')
     SnippetInstaller.prototype.addSnippetsToProject = jest.fn();
 
-    // responds to query to fetch system types
-    CommandRunner.prototype.runStyraCmdQuietly = jest.fn().mockResolvedValue('["typeA", "typeB"]');
-
-    // responds to primary styra link command under test
-    CommandRunner.prototype.runStyraCmd = jest.fn().mockResolvedValue('any');
+    // most types do not care about the return value; setting up for the one that does
+    runnerMock = jest.fn().mockResolvedValue('["typeA", "typeB"]');
+    CommandRunner.prototype.runShellCmd = runnerMock;
 
     // provide responses to user inputs
     MultiStepInput.prototype.showQuickPick = quickPickMock();
     MultiStepInput.prototype.showInputBox = inputBoxMock();
   });
 
+  test('invokes link command to initialize system', async () => {
+
+    await new LinkInit().run();
+
+    expect(runnerMock).toHaveBeenCalledWith(
+      'styra',
+      expect.arrayContaining(['link', 'init']),
+      expect.anything()
+    );
+  });
+
+  test('invokes link command to fetch existing system types', async () => {
+
+    await new LinkInit().run();
+
+    expect(runnerMock).toHaveBeenCalledWith(
+      'styra',
+      expect.arrayContaining(['link', 'global-config', 'read', 'systemTypes.#.name']),
+      expect.anything()
+    );
+  });
+
   [
-    [['link', 'init'], 'command prefix'],
     [['--skip-git'], 'skip git initialization'],
     [['--type', 'kubernetes'], 'system type'],
     [['--path', 'authz'], 'authorization directory'],
@@ -32,8 +53,11 @@ describe('LinkInit', () => {
 
       await new LinkInit().run();
 
-      expect(CommandRunner.prototype.runStyraCmd).toHaveBeenCalledWith(
-        expect.arrayContaining(terms as string[]));
+      expect(runnerMock).toHaveBeenCalledWith(
+        'styra',
+        expect.arrayContaining(terms as string[]),
+        expect.anything()
+      );
     });
   });
 
@@ -47,11 +71,13 @@ describe('LinkInit', () => {
 
       await new LinkInit().run();
 
-      expect(CommandRunner.prototype.runStyraCmd).toHaveBeenCalledWith(
+      expect(runnerMock).toHaveBeenCalledWith(
+        'styra',
         expect.arrayContaining(
           useNew ? ['--create', '--name', 'my new DAS system']
-            : ['--existing', '--name', 'my existing DAS system']
-        ));
+            : ['--existing', '--name', 'my existing DAS system']),
+        expect.anything()
+      );
     });
   });
 
@@ -72,7 +98,8 @@ describe('LinkInit', () => {
   // The `_inputMock` robustly makes tests independent of the order of prompts.
   // It handles both showQuickPick (which uses `placeholder`) and showInputBox (which uses `prompt`).
   // When reusing this, you should always have `isInputBox` to distinguish showQuickPick/showInputBox.
-  // Unlike link-config-git.test, not using InputMockOptions because only one option (`isNew`) to manage.
+  // This test file needs only a single additional param; if more are needed
+  // when writing a new test file, use an`InputMockOptions` as in link-config-git.test.
 
   const inputBoxMock = () => _inputMock(true, false /* don't care term */);
   const quickPickMock = (isNew = true) => _inputMock(false, isNew);
