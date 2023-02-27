@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 
 import {Executor} from './commands/executor';
 import {ICommand} from './lib/types';
+import {IDE} from './lib/vscode-api';
 import {infoDebug, outputChannel} from './lib/outputPane';
 import {LinkConfigGit} from './commands/link-config-git';
 import {LinkInit} from './commands/link-init';
@@ -43,7 +44,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<IMemen
     )
   );
 
-  await new SnippetInstaller().addSnippetsToProject();
+  if (IDE.workspaceFolders()) {
+    await new SnippetInstaller().addSnippetsToProject();
+  }
 
   // Check the env context at the time VSCode is launched.
   // Will only expose the persistent storage if this env var is set as shown.
