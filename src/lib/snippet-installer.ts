@@ -57,8 +57,9 @@ export class SnippetInstaller {
   }
 
   private async compareFiles(file1: string, file2: string): Promise<boolean> {
-    const contents1 = await fs.promises.readFile(file1, 'utf8');
-    const contents2 = await fs.promises.readFile(file2, 'utf8');
-    return contents1 === contents2;
+    return await Promise.all([
+      fs.promises.readFile(file1, 'utf8'),
+      fs.promises.readFile(file2, 'utf8'),
+    ]).then(([contents1, contents2]) => contents1 === contents2);
   }
 }
