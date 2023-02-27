@@ -10,7 +10,7 @@ import {compare} from 'semver';
 import {CommandRunner} from './command-runner';
 import {DAS} from './das-query';
 import {IDE} from './vscode-api';
-import {info, infoDebug, infoFromUserAction, teeError, teeInfo} from './outputPane';
+import {info, infoDebug, infoFromUserAction, teeError, teeInfo} from './output-pane';
 import {LocalStorageService, Workspace} from './local-storage-service';
 import {VersionType} from './types';
 

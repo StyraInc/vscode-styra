@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import {Executor} from './commands/executor';
 import {ICommand} from './lib/types';
 import {IDE} from './lib/vscode-api';
-import {infoDebug, outputChannel} from './lib/outputPane';
+import {infoDebug, outputChannel} from './lib/output-pane';
 import {LinkConfigGit} from './commands/link-config-git';
 import {LinkInit} from './commands/link-init';
 import {LinkSearch} from './commands/link-search';

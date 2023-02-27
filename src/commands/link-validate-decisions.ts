@@ -1,6 +1,6 @@
 import {CommandRunner} from '../lib/command-runner';
 import {ICommand, ReturnValue} from '../lib/types';
-import {info} from '../lib/outputPane';
+import {info} from '../lib/output-pane';
 
 export class LinkValidateDecisions implements ICommand {
 

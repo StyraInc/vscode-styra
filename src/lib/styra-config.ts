@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 
 import {CommandRunner} from './command-runner';
-import {footnoteMsg, info, infoDebug, infoInput, teeError} from './outputPane';
+import {footnoteMsg, info, infoDebug, infoInput, teeError} from './output-pane';
 import {generatePickList, shouldResume, StepType, validateNonEmpty} from '../commands/utility';
 import {IDE, QuickPickItem} from './vscode-api';
 import {MultiStepInput} from '../external/multi-step-input';

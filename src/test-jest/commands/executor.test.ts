@@ -1,7 +1,7 @@
 import {Executor} from '../../commands/executor';
 import {ICommand, ReturnValue} from '../../lib/types';
 import {mockType, OutputPaneSpy} from '../utility';
-import {outputChannel} from '../../lib/outputPane';
+import {outputChannel} from '../../lib/output-pane';
 
 class MockCompletedCommand implements ICommand {
   run = () => Promise.resolve(ReturnValue.Completed);
