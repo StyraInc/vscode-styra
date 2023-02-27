@@ -2,17 +2,24 @@ import * as fs from 'fs';
 import * as os from 'os';
 
 import {CommandRunner} from './command-runner';
-import {footnoteMsg, info, infoInput, teeError} from './outputPane';
+import {footnoteMsg, info, infoDebug, infoInput, teeError} from './outputPane';
 import {generatePickList, shouldResume, StepType, validateNonEmpty} from '../commands/utility';
 import {IDE, QuickPickItem} from './vscode-api';
 import {MultiStepInput} from '../external/multi-step-input';
+import path = require('path');
 
-export type ConfigData = {
-  url: string;
-  token: string;
-};
+export class DASConfigData {
+  url = '';
+  token = '';
+}
 
-const CONFIG_FILE_PATH = `${os.homedir}/.styra/config`;
+export class ProjectConfigData {
+  projectType = '';
+  name = '';
+}
+
+const CONFIG_FILE_PATH = '.styra/config';
+const DAS_CONFIG_FILE_PATH = `${os.homedir}/${CONFIG_FILE_PATH}`;
 
 interface State {
   hasTenant: QuickPickItem;
@@ -23,18 +30,26 @@ interface State {
 
 export class StyraConfig {
 
-  static async read(): Promise<ConfigData> {
-    const configData = <ConfigData>{};
-    return await fs.promises.readFile(CONFIG_FILE_PATH, 'utf8').then((data) => {
+  static async getProjectConfig(): Promise<ProjectConfigData> {
+    return await StyraConfig.read(path.join(IDE.projectDir() ?? '.', CONFIG_FILE_PATH), new ProjectConfigData());
+  }
+
+  static async getDASConfig(): Promise<DASConfigData> {
+    return await StyraConfig.read(DAS_CONFIG_FILE_PATH, new DASConfigData());
+  }
+
+  // TODO: get rid of "any" with appropriate index type
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any
+  static async read(filename: string, configData: any): Promise<any> {
+    const fields = Object.keys(configData);
+
+    return await fs.promises.readFile(filename, 'utf8').then((data) => {
       data.split(/\r?\n/).forEach((line) => {
         const {key, value} = line.match(/(?<key>\w+)\s*:\s*(?<value>.*\S)/)?.groups ?? {};
-        if (key === 'url') {
-          configData.url = value;
+        if (fields.includes(key)) {
+          configData[key] = value;
         }
-        if (key === 'token') {
-          configData.token = value;
-        }
-        // silently ignore any other properties in the config, valid or not
+        // silently ignore anything else in the config, valid property or otherwise
       });
       return configData;
     });
@@ -43,8 +58,8 @@ export class StyraConfig {
   static async checkCliConfiguration(): Promise<boolean> {
     const runner = new CommandRunner();
 
-    if (fs.existsSync(CONFIG_FILE_PATH)) {
-      info(`Using existing Styra CLI configuration: ${CONFIG_FILE_PATH}`);
+    if (fs.existsSync(DAS_CONFIG_FILE_PATH)) {
+      infoDebug(`Using existing Styra CLI configuration: ${DAS_CONFIG_FILE_PATH}`);
       return true;
     }
 

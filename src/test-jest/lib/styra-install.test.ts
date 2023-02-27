@@ -65,6 +65,7 @@ describe('StyraInstall', () => {
 
       test(`yields ${expected} when ${description}`, async () => {
         mockType(commandExistsSync).mockReturnValue(expected);
+        IDE.getConfigValue = jest.fn().mockReturnValue(true); // getConfigValue('styra', 'debug')
 
         expect(await StyraInstall.checkCliInstallation()).toBe(expected as boolean);
 

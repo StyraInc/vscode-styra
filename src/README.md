@@ -80,8 +80,6 @@ Start your new command with this template.  You will need to:
 3. Replace `<CODE>` with whatever you need to prepare <OTHER_PARAMS>.
 
 ``` typescript
-import { checkStartup } from './utility';
-import { CommandNotifier } from '../lib/command-notifier';
 import { CommandRunner } from '../lib/command-runner';
 import { ICommand } from '../lib/types';
 import { info } from '../lib/outputPane';

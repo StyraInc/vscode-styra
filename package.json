@@ -16,7 +16,9 @@
   "categories": [
     "Other", "Snippets"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "workspaceContains:.styra/config"
+  ],
   "main": "./out/main.js",
   "contributes": {
     "commands": [
@@ -83,7 +85,7 @@
     ],
     "snippets": [{
       "language": "rego",
-      "path": "./snippets.json"
+      "path": "./snippets/styra-common.json"
     }]
   },
   "scripts": {

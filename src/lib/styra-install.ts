@@ -3,13 +3,14 @@ import * as fse from 'fs-extra';
 import * as os from 'os';
 import {default as fetch} from 'node-fetch';
 import moveFile = require('move-file');
+import path = require('path');
 import {sync as commandExistsSync} from 'command-exists';
 import {compare} from 'semver';
 
 import {CommandRunner} from './command-runner';
 import {DAS} from './das-query';
 import {IDE} from './vscode-api';
-import {info, infoFromUserAction, teeError, teeInfo} from './outputPane';
+import {info, infoDebug, infoFromUserAction, teeError, teeInfo} from './outputPane';
 import {LocalStorageService, Workspace} from './local-storage-service';
 import {VersionType} from './types';
 
@@ -28,7 +29,7 @@ export class StyraInstall {
 
   static async checkCliInstallation(): Promise<boolean> {
     if (commandExistsSync(STYRA_CLI_CMD)) {
-      info('Styra CLI is installed');
+      infoDebug('Styra CLI is installed');
       return true;
     }
     info('Styra CLI is not installed');
@@ -91,8 +92,8 @@ export class StyraInstall {
     info(`    Architecture: ${targetArch}`);
 
     const binaryFile = targetOS === 'win32' ? STYRA_CLI_CMD + '.exe' : STYRA_CLI_CMD;
-    const exeFile = targetOS === 'win32' ? 'C:\\Program Files\\styra\\' + binaryFile : '/usr/local/bin/' + binaryFile;
-    const tempFileLocation = os.homedir() + '/' + binaryFile;
+    const exeFile = targetOS === 'win32' ? path.join('C:', 'Program Files', 'styra', binaryFile) : path.join('/usr/local/bin/', binaryFile);
+    const tempFileLocation = path.join(os.homedir(), binaryFile);
 
     const url =
       targetOS === 'win32'

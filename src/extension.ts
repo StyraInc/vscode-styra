@@ -2,13 +2,15 @@ import * as vscode from 'vscode';
 
 import {Executor} from './commands/executor';
 import {ICommand} from './lib/types';
-import {info, outputChannel} from './lib/outputPane';
+import {IDE} from './lib/vscode-api';
+import {infoDebug, outputChannel} from './lib/outputPane';
 import {LinkConfigGit} from './commands/link-config-git';
 import {LinkInit} from './commands/link-init';
 import {LinkSearch} from './commands/link-search';
 import {LinkTest} from './commands/link-test';
 import {LinkValidateDecisions} from './commands/link-validate-decisions';
 import {LocalStorageService} from './lib/local-storage-service';
+import {SnippetInstaller} from './lib/snippet-installer';
 
 // reference: https://github.com/bwateratmsft/memento-explorer
 interface IMementoExplorerExtension {
@@ -19,9 +21,9 @@ interface IMementoExplorerExtension {
 }
 
 // extension entry point
-export function activate(context: vscode.ExtensionContext): IMementoExplorerExtension {
+export async function activate(context: vscode.ExtensionContext): Promise<IMementoExplorerExtension> {
   outputChannel.show(true);
-  info('Styra extension active!');
+  infoDebug('Styra extension active!');
   LocalStorageService.instance.storage = context.workspaceState;
 
   // commands come from package.json::contribute.commands
@@ -32,6 +34,7 @@ export function activate(context: vscode.ExtensionContext): IMementoExplorerExte
     'styra.link.validate-decisions': new LinkValidateDecisions(),
     'styra.link.search': new LinkSearch(),
   };
+  infoDebug(`Registering ${Object.keys(styraCommands).length} commands`);
 
   Object.entries(styraCommands).forEach(([cmd, target]) =>
     context.subscriptions.push(
@@ -40,6 +43,10 @@ export function activate(context: vscode.ExtensionContext): IMementoExplorerExte
       })
     )
   );
+
+  if (IDE.workspaceFolders()) {
+    await new SnippetInstaller().addSnippetsToProject();
+  }
 
   // Check the env context at the time VSCode is launched.
   // Will only expose the persistent storage if this env var is set as shown.
