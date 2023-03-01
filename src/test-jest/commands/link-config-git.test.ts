@@ -1,4 +1,5 @@
 import {CommandRunner} from '../../lib/command-runner';
+import {footnoteMsg} from '../../lib/output-pane';
 import {IDE} from '../../lib/vscode-api';
 import {LinkConfigGit} from '../../commands/link-config-git';
 import {MultiStepInput} from '../../external/multi-step-input';
@@ -80,12 +81,12 @@ describe('LinkConfigGit', () => {
   });
 
   [
-    ['branch', 'my-branch'],
-    ['tag', 'my-tag'],
-    ['commit', 'my-hash']
-  ].forEach(([syncStyle, syncValue]) => {
+    ['branch', 'my-branch', 'Enter Git branch'],
+    ['tag', 'my-tag', 'Enter Git tag'],
+    ['commit', 'my-hash', 'Enter Git commit hash']
+  ].forEach(([syncStyle, syncValue, prompt]) => {
 
-    test(`correct prompt is used for ${syncStyle.toUpperCase()} sync style`, async () => {
+    test(`correct params are passed for ${syncStyle.toUpperCase()} sync style`, async () => {
       MultiStepInput.prototype.showQuickPick = quickPickMock({syncStyle});
 
       await new LinkConfigGit().run();
@@ -96,12 +97,30 @@ describe('LinkConfigGit', () => {
         expect.anything()
       );
     });
+
+    test(`correct prompts are invoked for ${syncStyle.toUpperCase()} sync style`, async () => {
+      MultiStepInput.prototype.showQuickPick = quickPickMock({syncStyle});
+
+      await new LinkConfigGit().run();
+
+      expect(MultiStepInput.prototype.showInputBox).toHaveBeenCalledWith(
+        expect.objectContaining({prompt})
+      );
+    });
   });
 
   [
-    [true, 'TLS', 'https://my.url.git'],
-    [false, 'SSL', 'git@my.url.git'],
-  ].forEach(([useTLS, protocol, url]) => {
+    [true, 'TLS', 'https://my.url.git',
+      [
+        'Enter Git user name',
+        `Enter Git access token or password ${footnoteMsg}`
+      ]],
+    [false, 'SSL', 'git@my.url.git',
+      [
+        `Enter SSH private key passphrase ${footnoteMsg}`,
+        `Enter SSH private key file path ${footnoteMsg}`
+      ]],
+  ].forEach(([useTLS, protocol, url, prompts]) => {
     test(`correct params are passed for ${protocol} protocol`, async () => {
       MultiStepInput.prototype.showInputBox = inputBoxMock({useTLS: useTLS as boolean});
 
@@ -111,6 +130,17 @@ describe('LinkConfigGit', () => {
         'styra',
         expect.arrayContaining(useTLS ? [url, '--username', 'my-username'] : [url, '--key-file', 'my key file path']),
         expect.objectContaining({stdinData: useTLS ? 'my token' : 'my key passphrase'})
+      );
+    });
+
+    test(`correct prompts are invoked for ${protocol} protocol`, async () => {
+      MultiStepInput.prototype.showInputBox = inputBoxMock({useTLS: useTLS as boolean});
+
+      await new LinkConfigGit().run();
+      (prompts as string[]).forEach((prompt) =>
+        expect(MultiStepInput.prototype.showInputBox).toHaveBeenCalledWith(
+          expect.objectContaining({prompt})
+        )
       );
     });
   });

@@ -62,9 +62,9 @@ describe('LinkInit', () => {
   });
 
   [
-    [true, 'creating new system'],
-    [false, 'connecting to existing system'],
-  ].forEach(([useNew, description]) => {
+    ['creating new system', true, 'Choose a unique name for the DAS System'],
+    ['connecting to existing system', false, 'Enter the name of an existing DAS System'],
+  ].forEach(([description, useNew, prompt]) => {
     test(`correct params are passed for ${description}`, async () => {
 
       MultiStepInput.prototype.showQuickPick = quickPickMock(useNew as boolean);
@@ -77,6 +77,16 @@ describe('LinkInit', () => {
           useNew ? ['--create', '--name', 'my new DAS system']
             : ['--existing', '--name', 'my existing DAS system']),
         expect.anything()
+      );
+    });
+
+    test(`correct prompts are invoked for ${description}`, async () => {
+      MultiStepInput.prototype.showQuickPick = quickPickMock(useNew as boolean);
+
+      await new LinkInit().run();
+
+      expect(MultiStepInput.prototype.showInputBox).toHaveBeenCalledWith(
+        expect.objectContaining({prompt})
       );
     });
   });
