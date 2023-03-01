@@ -107,7 +107,8 @@
     "test": "jest",
     "test:verbose": "jest --verbose",
     "test:watch": "jest --watch",
-    "watch": "tsc -watch -p ./"
+    "watch": "tsc -watch -p ./",
+    "snippets:build:common": "ts-node src/bin/yaml2json.ts"
   },
   "devDependencies": {
     "@babel/core": "^7.20.12",
