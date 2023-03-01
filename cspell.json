@@ -9,6 +9,7 @@
         "autofix",
         "esbuild",
         "logreplay",
+        "millisec",
         "outfile",
         "quickinput",
         "rego",
