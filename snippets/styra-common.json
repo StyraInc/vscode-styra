@@ -1,61 +1,91 @@
 {
-    "Styra Link intro": {
-        "prefix": "rego__help",
-        "description": "Introductory remarks on rego, Styra Link, and VSCode",
-        "scope": "rego",
-        "body": [
-            "# Welcome to the world of rego!",
-            "# The VSCode plugin provides a wealth of ready-made snippets to jump start your rego journey.",
-            "# Note that whether you have any snippets depends on the system type of the DAS system",
-            "# that you have connected to your currently loaded VSCode project with Styra Link.",
-            "# Use the \"Styra Link: Initialize\" command to set that up if you you have not already.",
-            "# Some useful links:",
-            "#    Rego Language https://www.openpolicyagent.org/docs/latest/policy-reference/",
-            "#    Styra DAS https://docs.styra.com/das",
-            ""
-        ]
-    },
-    "Example: conjunction of rules": {
-        "prefix": "rego_example_AND",
-        "description": "Illustrates how to write a rule where all expressions must be satisfied",
-        "scope": "rego",
-        "body": [
-            "# Sample input:",
-            "# {",
-            "#     \"role\": \"admin\",",
-            "#     \"reputation\": 500",
-            "# }",
-            "",
-            "# is_moderator is true if reputation exceeds 100 -AND- role is admin",
-            "",
-            "is_moderator {",
-            "  input.reputation > 100",
-            "  input.role == \"admin\"",
-            "}",
-            ""
-        ]
-    },
-    "Example: disjunction of rules": {
-        "prefix": "rego_example_OR",
-        "description": "Illustrates how to write a rule where only one expression must be satisfied",
-        "scope": "rego",
-        "body": [
-            "# Sample input:",
-            "# {",
-            "#     \"role\": \"customer\",",
-            "#     \"reputation\": 100",
-            "# }",
-            "",
-            "# is_moderator is true if reputation exceeds 100 -OR- role is admin",
-            "",
-            "is_moderator {",
-            "  input.reputation > 100",
-            "}",
-            "",
-            "is_moderator {",
-            "  input.role == \"admin\"",
-            "}",
-            ""
-        ]
-    }
+  "Styra Link intro": {
+    "prefix": "rego__help",
+    "description": "Introductory remarks on rego, Styra Link, and VSCode",
+    "scope": "rego",
+    "body": [
+      "# Welcome to the world of rego!",
+      "# The VSCode plugin provides a wealth of ready-made snippets to jump start your rego journey.",
+      "# There are two types: policy snippets (currently only available for Kubernetes projects)",
+      "# and rego examples, which help you get up to speed with rego itself.",
+      "",
+      "# To get started with language snippets, open any rego file and start typing `rego` to pop up the list.",
+      "# Once inserted in your file, you can copy it over to the rego playground if you actually want to run it.",
+      "# To do that... ",
+      "",
+      "# Use the \"Styra Link: Initialize\" command to set up your project if you you have not already.",
+      "# Some useful links:",
+      "#    Rego Language https://www.openpolicyagent.org/docs/latest/policy-reference/",
+      "#    Styra DAS https://docs.styra.com/das",
+      ""
+    ]
+  },
+  "Example: conjunction of rules": {
+    "prefix": "rego_example_AND",
+    "description": "Illustrates writing a rule where all conditions must be satisfied",
+    "scope": "rego",
+    "body": [
+      "###########################################################################################",
+      "# Example: All conditions must be satisfied",
+      "# is_moderator is true if reputation exceeds 100 -AND- role is admin",
+      "###########################################################################################",
+      "",
+      "# Sample data:",
+      "userData := {",
+      "     \"role\": \"admin\",",
+      "     \"reputation\": 500",
+      "}",
+      "",
+      "is_moderator {",
+      "  userData.reputation > 100",
+      "  userData.role == \"admin\"",
+      "}",
+      ""
+    ]
+  },
+  "Example: disjunction of rules": {
+    "prefix": "rego_example_OR",
+    "description": "Illustrates writing a rule where at least one condition must be satisfied",
+    "scope": "rego",
+    "body": [
+      "###########################################################################################",
+      "# Example: At least one condition must be satisfied",
+      "# is_moderator is true if reputation exceeds 100 -OR- role is admin",
+      "###########################################################################################",
+      "",
+      "# Sample data:",
+      "userData := {",
+      "    \"role\": \"customer\",",
+      "    \"reputation\": 100",
+      "}",
+      "",
+      "is_moderator {",
+      "  userData.reputation > 100",
+      "}",
+      "",
+      "is_moderator {",
+      "  userData.role == \"admin\"",
+      "}",
+      ""
+    ]
+  },
+  "Example: there exists, or, at least one": {
+    "prefix": "rego_example_AT_LEAST_ONE",
+    "description": "YAHOO-Illustrates writing a rule where at least one member of a set must meet a condition",
+    "scope": "rego",
+    "body": [
+      "###########################################################################################",
+      "# Example: At least one member of a set must meet a condition",
+      "# `set1_has_phone` is true if there exists some member of set1 ending with `-phone`",
+      "###########################################################################################",
+      "",
+      "set1 := {\"a-phone\", \"b-phone\", \"a-pad\"}",
+      "",
+      "set1_has_phone if {",
+      "  some item in set1",
+      "  endswith(item, \"-phone\")       # condition succeeds for item `a-phone` or `b-phone`",
+      "}",
+      ""
+    ]
+  }
 }
