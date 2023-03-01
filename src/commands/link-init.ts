@@ -3,7 +3,7 @@ import {MultiStepInput} from '../external/multi-step-input';
 import {CommandRunner} from '../lib/command-runner';
 import {generatePickList, shouldResume, StepType, validateNonEmpty} from './utility';
 import {ICommand, ReturnValue} from '../lib/types';
-import {info, infoDiagram} from '../lib/outputPane';
+import {info, infoDiagram} from '../lib/output-pane';
 import {QuickPickItem} from '../lib/vscode-api';
 import {SnippetInstaller} from '../lib/snippet-installer';
 

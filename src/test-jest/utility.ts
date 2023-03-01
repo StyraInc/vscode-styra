@@ -1,4 +1,4 @@
-import {outputChannel} from '../lib/outputPane';
+import {outputChannel} from '../lib/output-pane';
 
 export class OutputPaneSpy {
   private spyAppendLine = jest.spyOn(outputChannel, 'appendLine');

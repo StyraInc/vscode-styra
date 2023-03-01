@@ -1,7 +1,7 @@
 import {MultiStepInput} from '../external/multi-step-input';
 
 import {CommandRunner} from '../lib/command-runner';
-import {footnoteMsg, info, infoDiagram, infoInput} from '../lib/outputPane';
+import {footnoteMsg, info, infoDiagram, infoInput} from '../lib/output-pane';
 import {generatePickList, shouldResume, StepType, validateNonEmpty, validateNoop} from './utility';
 import {ICommand, ReturnValue} from '../lib/types';
 import {QuickPickItem} from '../lib/vscode-api';

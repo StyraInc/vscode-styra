@@ -10,7 +10,7 @@ import {compare} from 'semver';
 import {CommandRunner} from './command-runner';
 import {DAS} from './das-query';
 import {IDE} from './vscode-api';
-import {info, infoDebug, infoFromUserAction, teeError, teeInfo} from './outputPane';
+import {info, infoDebug, infoFromUserAction, teeError, teeInfo} from './output-pane';
 import {LocalStorageService, Workspace} from './local-storage-service';
 import {VersionType} from './types';
 
@@ -66,10 +66,8 @@ export class StyraInstall {
     const currentDate = new Date(Date.now());
 
     // run check periodically based on user preference in VSCode settings
-    if (!last || (currentDate.getDate() - new Date(last).getDate() >= interval)) {
-
+    if (!last || this.compareDates(currentDate, new Date(last)) >= interval) {
       localStorage.setValue(Workspace.UpdateCheckDate, currentDate.toDateString());
-
       try {
         const available = await DAS.runQuery('/v1/system/version') as VersionType;
         const installedVersion = await new CommandRunner().runStyraCmdQuietly(
@@ -128,5 +126,11 @@ export class StyraInstall {
       writeStream.on('error', reject);
       writeStream.on('finish', resolve);
     });
+  }
+
+  private static compareDates(dateA: Date, dateB: Date): number {
+    const millisecDifference = dateA.getTime() - dateB.getTime();
+    const daysDifference = millisecDifference / (1000 * 3600 * 24);
+    return daysDifference;
   }
 }

@@ -1,6 +1,6 @@
 import {MultiStepInput} from '../external/multi-step-input';
 
-import {infoFromUserAction} from '../lib/outputPane';
+import {infoFromUserAction} from '../lib/output-pane';
 import {LocalStorageService, Workspace} from '../lib/local-storage-service';
 import {QuickPickItem} from '../lib/vscode-api';
 

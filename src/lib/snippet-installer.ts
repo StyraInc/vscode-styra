@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import path = require('path');
 import {IDE} from './vscode-api';
-import {infoDebug, teeError} from './outputPane';
+import {infoDebug, teeError} from './output-pane';
 import {StyraConfig} from './styra-config';
 
 export class SnippetInstaller {

@@ -2,7 +2,7 @@ import {ChildProcessWithoutNullStreams, spawn} from 'child_process';
 import shellEscape = require('shell-escape');
 
 import {IDE} from './vscode-api';
-import {info, infoDebug, teeError} from './outputPane';
+import {info, infoDebug, teeError} from './output-pane';
 import {LocalStorageService, Workspace} from './local-storage-service';
 import {STYRA_CLI_CMD, StyraInstall} from './styra-install';
 

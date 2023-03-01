@@ -1,5 +1,5 @@
 import {ICommand, ReturnValue} from '../lib/types';
-import {info, infoFromUserAction, outputChannel, teeError} from '../lib/outputPane';
+import {info, infoFromUserAction, outputChannel, teeError} from '../lib/output-pane';
 import {LocalStorageService, Workspace} from '../lib/local-storage-service';
 import {StyraConfig} from '../lib/styra-config';
 import {StyraInstall} from '../lib/styra-install';
