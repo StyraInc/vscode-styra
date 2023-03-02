@@ -148,7 +148,20 @@ These snippets are stored in `snippets/styra-common.yaml` for ease of editing.
 If stored as JSON, you would have to worry about quotes surrounding each line,
 as well as escaping embedded quotes (which occurs a lot in these examples!).
 However, VSCode needs them to be in JSON rather than YAML, so after you make changes
-to `snippets/styra-common.yaml` just run `npm run snippets/styra-common.yaml` to regenerate
+to `snippets/styra-common.yaml` just run `npm run snippets:build:common` to regenerate
 the `snippets/styra-common.json` file that will be used by VSCode.
 
 DO NOT edit `snippets/styra-common.json` directly!
+
+The diagram shows the key pieces of a snippet definition.
+
+![snippet parts](https://github.com/StyraInc/vscode-styra/blob/main/image/rego-snippet.png)
+
+1. The trigger phrase
+2. The short description
+3. The long description
+4. Inserted description (that is, this item, and all below, are pasted into the editor)
+5. Documentation link
+6. Package/import header that allows the code block to execute in the playground.
+7. Sample data, surrounded by START/END comments for clarity.
+8. Code, with annotations as necessary.
