@@ -85,7 +85,7 @@ describe('SnippetInstaller', () => {
 
   [
     ['constructs path to source snippet file based on system type', new RegExp('from: /ext/root/dir/snippets/kubernetes.json')],
-    ['constructs path to destination snippet file', new RegExp('to: /my/project/dir/.vscode/styra-snippets.code-snippets')]
+    ['constructs path to destination snippet file', new RegExp('to: /my/project/dir/.vscode/styra.code-snippets')]
   ].forEach(([description, postedOutput]) => {
 
     test(description as string, async () => {
