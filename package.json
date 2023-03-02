@@ -1,7 +1,7 @@
 {
   "name": "vscode-styra",
   "displayName": "Styra",
-  "icon": "styra_icon-blue.png",
+  "icon": "styra-icon.png",
   "description": "A VSCode extension for the Styra CLI",
   "repository": {
     "type": "git",
