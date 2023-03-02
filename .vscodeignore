@@ -3,7 +3,8 @@
 .github/**
 out/test/**
 out/test-jest/**
-startup-flow.png
+image/**
+snippets/styra-common.yaml
 
 .gitignore
 .yarnrc
