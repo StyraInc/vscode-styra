@@ -132,3 +132,23 @@ export class Link<CMD> implements ICommand {
 
 }
 ```
+
+## Snippets
+
+There are two types of snippets:
+
+**Policy snippets** are system-type-specific and should be stored in the snippets directory
+with a name that matches the system type (e.g., snippets/kubernetes.json).
+When editing a rego file (in a kubernetes project only, following the same example),
+VSCode intellisense will trigger when you type, e.g. "add".
+
+**Rego example snippets** are available independent of system type.
+Simply typing "rego" inside any rego file will pop-up VSCode intellisense with a list of all the rego examples.
+These snippets are stored in `snippets/styra-common.yaml` for ease of editing.
+If stored as JSON, you would have to worry about quotes surrounding each line,
+as well as escaping embedded quotes (which occurs a lot in these examples!).
+However, VSCode needs them to be in JSON rather than YAML, so after you make changes
+to `snippets/styra-common.yaml` just run `npm run snippets/styra-common.yaml` to regenerate
+the `snippets/styra-common.json` file that will be used by VSCode.
+
+DO NOT edit `snippets/styra-common.json` directly!
