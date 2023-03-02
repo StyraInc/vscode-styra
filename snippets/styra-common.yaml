@@ -26,6 +26,9 @@ Conjunction of rules:
     # Example: All conditions must be satisfied
     ###########################################################################################
 
+    package example
+    import future.keywords
+
     # Sample data START
     userData := {
          "role": "admin",
@@ -49,6 +52,9 @@ Disjunction of rules:
     # Example: At least one condition must be satisfied
     # Reference: https://www.openpolicyagent.org/docs/latest/policy-language/#incremental-definitions
     ###########################################################################################
+
+    package example
+    import future.keywords
 
     # Sample data START
     userData := {
@@ -77,6 +83,9 @@ At least one condition:
     # Reference: https://www.openpolicyagent.org/docs/latest/policy-language/#futurekeywordsin
     ###########################################################################################
 
+    package example
+    import future.keywords
+
     # Sample data START
     set1 := {"a-phone", "b-phone", "a-pad"}
     # Sample data END
@@ -96,6 +105,9 @@ Every condition:
     # Reference: https://www.openpolicyagent.org/docs/latest/policy-language/#universal-quantification-for-all
     ###########################################################################################
  
+    package example
+    import future.keywords
+
     # Sample data START
     nums := {100, 200, 300}
     # Sample data END
@@ -123,6 +135,9 @@ At least one negated condition:
     # Reference: https://www.openpolicyagent.org/docs/latest/policy-language/#negation 
     ###########################################################################################
 
+    package example
+    import future.keywords
+
     # Sample data START
     set1 := {"a-phone", "b-phone", "a-pad"}
     # Sample data END
@@ -148,6 +163,9 @@ Every negated condition:
     # Reference: https://www.openpolicyagent.org/docs/latest/policy-language/#universal-quantification-for-all
     ###########################################################################################
 
+    package example
+    import future.keywords
+
     # Sample data START
     nums := {100, 200, 300}
     # Sample data END
@@ -170,6 +188,9 @@ Generate set based on conditions:
     # Example: Generate a set of elements (unique members) satisfying a condition
     # Reference: https://www.openpolicyagent.org/docs/latest/policy-language/#set-comprehensions
     ###########################################################################################
+
+    package example
+    import future.keywords
 
     # Sample data START
     array1 := ["a-phone", "b-phone", "a-phone", "a-pad"]
@@ -199,6 +220,9 @@ Generate object list based on conditions:
     # Reference: https://www.openpolicyagent.org/docs/latest/policy-language/#object-comprehensions
     ###########################################################################################
 
+    package example
+    import future.keywords
+
     # Sample data START
     array1 := ["a-phone", "b-phone", "a-phone", "a-pad"]
     # Sample data END
@@ -226,6 +250,9 @@ Generate array based on negation:
     # Example: Generate a list of elements (duplicates included) NOT satisfying a condition
     # Reference: https://www.openpolicyagent.org/docs/latest/policy-language/#array-comprehensions
     ###########################################################################################
+
+    package example
+    import future.keywords
 
     # Sample data START
     array1 := ["a-phone", "b-phone", "a-phone", "a-pad"]
