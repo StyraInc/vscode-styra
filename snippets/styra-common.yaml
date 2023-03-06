@@ -318,3 +318,54 @@ Generate array based on negation:
         some item in array1
         not endswith(item, "-car")
     ]
+
+Handling conflicts:
+  prefix: rego_ex_CONFLICTS
+  description: Conflicts cause runtime errors; code to avoid them.
+  scope: rego
+  body: |
+    ###########################################################################################
+    # Example: Illustrate run-time error and how to revise code to avoid it
+    ###########################################################################################
+
+    package example
+    import future.keywords
+
+    # Sample data START
+    sample := {
+      "user": {
+        "is_admin": true,
+        "is_super_admin": false
+      },
+      "path": {
+        "is_restricted": true
+      }
+    }
+    # Sample data END
+
+    #------------------------------------------------------------------------------------------
+    # first attempt generates a run-time error with the initial input values given above:
+
+    allow_request := true if {    # allow if user is admin
+      sample.user.is_admin
+    }
+
+    allow_request := false if {   # disallow if path is restricted
+      sample.path.is_restricted
+    }
+
+    #------------------------------------------------------------------------------------------
+    # delete the first attempt and uncomment this second attempt to avoid an error:
+    # (experiment with the three boolean inputs above to see varying results)
+
+    # allow_request := true if {      # allow if user is admin
+    #   sample.user.is_admin
+    #   not sample.path.is_restricted  # except for restricted path
+    # }
+
+    # allow_request := true if {      # allow if user is super-admin in all cases
+    #   sample.user.is_super_admin
+    # }
+
+    # default allow_request := false  # false in all other cases
+
