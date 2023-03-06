@@ -184,14 +184,44 @@ Every negated condition:
     nums := {100, 200, 300}
     # Sample data END
 
-    all_in_target_range if {  # negating multiple is often easier by starting with the opposite
+    all_in_target_range if {  # negating multiple is often easier by starting with the opposite...
       every num in nums {     # every-condition fails for this range
         num > 150
         num < 160
       }
     }
     
-    all_NOT_in_target_range if not all_in_target_range     # ...then just negate it!
+    all_NOT_in_target_range if not all_in_target_range     # ...then just negate the "helper" result!
+ 
+Generate array based on conditions:
+  prefix: rego_ex_GENERATE_ARRAY
+  description: Generates an array (duplicate elements possible) from a target list
+  scope: rego
+  body: |
+    ###########################################################################################
+    # Example: Generate an array of elements (includes duplicates if present) satisfying a condition
+    # Reference: https://www.openpolicyagent.org/docs/latest/policy-language/#array-comprehensions
+    ###########################################################################################
+
+    package example
+    import future.keywords
+
+    # Sample data START
+    array1 := ["a-phone", "b-phone", "a-phone", "a-pad"]
+    # Sample data END
+
+    # Square brackets here are the key for array generation (compare to rego_ex_GENERATE_SET).
+    my_array_of_phones := [         # Output: ["a-phone", "b-phone", "a-phone"]
+      item |                        # include each `item` such that...
+        some item in array1         # iterates over the input list and...
+        endswith(item, "-phone")    # it matches this condition
+    ]
+
+    my_array_of_cars := [           # Output: empty array because no item satisfies the condition
+      item |
+        some item in array1
+        endswith(item, "-car")
+    ]
  
 Generate set based on conditions:
   prefix: rego_ex_GENERATE_SET
@@ -210,7 +240,7 @@ Generate set based on conditions:
     array1 := ["a-phone", "b-phone", "a-phone", "a-pad"]
     # Sample data END
 
-    # The curly braces used here are the key for set generation!
+    # Curly brackes here are the key for set generation (compare to rego_ex_GENERATE_ARRAY).
     my_set_of_phones := {           # Output: ["a-phone", "b-phone"]
       item |                        # include each `item` such that...
         some item in array1         # iterates over the input list and...
@@ -222,7 +252,6 @@ Generate set based on conditions:
         some item in array1
         endswith(item, "-car")
     }
- 
  
 Generate object list based on conditions:
   prefix: rego_ex_GENERATE_OBJECT
@@ -241,6 +270,9 @@ Generate object list based on conditions:
     array1 := ["a-phone", "b-phone", "a-phone", "a-pad"]
     # Sample data END
 
+    # To get an object (rather than an array or set), the element shape is "key:item".
+    # Warning! If you generate duplicate keys you will get a runtime error.
+    # (Cannot happen in this example since the unique index is part of the key.)
     my_phone_details := {   # Output: {"x-0": "a-phone", "x-1": "b-phone", "x-2": "a-phone"}
       key:item |                          # construct key:value pairs
         some index, item in array1        # iterates over 0:"a-phone", 1:"b-phone", 2:"a-phone", 3:"a-pad"
@@ -273,6 +305,8 @@ Generate array based on negation:
     # Sample data END
 
     # The square brackets used here are the key for array generation!
+    #   > Use curly braces to get a set instead.
+    #   > Use the key:item construct shown in rego_ex_GENERATE_OBJECT to get an object instead.
     my_set_of_NON_phones := [         # Output: ["a-pad"]
       item |                          # include each `item` such that...
         some item in array1           # iterates over the input list and...
