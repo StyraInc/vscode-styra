@@ -361,7 +361,40 @@ Condition evaluation:
     no_result_4 { input.no_such_field }       # undefined
     no_result_5 { 0 / 0  }                    # undefined
     no_result_6 { to_number("not a number") } # undefined
- 
+
+Negated condition evaluation:
+
+  prefix: rego_ex_CONDITIONS_NEGATED
+  description: Illustrate which negated conditions pass and which do not
+  scope: rego
+  body: |
+    ###########################################################################################
+    # Example: Illustrate which negated conditions pass and which do not
+    ###########################################################################################
+
+    package example
+
+    an_undefined_value { 1 == 2 }
+
+    # negating conditions that fail
+    negate_failing_conditions { # every condition in this rule succeeds
+      not false
+      not 1 == 2
+      not input.no_such_path
+      not an_undefined_value
+    }
+
+    # negating conditions that succeed
+    negate_successful_conditions { # every condition in this rule fails
+      not true
+      not 1 == 1
+      not 1
+      not 0
+      not "str"
+      not ""
+      not null
+    }
+
 Handling conflicts:
   prefix: rego_ex_CONFLICTS
   description: Conflicts cause runtime errors; code to avoid them.
