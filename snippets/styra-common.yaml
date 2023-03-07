@@ -319,6 +319,49 @@ Generate array based on negation:
         not endswith(item, "-car")
     ]
 
+Condition evaluation:
+  prefix: rego_ex_CONDITIONS
+  description: Illustrate which conditions pass and which do not
+  scope: rego
+  body: |
+    ###########################################################################################
+    # Example: Illustrate which conditions pass and which do not
+    ###########################################################################################
+
+    package example
+    import future.keywords
+
+    all_values_other_than_false_succeed {
+      true         # literal true
+      3 == 3       # true
+      "a" == "a"   # true
+      3.14         # number
+      -1 * 10      # number
+      abs(-1)      # number
+      "a string"   # string
+      upper("str") # string
+      [1, "a"]     # array
+      {1, "a"}     # set
+      {"k": "v"}   # object
+    }
+
+    even_falsy_values_succeed {    # i.e., there is no "falsy" in Rego!
+      0            # zero
+      ""           # empty string
+      []           # empty array
+      {}           # empty object
+      {1} - {1}    # empty set computed by set difference
+      null         # JSON null value of type null
+    }
+
+    # Just two ways to fail a condition: undefined or actual false
+    no_result_1 { false }                     # literal false
+    no_result_2 { 1 == 2 }                    # false
+    no_result_3 { is_number("a") }            # false
+    no_result_4 { input.no_such_field }       # undefined
+    no_result_5 { 0 / 0  }                    # undefined
+    no_result_6 { to_number("not a number") } # undefined
+ 
 Handling conflicts:
   prefix: rego_ex_CONFLICTS
   description: Conflicts cause runtime errors; code to avoid them.
