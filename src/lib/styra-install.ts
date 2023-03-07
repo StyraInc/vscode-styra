@@ -15,6 +15,8 @@ import {LocalStorageService, Workspace} from './local-storage-service';
 import {VersionType} from './types';
 
 export const STYRA_CLI_CMD = 'styra';
+const STD_LINUX_INSTALL_DIR = '/usr/local/bin';
+const STD_WINDOWS_INSTALL_DIR = path.join('C:', 'Program Files', 'styra');
 
 export class StyraInstall {
 
@@ -89,7 +91,7 @@ export class StyraInstall {
     info(`    Architecture: ${targetArch}`);
 
     const binaryFile = targetOS === 'win32' ? STYRA_CLI_CMD + '.exe' : STYRA_CLI_CMD;
-    const exePath = targetOS === 'win32' ? path.join('C:', 'Program Files', 'styra') : '/usr/local/bin/';
+    const exePath = targetOS === 'win32' ? STD_WINDOWS_INSTALL_DIR : STD_LINUX_INSTALL_DIR;
     const exeFile = path.join(exePath, binaryFile);
     const tempFileLocation = path.join(os.homedir(), binaryFile);
 
