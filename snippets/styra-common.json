@@ -94,7 +94,7 @@
       ""
     ]
   },
-  "At least one condition": {
+  "At least one meets condition": {
     "prefix": "rego_ex_EXISTS_ONE",
     "description": "Determine whether at least one member of a set meets a condition",
     "scope": "rego",
@@ -118,7 +118,37 @@
       ""
     ]
   },
-  "Every condition": {
+  "At least one fails condition": {
+    "prefix": "rego_ex_EXISTS_ONE_NEGATED",
+    "description": "Determine whether at least one member of a set does NOT meet a condition",
+    "scope": "rego",
+    "body": [
+      "###########################################################################################",
+      "# Example: At least one member of a set does NOT meet a condition",
+      "# Reference: https://www.openpolicyagent.org/docs/latest/policy-language/#negation ",
+      "###########################################################################################",
+      "",
+      "package example",
+      "import future.keywords",
+      "",
+      "# Sample data START",
+      "set1 := {\"a-phone\", \"b-phone\", \"a-pad\"}",
+      "# Sample data END",
+      "",
+      "set1_has_some_NON_phone if {    # rule succeeds so evaluates to true",
+      "  some item in set1",
+      "  not endswith(item, \"-phone\")  # condition succeeds for item `a-pad`",
+      "}",
+      "",
+      "# For comparison",
+      "set1_has_phone if {             # rule succeeds so evaluates to true",
+      "  some item in set1",
+      "  endswith(item, \"-phone\")      # condition succeeds for item `a-phone` or `b-phone`",
+      "}",
+      ""
+    ]
+  },
+  "Every value satisfies condition": {
     "prefix": "rego_ex_EXISTS_ALL",
     "description": "Determine whether all members of a set meet a condition",
     "scope": "rego",
@@ -150,37 +180,7 @@
       ""
     ]
   },
-  "At least one negated condition": {
-    "prefix": "rego_ex_EXISTS_ONE_NEGATED",
-    "description": "Determine whether at least one member of a set does NOT meet a condition",
-    "scope": "rego",
-    "body": [
-      "###########################################################################################",
-      "# Example: At least one member of a set does NOT meet a condition",
-      "# Reference: https://www.openpolicyagent.org/docs/latest/policy-language/#negation ",
-      "###########################################################################################",
-      "",
-      "package example",
-      "import future.keywords",
-      "",
-      "# Sample data START",
-      "set1 := {\"a-phone\", \"b-phone\", \"a-pad\"}",
-      "# Sample data END",
-      "",
-      "set1_has_some_NON_phone if {    # rule succeeds so evaluates to true",
-      "  some item in set1",
-      "  not endswith(item, \"-phone\")  # condition succeeds for item `a-pad`",
-      "}",
-      "",
-      "# For comparison",
-      "set1_has_phone if {             # rule succeeds so evaluates to true",
-      "  some item in set1",
-      "  endswith(item, \"-phone\")      # condition succeeds for item `a-phone` or `b-phone`",
-      "}",
-      ""
-    ]
-  },
-  "Every negated condition": {
+  "No value satisfies condition": {
     "prefix": "rego_ex_EXISTS_ALL_NEGATED",
     "description": "Determine whether NO members of a set meet a condition",
     "scope": "rego",
@@ -209,8 +209,8 @@
     ]
   },
   "Generate array based on conditions": {
-    "prefix": "rego_ex_GENERATE_ARRAY",
-    "description": "Generates an array (duplicate elements possible) from a target list",
+    "prefix": "rego_ex_CREATE_ARRAY",
+    "description": "Generates a filtered array (retaining duplicates, if present)",
     "scope": "rego",
     "body": [
       "###########################################################################################",
@@ -225,7 +225,7 @@
       "array1 := [\"a-phone\", \"b-phone\", \"a-phone\", \"a-pad\"]",
       "# Sample data END",
       "",
-      "# Square brackets here are the key for array generation (compare to rego_ex_GENERATE_SET).",
+      "# Square brackets here are the key for array generation (compare to rego_ex_CREATE_SET).",
       "my_array_of_phones := [         # Output: [\"a-phone\", \"b-phone\", \"a-phone\"]",
       "  item |                        # include each `item` such that...",
       "    some item in array1         # iterates over the input list and...",
@@ -241,8 +241,8 @@
     ]
   },
   "Generate set based on conditions": {
-    "prefix": "rego_ex_GENERATE_SET",
-    "description": "Generates a set (unique elements) from a target list",
+    "prefix": "rego_ex_CREATE_SET",
+    "description": "Generates a filtered set (unique elements)",
     "scope": "rego",
     "body": [
       "###########################################################################################",
@@ -257,7 +257,7 @@
       "array1 := [\"a-phone\", \"b-phone\", \"a-phone\", \"a-pad\"]",
       "# Sample data END",
       "",
-      "# Curly brackes here are the key for set generation (compare to rego_ex_GENERATE_ARRAY).",
+      "# Curly brackes here are the key for set generation (compare to rego_ex_CREATE_ARRAY).",
       "my_set_of_phones := {           # Output: [\"a-phone\", \"b-phone\"]",
       "  item |                        # include each `item` such that...",
       "    some item in array1         # iterates over the input list and...",
@@ -272,9 +272,9 @@
       ""
     ]
   },
-  "Generate object list based on conditions": {
-    "prefix": "rego_ex_GENERATE_OBJECT",
-    "description": "Generates an object from a target list",
+  "Generate object based on conditions": {
+    "prefix": "rego_ex_CREATE_OBJECT",
+    "description": "Generate an object of key/value pairs satisfying a condition",
     "scope": "rego",
     "body": [
       "###########################################################################################",
@@ -309,7 +309,7 @@
     ]
   },
   "Generate array based on negation": {
-    "prefix": "rego_ex_GENERATE_NEGATION",
+    "prefix": "rego_ex_CREATE_NEGATION",
     "description": "Generates a negated array (duplicates preserved) from a target list",
     "scope": "rego",
     "body": [
@@ -327,7 +327,7 @@
       "",
       "# The square brackets used here are the key for array generation!",
       "#   > Use curly braces to get a set instead.",
-      "#   > Use the key:item construct shown in rego_ex_GENERATE_OBJECT to get an object instead.",
+      "#   > Use the key:item construct shown in rego_ex_CREATE_OBJECT to get an object instead.",
       "my_set_of_NON_phones := [         # Output: [\"a-pad\"]",
       "  item |                          # include each `item` such that...",
       "    some item in array1           # iterates over the input list and...",
