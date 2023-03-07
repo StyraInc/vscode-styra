@@ -1,4 +1,5 @@
 import {ChildProcessWithoutNullStreams, spawn} from 'child_process';
+import {sync as commandExistsSync} from 'command-exists';
 import shellEscape = require('shell-escape');
 
 import {IDE} from './vscode-api';
@@ -74,6 +75,17 @@ export class CommandRunner {
 
   private isDebugLine(line: string): boolean {
     return ['GET', 'PUT', 'POST', 'DELETE', 'PATCH'].filter((debugFlag) => line.startsWith(debugFlag)).length > 0;
+  }
+
+  async runPwshCmd(args: string[], options?: CommandRunnerOptions): Promise<string> {
+    const pwshCmd = process.platform === 'win32' ? 'powershell' : 'pwsh';
+    if (!commandExistsSync(pwshCmd)) {
+      info(`"${pwshCmd}" not found; aborting...`);
+      return '';
+    }
+    // Apparently optional on windows, macOS requires explicit `-Command` in the arg list
+    const result = await this.runShellCmd(pwshCmd, ['-NoProfile', '-Command', ...args], options);
+    return result.trim(); // importantly remove trailing CR/LF
   }
 
   // This can be used for any other (non `styra ...`) commands.

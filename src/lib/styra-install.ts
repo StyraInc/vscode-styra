@@ -89,7 +89,8 @@ export class StyraInstall {
     info(`    Architecture: ${targetArch}`);
 
     const binaryFile = targetOS === 'win32' ? STYRA_CLI_CMD + '.exe' : STYRA_CLI_CMD;
-    const exeFile = targetOS === 'win32' ? path.join('C:', 'Program Files', 'styra', binaryFile) : path.join('/usr/local/bin/', binaryFile);
+    const exePath = targetOS === 'win32' ? path.join('C:', 'Program Files', 'styra') : '/usr/local/bin/';
+    const exeFile = path.join(exePath, binaryFile);
     const tempFileLocation = path.join(os.homedir(), binaryFile);
 
     const url =
@@ -110,6 +111,7 @@ export class StyraInstall {
       info(`    Executable: ${exeFile}`);
       fs.chmodSync(tempFileLocation, '755');
       moveFile(tempFileLocation, exeFile);
+      await this.adjustPath(targetOS, exePath);
     });
   }
 
@@ -125,6 +127,32 @@ export class StyraInstall {
       writeStream.on('error', reject);
       writeStream.on('finish', resolve);
     });
+  }
+
+  private static async adjustPath(targetOS: string, newPathComponent: string): Promise<void> {
+    if (process.env.PATH?.includes(newPathComponent)) {
+      infoDebug(`${newPathComponent} is already included in env.PATH`);
+      return;
+    }
+    if (targetOS === 'win32') {
+      infoDebug(`PATH before updating: ${process.env.PATH}`);
+      const userPath = await new CommandRunner()
+        .runPwshCmd(['[Environment]::GetEnvironmentVariable("PATH", [System.EnvironmentVariableTarget]::User)']);
+      infoDebug(`user path before updating: ${userPath}`);
+      const updatedPath = this.updatePath(userPath, newPathComponent);
+      infoDebug(`updated user path: ${updatedPath}`);
+      const cmd = `[Environment]::SetEnvironmentVariable("PATH", "${updatedPath}", [EnvironmentVariableTarget]::User)`;
+      // TODO execute here...
+      infoDebug(cmd);
+    } else { // non-windows
+      teeError(`${newPathComponent} needs to be on your search PATH`);
+    }
+  }
+
+  private static updatePath(userPath: string, newPathComponent: string): string {
+    const pathParts = userPath.split(';') ?? [];
+    pathParts.push(newPathComponent);
+    return pathParts.join(';');
   }
 
   private static compareDates(dateA: Date, dateB: Date): number {
