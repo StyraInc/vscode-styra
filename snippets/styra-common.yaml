@@ -445,3 +445,149 @@ Handling conflicts:
 
     # default allow_request := false  # false in all other cases
 
+Partial rule vs. comprehension:
+  prefix: rego_ex_PARTIAL_RULE
+  description: Illustrates a common use of partial rules and contrasts with comprehensions
+  scope: rego
+  body: |
+    ###########################################################################################
+    # Example: Illustrates a common use of partial rules and contrasts with comprehensions
+    ###########################################################################################
+
+    package example
+
+    # This example shows how to use a partial rule to re-index a list of users by their user IDs.
+    # It is vital that the "id" field of each user be unique among the "users" list;  otherwise,
+    # you will get a runtime error about duplicate keys (unless their values are also identical).
+    #
+    # Partial objects are useful when the mapping from one collection to another is complicated, since
+    # long rule bodies are more readable than long comprehensions. Additionally, using partial objects
+    # can be a useful performance optimization, since the runtime can skip evaluating the rule body
+    # for key values that are never accessed in some circumstances.
+
+    # Sample data START
+    users := [
+      { "id": "jsmith",  "first": "John",  "last": "Smith"  },
+      { "id": "jdoe",    "first": "Jane",  "last": "Doe"    },
+      { "id": "acooper", "first": "Alice", "last": "Cooper" }
+    ]
+    # Sample data END
+
+    # A: Using partial rule formulation
+    A_users_by_id[id] = user {
+      user := users[_]  # Underscore indicates "any", so this iterates over the elements of `users`.
+      id := user.id     # Bind id (of users_by_id) to the "id" field of the current user object.
+    }
+
+    # B: Using object comprehension formulation
+    B_users_by_id := {
+      id: user |
+        user := users[_]
+        id := user.id
+    }
+
+Convert between set and array:
+  prefix: rego_ex_CONVERT_OBJECTS
+  description: Demonstrates how to convert from set to array and array to set
+  scope: rego
+  body: |
+    ###########################################################################################
+    # Example: Demonstrates how to convert from set to array and array to set
+    ###########################################################################################
+
+    package example
+
+    # Sample data START
+    original_set := {"a-phone", "b-phone", "a-pad"}
+    original_array := ["a-phone", "b-phone", "a-pad", "a-phone"]
+    # Sample data END
+
+    # Convert set to an array. The order of elements in new_array is arbitrary;
+    # for well-defined ordering, consider sorting the array after creating it.
+    #
+    # This can be read as "x such that x is a member of original_set".
+    new_array := [x | original_set[x]]
+
+    # Now we'll show the other way around...
+    # This can be read as "x such that x is a member of original_array at some arbitrary index".
+    new_set := {x | x := original_array[_]}
+
+Convert types:
+  prefix: rego_ex_CONVERT_TYPES
+  description: Demonstrates how to convert among boolean, number, and string
+  scope: rego
+  body: |
+    ###########################################################################################
+    # Example: Demonstrates how to convert among boolean, number, and string
+    ###########################################################################################
+
+    package example
+
+    # string -> number
+    num1 := to_number("1")         # 1
+    num2 := to_number("3.14159")   # 3.14159
+
+    # bool -> number
+    num3 := to_number(true)        # 1
+    num4 := to_number(false)       # 0
+
+    # number -> string
+    # This can be a bit of a pain point: if you do not choose the correct format string
+    # you will get bogus results. Generally, that means use "%f" if it has a decimal point
+    # or "%d" if not. These first two show bogus results because of the wrong format string.
+    bogus1 := sprintf("%f", [5])              # "%!f(int=5)"
+    bogus2 := sprintf("%d", [1.2])            # "%!d(float64=1.2)"
+
+    # If you know the appropriate format verb (see https://pkg.go.dev/fmt) in advance, you can just use sprintf:
+    str1 := sprintf("%d", [1])                # "1"
+    str2 := sprintf("%f", [3.14159])          # "3.141590"
+
+    # If you don't know the appropriate verb, you can try %v:
+    str3 := sprintf("%v", [1])                # "1"
+    str4 := sprintf("%v", [3.14159])          # "3.14159"
+
+    # Be wary though, since %v will happily accept _any_ type:
+    str5 := sprintf("%v", ["this is not a number"]) # "this is not a number"
+
+    # If you want to ensure you have an integer:
+    str6 := sprintf("%d", [round(123.856)])   # 124
+    str7 := sprintf("%d", [round(789)])       # 789
+
+Handle optional object keys:
+  prefix: rego_ex_OPTIONAL_KEYS
+  description: Demonstrates handling objects that may have optional keys 
+  scope: rego
+  body: |
+    ###########################################################################################
+    # Example: Demonstrates handling objects that may have optional keys 
+    # Reference: https://www.openpolicyagent.org/docs/latest/policy-reference/#builtin-object-objectget
+    ###########################################################################################
+
+    package example
+
+    # Sample data START
+    obj1 := {
+    	"id": "jsmith",
+    	"first": "John",
+    	"last": "Smith",
+    	"friends": ["acooper", "jdoe"],
+    }
+
+    obj2 := {
+    	"id": "gwolf",
+    	"first": "George",
+    	"last": "Wolf",
+    }
+    # Sample data END
+
+    # Suppose the "friends" key is optional. If not present,
+    # we still want to return valid data (and specificially an empty list for "friends").
+
+    # This way is WRONG, don't do this:
+    # bogus1 := obj1.friends    # this one works fine (returning ["acooper", "jdoe"])...
+    # bogus2 := obj2.friends    # ...but this causes a run-time error!
+
+    # The correct way uses object.get(); this ensures that good1 and good2 are always
+    # arrays, even if empty, when the "friends" key is omitted.
+    good1 := object.get(obj1, "friends", []) # ["acooper", "jdoe"]
+    good2 := object.get(obj2, "friends", []) # []
