@@ -137,15 +137,15 @@ export class StyraInstall {
       return;
     }
     if (targetOS === 'win32') {
+      const runner = new CommandRunner();
       infoDebug(`PATH before updating: ${process.env.PATH}`);
-      const userPath = await new CommandRunner()
+      const userPath = await runner
         .runPwshCmd(['[Environment]::GetEnvironmentVariable("PATH", [System.EnvironmentVariableTarget]::User)']);
       infoDebug(`user path before updating: ${userPath}`);
       const updatedPath = this.updatePath(userPath, newPathComponent);
+      await runner
+        .runPwshCmd([`[Environment]::SetEnvironmentVariable("PATH", "${updatedPath}", [EnvironmentVariableTarget]::User)`]);
       infoDebug(`updated user path: ${updatedPath}`);
-      const cmd = `[Environment]::SetEnvironmentVariable("PATH", "${updatedPath}", [EnvironmentVariableTarget]::User)`;
-      // TODO execute here...
-      infoDebug(cmd);
     } else { // non-windows
       teeError(`${newPathComponent} needs to be on your search PATH`);
     }
