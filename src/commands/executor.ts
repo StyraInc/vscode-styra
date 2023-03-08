@@ -1,5 +1,3 @@
-import {sync as commandExistsSync} from 'command-exists';
-
 import {ICommand, ReturnValue} from '../lib/types';
 import {info, infoFromUserAction, outputChannel, teeError} from '../lib/output-pane';
 import {LocalStorageService, Workspace} from '../lib/local-storage-service';
@@ -15,7 +13,7 @@ export class Executor {
     if (!(await this.checkStartup())) {
       return;
     }
-    if (!commandExistsSync(STYRA_CLI_CMD)) {
+    if (!await StyraInstall.styraCmdExists()) {
       info(`"${STYRA_CLI_CMD}" not found; aborting ${command.title}`);
     }
     this.StorageManager.setValue(Workspace.CmdName, command.title);
