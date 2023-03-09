@@ -8,6 +8,7 @@
     "words": [
         "autofix",
         "esbuild",
+        "LOCALAPPDATA",
         "logreplay",
         "millisec",
         "outfile",

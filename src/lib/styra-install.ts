@@ -16,7 +16,7 @@ import {VersionType} from './types';
 
 export const STYRA_CLI_CMD = 'styra';
 const STD_LINUX_INSTALL_DIR = '/usr/local/bin';
-const STD_WINDOWS_INSTALL_DIR = path.join('C:', 'Program Files', 'styra');
+const STD_WINDOWS_INSTALL_DIR = path.join(process.env.LOCALAPPDATA ?? '', 'Styra');
 
 export class StyraInstall {
 
