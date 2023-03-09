@@ -110,6 +110,9 @@ export class CommandRunner {
 
     // https://nodejs.org/api/child_process.html#child_processspawncommand-args-options
     const proc = spawn(path, args, {cwd: projectDir});
+    proc.on('error', ({message}) => {
+      teeError(`Failed to start subprocess: ${message}`);
+    });
     proc.stdin.write(stdinData.endsWith('\n') ? stdinData : stdinData + '\n');
     proc.stdin.end();
 
