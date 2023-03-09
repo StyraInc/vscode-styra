@@ -164,19 +164,15 @@ export class StyraInstall {
       const runner = new CommandRunner();
       infoDebug(`PATH before updating: ${process.env.PATH}`);
       const userPath = await runner
-        .runPwshCmd(['[Environment]::GetEnvironmentVariable("PATH", [System.EnvironmentVariableTarget]::User)']);
+        .runPwshCmd(['[Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariableTarget]::User)']);
       infoDebug(`user path before updating: ${userPath}`);
       const updatedPath = this.updatePath(userPath, newPathComponent);
-      // TODO === put this back when done testing!
-      // await runner
-      //   .runPwshCmd([`[Environment]::SetEnvironmentVariable("PATH", "${updatedPath}", [EnvironmentVariableTarget]::User)`]);
-
-      // TODO === Probably do not need this block
-      // infoDebug('Updating path for current session, too');
-      // await runner
-      //   .runPwshCmd([`$env:PATH="${process.env.PATH};${newPathComponent}"`]);
-      // infoDebug('Resultant path for current session:' + await runner.runPwshCmd(['$env:PATH']));
-
+      if (userPath.includes(newPathComponent)) {
+        infoDebug(`${newPathComponent} is already included in user PATH (but likely VSCode env has not been refreshed to show it)`);
+        return;
+      }
+      await runner
+        .runPwshCmd([`[Environment]::SetEnvironmentVariable("PATH", "${updatedPath}", [EnvironmentVariableTarget]::User)`]);
       infoDebug(`updated user path: ${updatedPath}`);
     } else { // non-windows
       teeError(`${newPathComponent} needs to be on your search PATH`);
