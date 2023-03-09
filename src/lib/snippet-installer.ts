@@ -4,6 +4,9 @@ import {IDE} from './vscode-api';
 import {infoDebug, teeError} from './output-pane';
 import {StyraConfig} from './styra-config';
 
+const SNIPPET_DIR = 'snippets';
+const SNIPPET_FILE = 'styra.code-snippets';
+
 export class SnippetInstaller {
 
   async addSnippetsToProject(): Promise<void> {
@@ -14,12 +17,10 @@ export class SnippetInstaller {
       return;
     }
     const extensionRootDir = vsix.extensionPath;
-    const destSnippetFile = 'styra-snippets.code-snippets';
-
     const dotDir = IDE.dotFolderForExtension();
     const srcName = await this.getSnippetFileName();
-    const srcPath = path.join(extensionRootDir, 'snippets', srcName);
-    const destPath = path.join(dotDir, destSnippetFile);
+    const srcPath = path.join(extensionRootDir, SNIPPET_DIR, srcName);
+    const destPath = path.join(dotDir, SNIPPET_FILE);
 
     if (!this.srcFileExists(srcPath)) {
       infoDebug(`no snippets ${srcName} available`);

@@ -1,0 +1,286 @@
+Styra Link intro:
+  prefix: rego__help
+  description: Introductory remarks on rego, Styra Link, and VSCode
+  scope: rego
+  body: |
+    # Welcome to the world of rego!
+    # The VSCode plugin provides a wealth of
+    # ready-made snippets to jump start your rego
+    # journey.  There are two types: policy
+    # snippets (currently only available for
+    # Kubernetes projects) and rego examples,
+    # which help you get up to speed with rego
+    # itself.
+
+    # To get started with rego examples, open any
+    # rego file and start typing `rego` to pop up
+    # the list. Select one to add it to your file.
+    # Copy the block of inserted code into the
+    # rego playground to actually see it execute.
+
+    # To use policy snippets, set up your
+    # kubernetes project via the
+    # "Styra Link: Initialize" command from
+    # VSCode's command palette.
+    # As you type in any rego file in that project
+    # Intellisense will provide suggestions
+    # (try "add" for example).
+
+    # Some useful links:
+    #    Rego Language https://www.openpolicyagent.org/docs/latest/policy-reference/
+    #    Rego Playground https://play.openpolicyagent.org/
+    #    Styra DAS https://docs.styra.com/das
+
+Conjunction of rules:
+  prefix: rego_ex_CONDITION_AND
+  description: Determine whether all conditions are satisfied
+  scope: rego
+  body: |
+    ###########################################################################################
+    # Example: All conditions must be satisfied
+    ###########################################################################################
+
+    package example
+    import future.keywords
+
+    # Sample data START
+    userData := {
+         "role": "admin",
+         "reputation": 500
+    }
+    # Sample data END
+
+    # `is_moderator` is true if reputation exceeds 100 -AND- role is admin
+
+    is_moderator {
+      userData.reputation > 100
+      userData.role == "admin"
+    }
+
+Disjunction of rules:
+  prefix: rego_ex_CONDITION_OR
+  description: Determine whether at least one condition is satisfied
+  scope: rego
+  body: |
+    ###########################################################################################
+    # Example: At least one condition must be satisfied
+    # Reference: https://www.openpolicyagent.org/docs/latest/policy-language/#incremental-definitions
+    ###########################################################################################
+
+    package example
+    import future.keywords
+
+    # Sample data START
+    userData := {
+        "role": "customer",
+        "reputation": 100
+    }
+    # Sample data END
+
+    # `is_moderator` is true if reputation exceeds 100 -OR- role is admin
+
+    is_moderator {
+      userData.reputation > 100
+    }
+
+    is_moderator {
+      userData.role == "admin"
+    }
+
+At least one condition:
+  prefix: rego_ex_EXISTS_ONE
+  description: Determine whether at least one member of a set meets a condition
+  scope: rego
+  body: |
+    ###########################################################################################
+    # Example: At least one member of a set must meet a condition
+    # Reference: https://www.openpolicyagent.org/docs/latest/policy-language/#futurekeywordsin
+    ###########################################################################################
+
+    package example
+    import future.keywords
+
+    # Sample data START
+    set1 := {"a-phone", "b-phone", "a-pad"}
+    # Sample data END
+
+    set1_has_phone if {          # rule succeeds so evaluates to true
+      some item in set1
+      endswith(item, "-phone")   # condition succeeds for item `a-phone` or `b-phone`
+    }
+
+Every condition:
+  prefix: rego_ex_EXISTS_ALL
+  description: Determine whether all members of a set meet a condition
+  scope: rego
+  body: |
+    ###########################################################################################
+    # Example: Every member of a set must meet a condition
+    # Reference: https://www.openpolicyagent.org/docs/latest/policy-language/#universal-quantification-for-all
+    ###########################################################################################
+ 
+    package example
+    import future.keywords
+
+    # Sample data START
+    nums := {100, 200, 300}
+    # Sample data END
+
+    all_above_50 if {         # rule succeeds so evaluates to true
+      every num in nums {     # every-condition succeeds
+        num > 50              # condition succeeds for every num
+      }
+    }
+
+    all_in_target_range if {  # rule fails so variable is undefined
+      every num in nums {     # every-condition fails 
+        num > 50              # condition succeeds for every num
+        num < 250             # condition fails for 300
+      }
+    }
+
+At least one negated condition:
+  prefix: rego_ex_EXISTS_ONE_NEGATED
+  description: Determine whether at least one member of a set does NOT meet a condition
+  scope: rego
+  body: |
+    ###########################################################################################
+    # Example: At least one member of a set does NOT meet a condition
+    # Reference: https://www.openpolicyagent.org/docs/latest/policy-language/#negation 
+    ###########################################################################################
+
+    package example
+    import future.keywords
+
+    # Sample data START
+    set1 := {"a-phone", "b-phone", "a-pad"}
+    # Sample data END
+
+    set1_has_some_NON_phone if {    # rule succeeds so evaluates to true
+      some item in set1
+      not endswith(item, "-phone")  # condition succeeds for item `a-pad`
+    }
+    
+    # For comparison
+    set1_has_phone if {             # rule succeeds so evaluates to true
+      some item in set1
+      endswith(item, "-phone")      # condition succeeds for item `a-phone` or `b-phone`
+    }
+
+Every negated condition:
+  prefix: rego_ex_EXISTS_ALL_NEGATED
+  description: Determine whether NO members of a set meet a condition
+  scope: rego
+  body: |
+    ###########################################################################################
+    # Example: NO member of a set meets a condition
+    # Reference: https://www.openpolicyagent.org/docs/latest/policy-language/#universal-quantification-for-all
+    ###########################################################################################
+
+    package example
+    import future.keywords
+
+    # Sample data START
+    nums := {100, 200, 300}
+    # Sample data END
+
+    all_in_target_range if {  # negating multiple is often easier by starting with the opposite
+      every num in nums {     # every-condition fails for this range
+        num > 150
+        num < 160
+      }
+    }
+    
+    all_NOT_in_target_range if not all_in_target_range     # ...then just negate it!
+ 
+Generate set based on conditions:
+  prefix: rego_ex_GENERATE_SET
+  description: Generates a set (unique elements) from a target list
+  scope: rego
+  body: |
+    ###########################################################################################
+    # Example: Generate a set of elements (unique members) satisfying a condition
+    # Reference: https://www.openpolicyagent.org/docs/latest/policy-language/#set-comprehensions
+    ###########################################################################################
+
+    package example
+    import future.keywords
+
+    # Sample data START
+    array1 := ["a-phone", "b-phone", "a-phone", "a-pad"]
+    # Sample data END
+
+    # The curly braces used here are the key for set generation!
+    my_set_of_phones := {           # Output: ["a-phone", "b-phone"]
+      item |                        # include each `item` such that...
+        some item in array1         # iterates over the input list and...
+        endswith(item, "-phone")    # it matches this condition
+    }
+
+    my_set_of_cars := {             # Output: empty set because no item satisfies the condition
+      item |
+        some item in array1
+        endswith(item, "-car")
+    }
+ 
+ 
+Generate object list based on conditions:
+  prefix: rego_ex_GENERATE_OBJECT
+  description: Generates an object from a target list
+  scope: rego
+  body: |
+    ###########################################################################################
+    # Example: Generate an object of key/value pairs satisfying a condition
+    # Reference: https://www.openpolicyagent.org/docs/latest/policy-language/#object-comprehensions
+    ###########################################################################################
+
+    package example
+    import future.keywords
+
+    # Sample data START
+    array1 := ["a-phone", "b-phone", "a-phone", "a-pad"]
+    # Sample data END
+
+    my_phone_details := {   # Output: {"x-0": "a-phone", "x-1": "b-phone", "x-2": "a-phone"}
+      key:item |                          # construct key:value pairs
+        some index, item in array1        # iterates over 0:"a-phone", 1:"b-phone", 2:"a-phone", 3:"a-pad"
+        endswith(item, "-phone")          # condition succeeds for "a-phone", "b-phone", and again "a-phone"
+        key := sprintf("x-%v", [index])   # construct a key of the form "x-n" where n is the index
+    }                                   
+
+    my_car_details := {     # Output: empty object because no item satisfies the condition
+      key:item |                          # construct key:value pairs
+        some index, item in array1        # iterates over 0:"a-phone", 1:"b-phone", 2:"a-pad"
+        endswith(item, "-car")            # condition fails for all items in iteration range
+        key := sprintf("x-%v", [index])   # construct a key of the form "x-n" where n is the index
+    }
+
+Generate array based on negation:
+  prefix: rego_ex_GENERATE_NEGATION
+  description: Generates a negated array (duplicates preserved) from a target list
+  scope: rego
+  body: |
+    ###########################################################################################
+    # Example: Generate a list of elements (duplicates included) NOT satisfying a condition
+    # Reference: https://www.openpolicyagent.org/docs/latest/policy-language/#array-comprehensions
+    ###########################################################################################
+
+    package example
+    import future.keywords
+
+    # Sample data START
+    array1 := ["a-phone", "b-phone", "a-phone", "a-pad"]
+    # Sample data END
+
+    # The square brackets used here are the key for array generation!
+    my_set_of_NON_phones := [         # Output: ["a-pad"]
+      item |                          # include each `item` such that...
+        some item in array1           # iterates over the input list and...
+        not endswith(item, "-phone")  # it does NOT match this condition
+    ]
+
+    my_set_of_NON_cars := [           # Output: ["a-phone", "b-phone", "a-phone", "a-pad"]
+      item |
+        some item in array1
+        not endswith(item, "-car")
+    ]

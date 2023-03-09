@@ -3,7 +3,8 @@
 .github/**
 out/test/**
 out/test-jest/**
-startup-flow.png
+image/**
+snippets/styra-common.yaml
 
 .gitignore
 .yarnrc
@@ -11,6 +12,7 @@ cspell.json
 Makefile
 packaging/**
 src/**
+START_HERE.md
 vsc-extension-quickstart.md
 *.config.js
 **/tsconfig.json
