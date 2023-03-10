@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Policy snippets are now system-type specific.
-- Added a few general language snippets for any system type.
+- Added assortment of rego language snippets for any system type.
 
 ## [0.0.6-alpha] - 2023-02-17
 

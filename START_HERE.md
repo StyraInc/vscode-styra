@@ -16,7 +16,7 @@ Review as much as you can, of course, but here is a list of key items with some 
 
 Where: `VS Code > Extensions > Styra`
 
-- should give the user thorough but concise info on Styra DAS, Styra Link, the extension
+- should give the user thorough but concise info on Styra DAS, Styra Link, and the extension
 - should itemize available commands
 - should itemize available VS Code settings
 

@@ -148,7 +148,7 @@ These snippets are stored in `snippets/styra-common.yaml` for ease of editing.
 If stored as JSON, you would have to worry about quotes surrounding each line,
 as well as escaping embedded quotes (which occurs a lot in these examples!).
 However, VSCode needs them to be in JSON rather than YAML, so after you make changes
-to `snippets/styra-common.yaml` just run `npm run snippets:build:common` to regenerate
+to `snippets/styra-common.yaml` run `npm run snippets:build:common` to regenerate
 the `snippets/styra-common.json` file that will be used by VSCode.
 
 DO NOT edit `snippets/styra-common.json` directly!
