@@ -139,7 +139,9 @@ export class StyraInstall {
       info(`    Executable: ${this.ExeFile}`);
       fs.chmodSync(tempFileLocation, '755');
       moveFile(tempFileLocation, this.ExeFile);
-      await this.adjustPath(this.ExePath);
+      if (this.isWindows()) {
+        await this.adjustWindowsPath(this.ExePath);
+      }
     });
   }
 
@@ -157,28 +159,25 @@ export class StyraInstall {
     });
   }
 
-  private static async adjustPath(newPathComponent: string): Promise<void> {
-    if (process.env.PATH?.includes(newPathComponent)) {
-      infoDebug(`${newPathComponent} is already included in env.PATH`);
+  private static async adjustWindowsPath(newPathComponent: string): Promise<void> {
+    // NB: On Windows it is "Path"; on linux it is "PATH"
+    if (process.env.Path?.includes(newPathComponent)) {
+      infoDebug(`${newPathComponent} is already included in env.Path`);
       return;
     }
-    if (this.isWindows()) {
-      const runner = new CommandRunner();
-      infoDebug(`PATH before updating: ${process.env.PATH}`);
-      const userPath = await runner
+    const runner = new CommandRunner();
+    infoDebug(`PATH before updating: ${process.env.Path}`);
+    const userPath = await runner
         .runPwshCmd(['[Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariableTarget]::User)']);
-      infoDebug(`user path before updating: ${userPath}`);
-      const updatedPath = this.updatePath(userPath, newPathComponent);
-      if (userPath.includes(newPathComponent)) {
-        infoDebug(`${newPathComponent} is already included in user PATH (but likely VSCode env has not been refreshed to show it)`);
-        return;
-      }
-      await runner
-        .runPwshCmd([`[Environment]::SetEnvironmentVariable("PATH", "${updatedPath}", [EnvironmentVariableTarget]::User)`]);
-      infoDebug(`updated user path: ${updatedPath}`);
-    } else { // non-windows
-      teeError(`${newPathComponent} needs to be on your search PATH`);
+    infoDebug(`user path before updating: ${userPath}`);
+    const updatedPath = this.updatePath(userPath, newPathComponent);
+    if (userPath.includes(newPathComponent)) {
+      infoDebug(`${newPathComponent} is already included in user PATH (but likely VSCode env has not been refreshed to show it)`);
+      return;
     }
+    await runner
+        .runPwshCmd([`[Environment]::SetEnvironmentVariable("PATH", "${updatedPath}", [EnvironmentVariableTarget]::User)`]);
+    infoDebug(`updated user path: ${updatedPath}`);
   }
 
   private static updatePath(userPath: string, newPathComponent: string): string {

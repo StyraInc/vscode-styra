@@ -121,9 +121,9 @@ export class CommandRunner {
       const combinedEnv = {
         ...process.env,
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        PATH: `${process.env.PATH};${StyraInstall.ExePath}`
+        Path: `${process.env.Path};${StyraInstall.ExePath}`
       };
-      spawnArgs.env = this.normalize(combinedEnv);
+      spawnArgs.env = combinedEnv;
     }
 
     const proc = spawn(path, args, spawnArgs);
@@ -178,17 +178,4 @@ export class CommandRunner {
     return data;
   }
 
-  // I am not sure of what the differences are but I will believe the author:
-  // This is only necessary because Node defines the environment slightly differently from VS Code... %-/
-  // from https://github.com/Azure/azure-dev/blob/35abe10a19adf806a9b94cf08965380ed2ad549b/ext/vscode/src/utils/azureDevCli.ts#L105-L115
-  normalize(env: NodeJS.ProcessEnv): Environment {
-    const result: Environment = {};
-    for (const prop of Object.getOwnPropertyNames(env)) {
-      if (env[prop]) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        result[prop] = env[prop]!;
-      }
-    }
-    return result;
-  }
 }
