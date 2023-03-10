@@ -1,4 +1,4 @@
-import {ChildProcessWithoutNullStreams, spawn} from 'child_process';
+import {ChildProcessWithoutNullStreams, spawn, SpawnOptionsWithoutStdio} from 'child_process';
 import {sync as commandExistsSync} from 'command-exists';
 import shellEscape = require('shell-escape');
 
@@ -30,6 +30,8 @@ type CommandRunnerOptions = {
   // so it treats it more like an "internal" operation not revealed to the user.
   quiet?: boolean;
 }
+
+export type Environment = { [key: string]: string };
 
 export class CommandRunner {
 
@@ -78,7 +80,7 @@ export class CommandRunner {
   }
 
   async runPwshCmd(args: string[], options?: CommandRunnerOptions): Promise<string> {
-    const pwshCmd = process.platform === 'win32' ? 'powershell' : 'pwsh';
+    const pwshCmd = StyraInstall.isWindows() ? 'powershell' : 'pwsh';
     if (!commandExistsSync(pwshCmd)) {
       info(`"${pwshCmd}" not found; aborting...`);
       return '';
@@ -109,7 +111,22 @@ export class CommandRunner {
     }
 
     // https://nodejs.org/api/child_process.html#child_processspawncommand-args-options
-    const proc = spawn(path, args, {cwd: projectDir});
+    const spawnArgs: SpawnOptionsWithoutStdio = {};
+    if (projectDir) {
+      spawnArgs.cwd = projectDir;
+    }
+
+    if (path === STYRA_CLI_CMD && StyraInstall.isWindows() && !process.env.PATH?.includes(StyraInstall.ExePath)) {
+      infoDebug('Styra CLI just installed; compensating for search path');
+      const combinedEnv = {
+        ...process.env,
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        PATH: `${process.env.PATH};${StyraInstall.ExePath}`
+      };
+      spawnArgs.env = this.normalize(combinedEnv);
+    }
+
+    const proc = spawn(path, args, spawnArgs);
     proc.on('error', ({message}) => {
       teeError(`Failed to start subprocess: ${message}`);
     });
@@ -159,5 +176,19 @@ export class CommandRunner {
       throw new Error(error);
     }
     return data;
+  }
+
+  // I am not sure of what the differences are but I will believe the author:
+  // This is only necessary because Node defines the environment slightly differently from VS Code... %-/
+  // from https://github.com/Azure/azure-dev/blob/35abe10a19adf806a9b94cf08965380ed2ad549b/ext/vscode/src/utils/azureDevCli.ts#L105-L115
+  normalize(env: NodeJS.ProcessEnv): Environment {
+    const result: Environment = {};
+    for (const prop of Object.getOwnPropertyNames(env)) {
+      if (env[prop]) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        result[prop] = env[prop]!;
+      }
+    }
+    return result;
   }
 }

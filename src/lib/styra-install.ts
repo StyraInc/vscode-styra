@@ -20,10 +20,12 @@ const STD_WINDOWS_INSTALL_DIR = path.join(process.env.LOCALAPPDATA ?? '', 'Styra
 
 export class StyraInstall {
 
-  static TargetOS = process.platform;
-  static TargetArch = process.arch;
-  static BinaryFile = this.TargetOS === 'win32' ? STYRA_CLI_CMD + '.exe' : STYRA_CLI_CMD;
-  static ExePath = this.TargetOS === 'win32' ? STD_WINDOWS_INSTALL_DIR : STD_LINUX_INSTALL_DIR;
+  static isWindows(): boolean {
+    return process.platform === 'win32';
+  }
+
+  static BinaryFile = this.isWindows() ? STYRA_CLI_CMD + '.exe' : STYRA_CLI_CMD;
+  static ExePath = this.isWindows() ? STD_WINDOWS_INSTALL_DIR : STD_LINUX_INSTALL_DIR;
   static ExeFile = path.join(this.ExePath, this.BinaryFile);
 
   static checkWorkspace(): boolean {
@@ -114,17 +116,17 @@ export class StyraInstall {
   }
 
   private static async installStyra(): Promise<void> {
-    info(`    Platform: ${this.TargetOS}`);
-    info(`    Architecture: ${this.TargetArch}`);
+    info(`    Platform: ${process.platform}`);
+    info(`    Architecture: ${process.arch}`);
 
     const tempFileLocation = path.join(os.homedir(), this.BinaryFile);
 
     const url =
-      this.TargetOS === 'win32'
+      process.platform === 'win32'
         ? 'https://docs.styra.com/v1/docs/bin/windows/amd64/styra.exe'
-        : this.TargetOS !== 'darwin'
+        : process.platform !== 'darwin'
           ? 'https://docs.styra.com/v1/docs/bin/linux/amd64/styra'
-          : this.TargetArch === 'arm64'
+          : process.arch === 'arm64'
             ? 'https://docs.styra.com/v1/docs/bin/darwin/arm64/styra'
             : 'https://docs.styra.com/v1/docs/bin/darwin/amd64/styra'; // otherwise target "x64"
 
@@ -137,7 +139,7 @@ export class StyraInstall {
       info(`    Executable: ${this.ExeFile}`);
       fs.chmodSync(tempFileLocation, '755');
       moveFile(tempFileLocation, this.ExeFile);
-      await this.adjustPath(this.TargetOS, this.ExePath);
+      await this.adjustPath(this.ExePath);
     });
   }
 
@@ -155,12 +157,12 @@ export class StyraInstall {
     });
   }
 
-  private static async adjustPath(targetOS: string, newPathComponent: string): Promise<void> {
+  private static async adjustPath(newPathComponent: string): Promise<void> {
     if (process.env.PATH?.includes(newPathComponent)) {
       infoDebug(`${newPathComponent} is already included in env.PATH`);
       return;
     }
-    if (targetOS === 'win32') {
+    if (this.isWindows()) {
       const runner = new CommandRunner();
       infoDebug(`PATH before updating: ${process.env.PATH}`);
       const userPath = await runner
