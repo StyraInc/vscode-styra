@@ -96,14 +96,18 @@ export class StyraInstall {
     try {
       await commandExists(STYRA_CLI_CMD);
       return true;
-    } catch { /* command does NOT exist; so continue... */ }
+    } catch {
+      if (!this.isWindows()) {
+        return false;
+      }
+    }
+    // continue if !commandExists && isWindows (and notify user of findings thus far)
+    infoDebug('styra executable active on search path? false');
 
-    // During the session it was installed, commandExists won't find it!
-    // So if that is our situation, check further if actually available.
-    // (commandExists should yield true NEXT time VSCode is started)
-
-    const stdCommandCheck = false;
-    infoDebug(`styra executable active on search path? ${stdCommandCheck}`);
+    // During the session the CLI was installed, commandExists won't find it!
+    // But that is OK; the command-runner still knows how to run it.
+    // Thus, the remaining checks here determine if it is, in fact, installed.
+    // (commandExists above will yield true the NEXT time VSCode is started)
 
     const userPath = await new CommandRunner()
         .runPwshCmd(['[Environment]::GetEnvironmentVariable("PATH", [System.EnvironmentVariableTarget]::User)']);
@@ -112,7 +116,7 @@ export class StyraInstall {
 
     const styraExeExists = fs.existsSync(this.ExeFile);
     infoDebug(`styra executable exists? ${styraExeExists}`);
-    return stdCommandCheck || (styraPathInPath && styraExeExists);
+    return styraPathInPath && styraExeExists;
   }
 
   private static async installStyra(): Promise<void> {

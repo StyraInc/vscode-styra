@@ -85,7 +85,6 @@ export class CommandRunner {
       info(`"${pwshCmd}" not found; aborting...`);
       return '';
     }
-    // Apparently optional on windows, macOS requires explicit `-Command` in the arg list
     const result = await this.runShellCmd(pwshCmd, ['-NoProfile', '-Command', ...args], options);
     return result.trim(); // importantly remove trailing CR/LF
   }
@@ -177,5 +176,4 @@ export class CommandRunner {
     }
     return data;
   }
-
 }
