@@ -212,9 +212,10 @@ describe('StyraInstall', () => {
     });
 
     [
-      {description: 'available version is invalid', installed: () => ({cliVersion: '1.2.3'}), available: () => ({cliVersion: '1.2.x'}), expected: /invalid version/i},
-      {description: 'installed version is invalid', installed: () => ({cliVersion: '1.2.x'}), available: () => ({cliVersion: '1.2.3'}), expected: /invalid version/i},
-      {description: 'available callback throws error', installed: () => ({cliVersion: '1.2.3'}), available: () => Promise.reject({message: 'error bar'}), expected: /error bar/},
+      {description: 'available version is invalid', installed: () => '1.2.3', available: () => ({cliVersion: '1.2.x'}), expected: /invalid version/i},
+      {description: 'installed version is invalid', installed: () => '1.2.x', available: () => ({cliVersion: '1.2.3'}), expected: /invalid version.*1.2.x$/i},
+      {description: 'installed version with newline is invalid', installed: () => '1.2.x\n', available: () => ({cliVersion: '1.2.3'}), expected: /invalid version.*1.2.x$/i},
+      {description: 'available callback throws error', installed: () => '1.2.3', available: () => Promise.reject({message: 'error bar'}), expected: /error bar/},
       {description: 'installed callback throws error', installed: () => Promise.reject({message: 'error foo'}), available: () => ({cliVersion: '1.2.3'}), expected: /error foo/},
     ].forEach(({description, installed, available, expected}) => {
 
