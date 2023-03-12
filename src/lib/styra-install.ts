@@ -2,9 +2,9 @@ import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as os from 'os';
 import {default as fetch} from 'node-fetch';
+import commandExists = require('command-exists');
 import moveFile = require('move-file');
 import path = require('path');
-import {sync as commandExistsSync} from 'command-exists';
 import {compare} from 'semver';
 
 import {CommandRunner} from './command-runner';
@@ -15,8 +15,18 @@ import {LocalStorageService, Workspace} from './local-storage-service';
 import {VersionType} from './types';
 
 export const STYRA_CLI_CMD = 'styra';
+const STD_LINUX_INSTALL_DIR = '/usr/local/bin';
+const STD_WINDOWS_INSTALL_DIR = path.join(process.env.LOCALAPPDATA ?? '', 'Styra');
 
 export class StyraInstall {
+
+  static isWindows(): boolean {
+    return process.platform === 'win32';
+  }
+
+  static BinaryFile = this.isWindows() ? STYRA_CLI_CMD + '.exe' : STYRA_CLI_CMD;
+  static ExePath = this.isWindows() ? STD_WINDOWS_INSTALL_DIR : STD_LINUX_INSTALL_DIR;
+  static ExeFile = path.join(this.ExePath, this.BinaryFile);
 
   static checkWorkspace(): boolean {
 
@@ -28,18 +38,17 @@ export class StyraInstall {
   }
 
   static async checkCliInstallation(): Promise<boolean> {
-    if (commandExistsSync(STYRA_CLI_CMD)) {
+    if (await StyraInstall.styraCmdExists()) {
       infoDebug('Styra CLI is installed');
       return true;
     }
     info('Styra CLI is not installed');
-
     return await StyraInstall.promptForInstall('is not installed', 'installation');
   }
 
   private static async promptForInstall(description: string, operation: string): Promise<boolean> {
     // "Cancel" is always shown as the last choice by default
-    // Here, just using it ot cancel the install itself; the command the user initiated will continue either way.
+    // Here, just using it to cancel the install itself; the command the user initiated will continue either way.
     const selection = await IDE.showInformationMessageModal(
       `Styra CLI ${description}. Would you like to install it now?`, 'Install');
 
@@ -83,22 +92,45 @@ export class StyraInstall {
     }
   }
 
-  static async installStyra(): Promise<void> {
-    const targetOS = process.platform;
-    const targetArch = process.arch;
-    info(`    Platform: ${targetOS}`);
-    info(`    Architecture: ${targetArch}`);
+  static async styraCmdExists(): Promise<boolean> {
+    try {
+      await commandExists(STYRA_CLI_CMD);
+      return true;
+    } catch {
+      if (!this.isWindows()) {
+        return false;
+      }
+    }
+    // continue if !commandExists && isWindows (and notify user of findings thus far)
+    infoDebug('styra executable active on search path? false');
 
-    const binaryFile = targetOS === 'win32' ? STYRA_CLI_CMD + '.exe' : STYRA_CLI_CMD;
-    const exeFile = targetOS === 'win32' ? path.join('C:', 'Program Files', 'styra', binaryFile) : path.join('/usr/local/bin/', binaryFile);
-    const tempFileLocation = path.join(os.homedir(), binaryFile);
+    // During the session the CLI was installed, commandExists won't find it!
+    // But that is OK; the command-runner still knows how to run it.
+    // Thus, the remaining checks here determine if it is, in fact, installed.
+    // (commandExists above will yield true the NEXT time VSCode is started)
+
+    const userPath = await new CommandRunner()
+        .runPwshCmd(['[Environment]::GetEnvironmentVariable("PATH", [System.EnvironmentVariableTarget]::User)']);
+    const styraPathInPath = userPath.includes(this.ExePath) ?? false;
+    infoDebug(`styra executable defined on search path? ${styraPathInPath}`);
+
+    const styraExeExists = fs.existsSync(this.ExeFile);
+    infoDebug(`styra executable exists? ${styraExeExists}`);
+    return styraPathInPath && styraExeExists;
+  }
+
+  private static async installStyra(): Promise<void> {
+    info(`    Platform: ${process.platform}`);
+    info(`    Architecture: ${process.arch}`);
+
+    const tempFileLocation = path.join(os.homedir(), this.BinaryFile);
 
     const url =
-      targetOS === 'win32'
+      process.platform === 'win32'
         ? 'https://docs.styra.com/v1/docs/bin/windows/amd64/styra.exe'
-        : targetOS !== 'darwin'
+        : process.platform !== 'darwin'
           ? 'https://docs.styra.com/v1/docs/bin/linux/amd64/styra'
-          : targetArch === 'arm64'
+          : process.arch === 'arm64'
             ? 'https://docs.styra.com/v1/docs/bin/darwin/arm64/styra'
             : 'https://docs.styra.com/v1/docs/bin/darwin/amd64/styra'; // otherwise target "x64"
 
@@ -108,9 +140,12 @@ export class StyraInstall {
       cancellable: false
     }, async () => {
       await this.getBinary(url, tempFileLocation);
-      info(`    Executable: ${exeFile}`);
+      info(`    Executable: ${this.ExeFile}`);
       fs.chmodSync(tempFileLocation, '755');
-      moveFile(tempFileLocation, exeFile);
+      moveFile(tempFileLocation, this.ExeFile);
+      if (this.isWindows()) {
+        await this.adjustWindowsPath(this.ExePath);
+      }
     });
   }
 
@@ -126,6 +161,33 @@ export class StyraInstall {
       writeStream.on('error', reject);
       writeStream.on('finish', resolve);
     });
+  }
+
+  private static async adjustWindowsPath(newPathComponent: string): Promise<void> {
+    // NB: On Windows it is "Path"; on linux it is "PATH"
+    if (process.env.Path?.includes(newPathComponent)) {
+      infoDebug(`${newPathComponent} is already included in env.Path`);
+      return;
+    }
+    const runner = new CommandRunner();
+    infoDebug(`PATH before updating: ${process.env.Path}`);
+    const userPath = await runner
+        .runPwshCmd(['[Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariableTarget]::User)']);
+    infoDebug(`user path before updating: ${userPath}`);
+    const updatedPath = this.updatePath(userPath, newPathComponent);
+    if (userPath.includes(newPathComponent)) {
+      infoDebug(`${newPathComponent} is already included in user PATH (but likely VSCode env has not been refreshed to show it)`);
+      return;
+    }
+    await runner
+        .runPwshCmd([`[Environment]::SetEnvironmentVariable("PATH", "${updatedPath}", [EnvironmentVariableTarget]::User)`]);
+    infoDebug(`updated user path: ${updatedPath}`);
+  }
+
+  private static updatePath(userPath: string, newPathComponent: string): string {
+    const pathParts = userPath.split(';') ?? [];
+    pathParts.push(newPathComponent);
+    return pathParts.join(';');
   }
 
   private static compareDates(dateA: Date, dateB: Date): number {

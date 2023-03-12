@@ -1,8 +1,8 @@
 import {ICommand, ReturnValue} from '../lib/types';
 import {info, infoFromUserAction, outputChannel, teeError} from '../lib/output-pane';
 import {LocalStorageService, Workspace} from '../lib/local-storage-service';
+import {STYRA_CLI_CMD, StyraInstall} from '../lib/styra-install';
 import {StyraConfig} from '../lib/styra-config';
-import {StyraInstall} from '../lib/styra-install';
 
 export class Executor {
 
@@ -12,6 +12,9 @@ export class Executor {
 
     if (!(await this.checkStartup())) {
       return;
+    }
+    if (!await StyraInstall.styraCmdExists()) {
+      info(`"${STYRA_CLI_CMD}" not found; aborting ${command.title}`);
     }
     this.StorageManager.setValue(Workspace.CmdName, command.title);
     this.announce(command.title);

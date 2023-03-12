@@ -2,6 +2,7 @@ import {Executor} from '../../commands/executor';
 import {ICommand, ReturnValue} from '../../lib/types';
 import {mockType, OutputPaneSpy} from '../utility';
 import {outputChannel} from '../../lib/output-pane';
+import {StyraInstall} from '../../lib/styra-install';
 
 class MockCompletedCommand implements ICommand {
   run = () => Promise.resolve(ReturnValue.Completed);
@@ -23,6 +24,7 @@ describe('Executor', () => {
   const spy = new OutputPaneSpy();
   const spyAppendLine = jest.spyOn(outputChannel, 'appendLine');
   Executor.checkStartup = jest.fn();
+  StyraInstall.styraCmdExists = jest.fn().mockResolvedValue(true);
 
   [
     [true, 'CONTINUES'],

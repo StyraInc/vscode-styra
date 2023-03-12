@@ -8,9 +8,11 @@
     "words": [
         "autofix",
         "esbuild",
+        "LOCALAPPDATA",
         "logreplay",
         "millisec",
         "outfile",
+        "pwsh",
         "quickinput",
         "rego",
         "styra",

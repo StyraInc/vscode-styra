@@ -54,6 +54,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IMemen
   //     % export STYRA_VSCODE_ENV=development
   //     % cd <YOUR_PROJECT_DIR>
   //     % code .
+  // Once running, open the Memento Explorer from the VSCode command palette.
   const DEV_MODE = process.env.STYRA_VSCODE_ENV === 'development';
   return {
     memento:

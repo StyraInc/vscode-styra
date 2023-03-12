@@ -1,4 +1,5 @@
-import {ChildProcessWithoutNullStreams, spawn} from 'child_process';
+import {ChildProcessWithoutNullStreams, spawn, SpawnOptionsWithoutStdio} from 'child_process';
+import {sync as commandExistsSync} from 'command-exists';
 import shellEscape = require('shell-escape');
 
 import {IDE} from './vscode-api';
@@ -29,6 +30,8 @@ type CommandRunnerOptions = {
   // so it treats it more like an "internal" operation not revealed to the user.
   quiet?: boolean;
 }
+
+export type Environment = { [key: string]: string };
 
 export class CommandRunner {
 
@@ -76,6 +79,16 @@ export class CommandRunner {
     return ['GET', 'PUT', 'POST', 'DELETE', 'PATCH'].filter((debugFlag) => line.startsWith(debugFlag)).length > 0;
   }
 
+  async runPwshCmd(args: string[], options?: CommandRunnerOptions): Promise<string> {
+    const pwshCmd = StyraInstall.isWindows() ? 'powershell' : 'pwsh';
+    if (!commandExistsSync(pwshCmd)) {
+      info(`"${pwshCmd}" not found; aborting...`);
+      return '';
+    }
+    const result = await this.runShellCmd(pwshCmd, ['-NoProfile', '-Command', ...args], options);
+    return result.trim(); // importantly remove trailing CR/LF
+  }
+
   // This can be used for any other (non `styra ...`) commands.
   // If options.progressTitle is truthy, it will show a progress bar with that as a prefix.
   // Upon success returns the command's output.
@@ -97,7 +110,25 @@ export class CommandRunner {
     }
 
     // https://nodejs.org/api/child_process.html#child_processspawncommand-args-options
-    const proc = spawn(path, args, {cwd: projectDir});
+    const spawnArgs: SpawnOptionsWithoutStdio = {};
+    if (projectDir) {
+      spawnArgs.cwd = projectDir;
+    }
+
+    if (path === STYRA_CLI_CMD && StyraInstall.isWindows() && !process.env.PATH?.includes(StyraInstall.ExePath)) {
+      infoDebug('Styra CLI just installed; compensating for search path');
+      const combinedEnv = {
+        ...process.env,
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        Path: `${process.env.Path};${StyraInstall.ExePath}`
+      };
+      spawnArgs.env = combinedEnv;
+    }
+
+    const proc = spawn(path, args, spawnArgs);
+    proc.on('error', ({message}) => {
+      teeError(`Failed to start subprocess: ${message}`);
+    });
     proc.stdin.write(stdinData.endsWith('\n') ? stdinData : stdinData + '\n');
     proc.stdin.end();
 

@@ -20,8 +20,8 @@ describe('SnippetInstaller', () => {
     IDE.getExtension = jest.fn().mockReturnValue({extensionPath: '/ext/root/dir'});
     IDE.projectDir = jest.fn().mockReturnValue('/my/project/dir');
     IDE.getConfigValue = jest.fn().mockReturnValue(true); // getConfigValue('styra', 'debug')
-    const config: ProjectConfigData = {projectType: 'kubernetes', name: 'my_project'};
-    StyraConfig.read = jest.fn().mockResolvedValue(config);
+    StyraConfig.getProjectConfig =
+      jest.fn().mockResolvedValue({projectType: 'kubernetes', name: 'my_project'} as ProjectConfigData);
     installer = new SnippetInstaller();
   });
 

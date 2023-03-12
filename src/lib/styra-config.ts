@@ -31,7 +31,16 @@ interface State {
 export class StyraConfig {
 
   static async getProjectConfig(): Promise<ProjectConfigData> {
-    return await StyraConfig.read(path.join(IDE.projectDir() ?? '.', CONFIG_FILE_PATH), new ProjectConfigData());
+
+    const configFile = path.join(IDE.projectDir() ?? '.', CONFIG_FILE_PATH);
+    if (fs.existsSync(configFile)) {
+      return await StyraConfig.read(configFile, new ProjectConfigData());
+    }
+    infoDebug(`Project config file (${configFile}) not found`);
+    return Promise.resolve({
+      name: '',
+      projectType: ''
+    });
   }
 
   static async getDASConfig(): Promise<DASConfigData> {

@@ -1,14 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {IDE} from '../../lib/vscode-api';
-import {StyraInstall} from '../../lib/styra-install';
+import {Memento} from 'vscode';
 
-import {sync as commandExistsSync} from 'command-exists';
-jest.mock('command-exists');
 import {CommandRunner} from '../../lib/command-runner';
 import {DAS} from '../../lib/das-query';
+import {IDE} from '../../lib/vscode-api';
 import {LocalStorageService, Workspace} from '../../lib/local-storage-service';
-import {Memento} from 'vscode';
-import {mockType, OutputPaneSpy} from '../utility';
+import {OutputPaneSpy} from '../utility';
+import {StyraInstall} from '../../lib/styra-install';
 
 // copied from local-storage-service.test.ts; importing it fails!?!
 class TestMemento implements Memento {
@@ -34,6 +32,12 @@ class TestMemento implements Memento {
 describe('StyraInstall', () => {
 
   const spy = new OutputPaneSpy();
+
+  beforeEach(() => {
+    // eslint-disable-next-line dot-notation
+    StyraInstall['installStyra'] = jest.fn().mockResolvedValue('');
+    StyraInstall.styraCmdExists = jest.fn().mockResolvedValue(false);
+  });
 
   describe('checkWorkspace', () => {
 
@@ -64,7 +68,7 @@ describe('StyraInstall', () => {
     ].forEach(([expected, postedOutput, description]) => {
 
       test(`yields ${expected} when ${description}`, async () => {
-        mockType(commandExistsSync).mockReturnValue(expected);
+        StyraInstall.styraCmdExists = jest.fn().mockResolvedValue(expected);
         IDE.getConfigValue = jest.fn().mockReturnValue(true); // getConfigValue('styra', 'debug')
 
         expect(await StyraInstall.checkCliInstallation()).toBe(expected as boolean);
@@ -79,9 +83,7 @@ describe('StyraInstall', () => {
     ].forEach(([choice, expected, postedOutput]) => {
 
       test(`returns ${expected} for ${choice} selection`, async () => {
-        mockType(commandExistsSync).mockReturnValue(false);
         IDE.showInformationMessageModal = jest.fn().mockReturnValue(choice);
-        StyraInstall.installStyra = jest.fn().mockResolvedValue('');
 
         expect(await StyraInstall.checkCliInstallation()).toBe(expected as boolean);
         expect(spy.content).toMatch(postedOutput as RegExp);
@@ -89,9 +91,9 @@ describe('StyraInstall', () => {
     });
 
     test('returns false if installStyra throws an error', async () => {
-      mockType(commandExistsSync).mockReturnValue(false);
       IDE.showInformationMessageModal = jest.fn().mockReturnValue('Install');
-      StyraInstall.installStyra = jest.fn().mockRejectedValue('error');
+      // eslint-disable-next-line dot-notation
+      StyraInstall['installStyra'] = jest.fn().mockRejectedValue('error');
 
       expect(await StyraInstall.checkCliInstallation()).toBe(false);
       expect(spy.content).toMatch(/CLI installation failed/);
@@ -130,7 +132,6 @@ describe('StyraInstall', () => {
       IDE.getConfigValue = jest.fn().mockReturnValue(undefined);
       const showInfoMock = jest.fn().mockReturnValue(undefined);
       IDE.showInformationMessageModal = showInfoMock;
-      StyraInstall.installStyra = jest.fn().mockResolvedValue('');
 
       await StyraInstall.checkForUpdates();
 
@@ -183,7 +184,6 @@ describe('StyraInstall', () => {
           CommandRunner.prototype.runShellCmd = jest.fn().mockResolvedValue(installed);
           IDE.getConfigValue = jest.fn().mockReturnValue(undefined);
           IDE.showInformationMessageModal = jest.fn().mockReturnValue(choice);
-          StyraInstall.installStyra = jest.fn().mockResolvedValue('');
 
           await StyraInstall.checkForUpdates();
 

@@ -19,6 +19,11 @@ export class SnippetInstaller {
     const extensionRootDir = vsix.extensionPath;
     const dotDir = IDE.dotFolderForExtension();
     const srcName = await this.getSnippetFileName();
+
+    if (!srcName) { // in case project has not been initialized yet
+      return;
+    }
+
     const srcPath = path.join(extensionRootDir, SNIPPET_DIR, srcName);
     const destPath = path.join(dotDir, SNIPPET_FILE);
 
@@ -52,6 +57,9 @@ export class SnippetInstaller {
 
   private async getSnippetFileName(): Promise<string> {
     const config = await StyraConfig.getProjectConfig();
+    if (!config.name) {
+      return '';
+    }
     infoDebug(`project: ${config.name}`);
     infoDebug(`system type: ${config.projectType}`);
     return `${config.projectType}.json`;
