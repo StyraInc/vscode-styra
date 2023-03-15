@@ -9,10 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2023-03-15
+
 ### Added
 
 - Policy snippets are now system-type specific.
 - Added assortment of rego language snippets for any system type.
+- Versioning info reported in diagnostic output at startup.
+- Sensitive info redacted from diagnostic output.
 
 ## [0.0.6-alpha] - 2023-02-17
 
@@ -95,6 +99,7 @@ whether there is anything to overwrite, then asks that first, mirroring the CLI 
 
 <!-- Be sure to add an entry here for each release! -->
 [unreleased]: https://github.com/StyraInc/vscode-styra/compare/v0.0.6-alpha...HEAD
+[1.0.0]: https://github.com/StyraInc/vscode-styra/compare/v0.0.6-alpha...v1.0.0
 [0.0.6-alpha]: https://github.com/StyraInc/vscode-styra/compare/v0.0.5-alpha...v0.0.6-alpha
 [0.0.5-alpha]: https://github.com/StyraInc/vscode-styra/compare/v0.0.4-alpha...v0.0.5-alpha
 [0.0.4-alpha]: https://github.com/StyraInc/vscode-styra/compare/v0.0.3-alpha...v0.0.4-alpha
