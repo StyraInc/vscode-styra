@@ -33,7 +33,7 @@ All of these start with "rego" as the trigger, so just type that into a rego fil
 
 ## Requirements
 
-* [Styra CLI](https://docs.styra.com/reference/cli/install-use-cli) executable (`styra`) must be installed on your `$PATH`.  If you do not have Styra CLI installed, the plugin will prompt you to install it when you run any command.
+* [Styra CLI](https://docs.styra.com/reference/cli/install-use-cli) executable (`styra`) must be installed on your `$PATH`.  If you do not have Styra CLI installed, the plugin will prompt you to install it when you run any command. Supports Windows, Mac, and Linux systems.
 * A [Styra DAS](https://www.styra.com/styra-das/) tenant; you can get one for free at our [Sign-up page](https://signup.styra.com); the VSCode plugin will check for this when you run any command; if not found, it will offer to take you to the same URL so you can get one. It only takes a moment!
 
 ## Extension Settings
@@ -45,4 +45,4 @@ All of these start with "rego" as the trigger, so just type that into a rego fil
 
 ## Known Issues
 
-* Windows automatic installation is not yet supported.
+None
