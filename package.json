@@ -8,13 +8,14 @@
     "url": "https://github.com/styraInc/vscode-styra/"
   },
   "publisher": "styra",
-  "version": "0.0.6-alpha",
+  "version": "1.0.0",
   "private": true,
   "engines": {
     "vscode": "^1.74.0"
   },
   "categories": [
-    "Other", "Snippets"
+    "Other",
+    "Snippets"
   ],
   "activationEvents": [
     "workspaceContains:.styra/config"
