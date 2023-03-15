@@ -79,9 +79,7 @@ export class StyraInstall {
       localStorage.setValue(Workspace.UpdateCheckDate, currentDate.toDateString());
       try {
         const available = await DAS.runQuery('/v1/system/version') as VersionType;
-        const installedVersion = await new CommandRunner().runStyraCmdQuietly(
-          'version -o jsonpath {.version}'.split(' '));
-
+        const installedVersion = await this.getInstalledCliVersion();
         if (compare(available.cliVersion, installedVersion) === 1) {
           await StyraInstall.promptForInstall(
             `has an update available (installed=${installedVersion}, available=${available.cliVersion})`, 'update');
@@ -90,6 +88,28 @@ export class StyraInstall {
         teeError(message as string);
       }
     }
+  }
+
+  static async reportVersionDetails(): Promise<void> {
+    try {
+      const versionInfo = await DAS.runQuery('/v1/system/version') as VersionType;
+      infoDebug(`DAS release: ${versionInfo.release} `);
+      infoDebug(`DAS edition: ${versionInfo.dasEdition} `);
+      const cliVersion = await StyraInstall.getInstalledCliVersion();
+      infoDebug(`CLI version: ${cliVersion} `);
+      if (cliVersion !== versionInfo.cliVersion) {
+        infoDebug(`(Latest CLI version: ${versionInfo.cliVersion})`);
+      }
+      infoDebug(`OPA version: ${versionInfo.opaVersion} `);
+    } catch {
+      /* no info if not yet configured; just continue on... */
+    }
+  }
+
+  private static async getInstalledCliVersion(): Promise<string> {
+    const result = (await new CommandRunner().runStyraCmdQuietly(
+      'version -o jsonpath {.version}'.split(' ')));
+    return result.trim(); // remove trailing CR/LF
   }
 
   static async styraCmdExists(): Promise<boolean> {

@@ -2,9 +2,11 @@ import {outputChannel} from '../lib/output-pane';
 
 export class OutputPaneSpy {
   private spyAppendLine = jest.spyOn(outputChannel, 'appendLine');
+  private spyAppend = jest.spyOn(outputChannel, 'append');
 
   get content(): string {
-    return this.spyAppendLine.mock.calls.join(',');
+    return this.spyAppendLine.mock.calls.join(',') +
+      this.spyAppend.mock.calls.join(',');
   }
 }
 

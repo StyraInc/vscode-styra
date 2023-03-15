@@ -25,5 +25,6 @@ export type VersionType = {
   slpVersion: string;
   cliVersion: string;
   datasourcesAgentVersion: string;
+  dasEdition: string;
 }
 
