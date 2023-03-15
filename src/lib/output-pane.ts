@@ -6,10 +6,11 @@ const footnoteSymbol = '(*)';
 
 // the workhorse that interacts with outputChanel
 export function info(msg: string): void {
-  if (msg && msg.endsWith('\n')) {
-    outputChannel.append(msg); // remove superfluous newline
+  const filteredMsg = msg.replace(/BEGIN OPENSSH PRIVATE KEY.*END OPENSSH PRIVATE KEY/s, '-*-*-REDACTED-*-*-');
+  if (filteredMsg && filteredMsg.endsWith('\n')) {
+    outputChannel.append(filteredMsg); // remove superfluous newline
   } else {
-    outputChannel.appendLine(msg);
+    outputChannel.appendLine(filteredMsg);
   }
 }
 
