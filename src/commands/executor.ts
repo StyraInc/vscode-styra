@@ -26,8 +26,9 @@ export class Executor {
       } else {
         info(`====> ${command.title} completed`);
       }
-    } catch ({message}) {
-      teeError(message as string);
+    } catch (err) {
+      // using `err` arg instead of `{message}` as it is easier to grab the stack trace on occasion
+      teeError((err as Error).message as string);
       info(`====> ${command.title} failed`);
     }
     this.StorageManager.setValue<string>(Workspace.CmdName, '');
