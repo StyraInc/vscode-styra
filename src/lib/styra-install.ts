@@ -10,13 +10,19 @@ import {compare} from 'semver';
 import {CommandRunner} from './command-runner';
 import {DAS} from './das-query';
 import {IDE} from './vscode-api';
-import {info, infoDebug, infoFromUserAction, teeError, teeInfo} from './output-pane';
+import {info, infoDebug, infoFromUserAction, infoInput, teeError, teeInfo} from './output-pane';
 import {LocalStorageService, Workspace} from './local-storage-service';
+import {MultiStepInput} from '../external/multi-step-input';
+import {shouldResume, validateNoop} from '../commands/utility';
 import {VersionType} from './types';
 
 export const STYRA_CLI_CMD = 'styra';
 const STD_LINUX_INSTALL_DIR = '/usr/local/bin';
 const STD_WINDOWS_INSTALL_DIR = path.join(process.env.LOCALAPPDATA ?? '', 'Styra');
+
+interface State {
+  pwd: string;
+}
 
 export class StyraInstall {
 
@@ -162,9 +168,14 @@ export class StyraInstall {
       await this.getBinary(url, tempFileLocation);
       info(`    Executable: ${this.ExeFile}`);
       fs.chmodSync(tempFileLocation, '755');
-      moveFile(tempFileLocation, this.ExeFile);
       if (this.isWindows()) {
+        await moveFile(tempFileLocation, this.ExeFile);
         await this.adjustWindowsPath(this.ExePath);
+      } else {
+        const state = await this.collectInputs();
+        const args = ['-c', `echo ${state.pwd} | sudo -S bash -c 'mv ${tempFileLocation} ${this.ExeFile}'`];
+        // vital to run in quiet mode so password does not display
+        await new CommandRunner().runShellCmd('sh', args, {progressTitle: '', quiet: true});
       }
     });
   }
@@ -214,5 +225,26 @@ export class StyraInstall {
     const millisecDifference = dateA.getTime() - dateB.getTime();
     const daysDifference = millisecDifference / (1000 * 3600 * 24);
     return daysDifference;
+  }
+
+  private static async collectInputs(): Promise<State> {
+    const state = {} as Partial<State>;
+    await MultiStepInput.run((input) => this.inputPwd(input, state));
+    return state as State;
+  }
+
+  private static async inputPwd(input: MultiStepInput, state: Partial<State>): Promise<void> {
+    infoInput('Need your password, please — look at the top of the window.');
+    state.pwd = await input.showInputBox({
+      ignoreFocusOut: true,
+      password: true,
+      title: 'CLI Installation',
+      step: 1,
+      totalSteps: 1,
+      value: state.pwd ?? '',
+      prompt: `Enter admin password to install into ${STD_LINUX_INSTALL_DIR}`,
+      validate: validateNoop,
+      shouldResume
+    });
   }
 }

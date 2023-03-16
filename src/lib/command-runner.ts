@@ -127,7 +127,9 @@ export class CommandRunner {
 
     const proc = spawn(path, args, spawnArgs);
     proc.on('error', ({message}) => {
-      teeError(`Failed to start subprocess: ${message}`);
+      if (!quiet) {
+        teeError(`${path} not found: ${message}`);
+      }
     });
     proc.stdin.write(stdinData.endsWith('\n') ? stdinData : stdinData + '\n');
     proc.stdin.end();
