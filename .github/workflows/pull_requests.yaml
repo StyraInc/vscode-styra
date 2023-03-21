@@ -20,7 +20,7 @@ jobs:
         node-version: '18'
 
     - run: npm install
-    - run: npm run test
+    - run: npm run test-CI
   lint:
     runs-on: ubuntu-latest
     steps:

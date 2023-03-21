@@ -9,6 +9,7 @@
         "autofix",
         "datasources",
         "esbuild",
+        "lcov",
         "LOCALAPPDATA",
         "logreplay",
         "millisec",

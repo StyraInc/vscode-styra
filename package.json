@@ -106,10 +106,12 @@
     "pretest-vscode": "npm run compile && npm run lint",
     "test-vscode": "node ./out/test/runTest.js",
     "test": "jest",
+    "test-CI": "jest --collectCoverage false",
     "test:verbose": "jest --verbose",
     "test:watch": "jest --watch",
     "watch": "tsc -watch -p ./",
-    "snippets:build:common": "ts-node src/bin/yaml2json.ts"
+    "snippets:build:common": "ts-node src/bin/yaml2json.ts",
+    "view-coverage": "open coverage/lcov-report/index.html "
   },
   "devDependencies": {
     "@babel/core": "^7.20.12",
