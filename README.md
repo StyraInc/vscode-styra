@@ -1,3 +1,8 @@
+[![Apache License](https://img.shields.io/badge/license-Apache%202.0-orange.svg?style=flat-square)](http://www.apache.org/licenses/LICENSE-2.0)
+![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/Styra.vscode-styra?style=flat-square)
+![CI status](https://github.com/StyraInc/vscode-styra/actions/workflows/main.yaml/badge.svg)
+<!-- https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/adding-a-workflow-status-badge -->
+
 # Styra DAS for Visual Studio Code
 
 **Styra Link** is a new way of working with [Styra DAS](https://www.styra.com/styra-das/).
