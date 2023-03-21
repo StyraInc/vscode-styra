@@ -6,6 +6,7 @@
     "language": "en",
     // words - list of words to be always considered correct
     "words": [
+        "aargh",
         "autofix",
         "datasources",
         "esbuild",
@@ -18,6 +19,7 @@
         "quickinput",
         "rego",
         "styra",
+        "vscodeignore",
         "vsix"
     ],
     "patterns": [

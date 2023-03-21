@@ -47,16 +47,50 @@ On the command-line, you can run Jest tests in a few ways (per scripts in packag
 
 ## Preparing a Release
 
-1. Add release to top of /CHANGELOG.md, following "Keep a Changelog" conventions.
-2. Add release tag to bottom of /CHANGELOG.md, to make the title a hyperlink to a version diff.
-3. Update the URL for the "unreleased" tag at the bottom of the file, too.
-4. Update version n.n.n in package.json.
-5. Update version n.n.n also in package-lock.json.
+1. CHANGELOG.md: Add release to top of file, following "Keep a Changelog" conventions.
+2. CHANGELOG.md: Add release tag to bottom of file, to make the title a hyperlink to a version diff.
+3. CHANGELOG.md: Update release tag at bottom for `unreleased`.
+4. README.md: Run `npm test` which has a by-product of updating the code coverage badge stored in this file.
+5. .vscodeignore: After you build the VSIX package, review its contents (it is just a zip file), then come back here and add exclusionary items, as appropriate (then rebuild the VSIX again).
 6. Post a pull request with the above changes. Title should be "release: n.n.n" and description should be "Bookkeeping for release n.n.n.".
-7. Run `npm run package`.
-8. Create a new release in GitHub [Releases](https://github.com/StyraInc/vscode-styra/releases) page, tagging the commit for the merged PR done in (6).
-9. Upload package (`vscode-styra-n.n.n.vsix`) to the release. (Once we publish to VSCode marketplace, this will change.)
-10. Post notice of release in `#proj-link` channel.
+
+## Publish to VSCode marketplace
+
+Usually you just run `vsce publish minor`. The last arg may also be `major` or `patch`, as appropriate.
+Any of those choices will auto-increment your version number.
+You may also provide a fixed, specific version number if desired.
+That takes a minute or so to bundle and ship a new package off to the VSCode marketplace.
+Once it finishes locally, the VSCode marketplace then takes several minutes to validate it
+before it makes it live on their site.
+You can monitor the progress under [Manage Publishers & Extensions](https://marketplace.visualstudio.com/manage/publishers/styra).
+Contact our ops team to get a login of the form `your-name@platformstyra.onmicrosoft.com`.
+
+This `vsce publish` command does two things:
+
+- records the new version number in package.json and package-lock.json
+- adds a local commit with these version updates
+- generates a matching version git tag
+
+Thus, you need to:
+
+- Push the commit (updating package*.json) to github via a standard PR.
+- Push the new tag to github (example: `git push origin v1.0.1`)
+
+Finally, be sure to post notice of the release in the `#proj-link` channel.
+
+## Package for testing/code review only
+
+To generate a build for testing and code review (i.e. a build before going public):
+
+1. Update `version n.n.n` in package.json to bump the version
+   (I typically bump just the `patch` octet)
+   and add a `-next-A` suffix (or `-next-B`, `-next-C`, etc., as you iterate during the review).
+   The `major.minor.patch` _must_ be higher than the latest released version;
+   otherwise, VS Code will NOT install your local version
+   (even though it WILL show your new version number. Aargh!)
+   So if you have released `25.14.7`, use `25.14.7-next-A` for your new release candidate.
+2. Run `npm run package`.
+3. Provide the resultant package (`vscode-styra-n.n.n-next-A.vsix`) to interested parties.
 
 ## Adding a New Command
 

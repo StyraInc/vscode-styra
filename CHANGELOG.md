@@ -104,7 +104,7 @@ whether there is anything to overwrite, then asks that first, mirroring the CLI 
 - `Styra Link: Config Git` command added.
 
 <!-- Be sure to add an entry here for each release! -->
-[unreleased]: https://github.com/StyraInc/vscode-styra/compare/v0.0.6-alpha...HEAD
+[unreleased]: https://github.com/StyraInc/vscode-styra/compare/v1.0.1-alpha...HEAD
 [1.0.1]: https://github.com/StyraInc/vscode-styra/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/StyraInc/vscode-styra/compare/v0.0.6-alpha...v1.0.0
 [0.0.6-alpha]: https://github.com/StyraInc/vscode-styra/compare/v0.0.5-alpha...v0.0.6-alpha
