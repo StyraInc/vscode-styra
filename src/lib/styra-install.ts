@@ -173,6 +173,7 @@ export class StyraInstall {
         await this.adjustWindowsPath(this.ExePath);
       } else {
         const state = await this.collectInputs();
+        // see https://stackoverflow.com/q/39785436/115690 for ideas on running sudo
         const args = ['-c', `echo ${state.pwd} | sudo -S bash -c 'mv ${tempFileLocation} ${this.ExeFile}'`];
         // vital to run in quiet mode so password does not display
         await new CommandRunner().runShellCmd('sh', args, {progressTitle: '', quiet: true});
