@@ -105,7 +105,7 @@
     "lint:fix": "eslint --fix src --ext ts",
     "pretest-vscode": "npm run compile && npm run lint",
     "test-vscode": "node ./out/test/runTest.js",
-    "test": "jest",
+    "test": "jest; ts-node src/bin/update-coverage.ts",
     "test-CI": "jest --collectCoverage false",
     "test:verbose": "jest --verbose",
     "test:watch": "jest --watch",
