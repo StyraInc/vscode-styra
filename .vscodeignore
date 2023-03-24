@@ -1,6 +1,7 @@
 .vscode/**
 .vscode-test/**
 .github/**
+coverage/**
 out/test/**
 out/test-jest/**
 image/**
