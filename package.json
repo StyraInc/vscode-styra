@@ -106,7 +106,7 @@
     "pretest-vscode": "npm run compile && npm run lint",
     "test-vscode": "node ./out/test/runTest.js",
     "test": "jest; ts-node src/bin/update-coverage.ts",
-    "test-CI": "jest --collectCoverage false",
+    "test:ci": "jest --collectCoverage false",
     "test:verbose": "jest --verbose",
     "test:watch": "jest --watch",
     "watch": "tsc -watch -p ./",
