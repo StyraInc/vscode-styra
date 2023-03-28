@@ -1,8 +1,8 @@
-### :nut_and_bolt: What code changed, and why?
+### What code changed, and why?
 
-### :+1: Definition of done
+### Definition of done
 
-### :athletic_shoe: How to test
+### How to test
 
 You can install either from source code or from GitHub.
 
@@ -17,13 +17,13 @@ You can install either from source code or from GitHub.
 #### Install from GitHub
 
 1. Go to the latest release on the [release page](https://github.com/StyraInc/vscode-styra/releases).
-2. Download the additional version piggybacked into that release, labelled `vscode-styra-0.0.0-next.vsix`.
-3. Install via the standard command: `code --install-extension vscode-styra-0.0.0-next.vsix`
+2. Download the additional version piggybacked into that release, labelled `vscode-styra-n.n.n-next.N.vsix`.
+3. Install via the standard command: `code --install-extension vscode-styra-n.n.n-next.N.vsix`
 
 #### Exercise the Code
 
 <!-- Fill in details here... -->
 
-### :chains: Related Resources
+### Related Resources
 
 STY-

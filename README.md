@@ -21,11 +21,12 @@ Some of the commands execute immediately but those with a trailing ellipsis ask 
 Be on the lookout! When you see the footnote indicator next to the prompt `(*) See output pane (*)` look
 for the latest footnote in the Styra output pane to provide further context on what you need to supply.
 
-* `Styra Link: Initialize...` — create (or connect to) a system in DAS.
+* `Styra Link: Bundle Update...` — update the local bundle with any current changes.
 * `Styra Link: Configure Git...` — configure Styra Link with a Git connection.
+* `Styra Link: Initialize...` — create (or connect to) a system in DAS.
+* `Styra Link: Search...` — find available library rules for the current Styra Link project.
 * `Styra Link: Test` — run your unit tests using the latest authored policies.
 * `Styra Link: Validate Decisions` — replay prior decisions against your latest authored polices to see how decisions will change.
-* `Styra Link: Search...` — find available library rules for the current Styra Link project.
 
 ## Editing Rego Files
 
