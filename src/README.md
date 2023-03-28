@@ -65,7 +65,7 @@ before it makes it live on their site.
 You can monitor the progress under [Manage Publishers & Extensions](https://marketplace.visualstudio.com/manage/publishers/styra).
 Contact our ops team to get a login of the form `your-name@platformstyra.onmicrosoft.com`.
 
-This `vsce publish` command does two things:
+This `vsce publish` command:
 
 - records the new version number in package.json and package-lock.json
 - adds a local commit with these version updates
@@ -84,7 +84,7 @@ To generate a build for testing and code review (i.e. a build before going publi
 
 1. Update `version n.n.n` in package.json to bump the version
    (I typically bump just the `patch` octet)
-   and add a `-next-A` suffix (or `-next-B`, `-next-C`, etc., as you iterate during the review).
+   and add a `-next.0` suffix (or `-next.1`, `-next.2`, etc., as you iterate during the review).
    The `major.minor.patch` _must_ be higher than the latest released version;
    otherwise, VS Code will NOT install your local version
    (even though it WILL show your new version number. Aargh!)
