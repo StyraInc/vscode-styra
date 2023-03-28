@@ -1,8 +1,8 @@
-### :nut_and_bolt: What code changed, and why?
+### What code changed, and why?
 
-### :+1: Definition of done
+### Definition of done
 
-### :athletic_shoe: How to test
+### How to test
 
 You can install either from source code or from GitHub.
 
@@ -24,6 +24,6 @@ You can install either from source code or from GitHub.
 
 <!-- Fill in details here... -->
 
-### :chains: Related Resources
+### Related Resources
 
 STY-
