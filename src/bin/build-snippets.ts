@@ -1,21 +1,15 @@
 import {runStyraCmd} from '../lib-sans-vscode/command-runner';
 
-// This is an offline snippet generation tool.
+// Purpose: Offline snippet generation tool for specific system-type snippets.
 //
 // Usage:
-//
-// (1) Install ts-node:
-//       npm install -g ts-node
-// (2) Configure a styra link project with a kubernetes system:
+// (1) Configure a styra link project with a kubernetes system:
 //       cmd line: styra link init...
-//       VSCode: "Styra Link: Initialize"
-// (3) From that styra link project's root directory run this,
-//     redirecting output to overwrite the kubernetes.json file in this project. Example:
+//       VSCode: "Styra Link: Initialize..."
+// (2) Run this from that styra link project's root directory,
+//     redirecting output to overwrite the kubernetes.json file in the vscode-styra project. Example:
 //       ts-node ../vscode-styra/src/bin/build-snippets.ts > ../vscode-styra/snippets/kubernetes.json
 //     Note that this will take 6 minutes to run, which is fine for now since it is done offline.
-
-// Tips on running from the command line:
-// https://stackoverflow.com/questions/33535879/how-to-run-typescript-files-from-command-line
 
 type InputSnippetType = {
   id: string;

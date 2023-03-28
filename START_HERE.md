@@ -8,7 +8,7 @@
 
 ## Doing a Quality Review
 
-Setup: Download and install the extension from the project [Releases](https://github.com/StyraInc/vscode-styra/releases) page (it is not yet published to the VSCode marketplace).
+Setup: Download and install the extension from the VSCode marketplace.
 
 Review as much as you can, of course, but here is a list of key items with some points to consider (not exhaustive, of course!).
 

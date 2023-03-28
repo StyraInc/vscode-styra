@@ -1,11 +1,11 @@
 import * as yaml from 'js-yaml';
 import {readFileSync, writeFileSync} from 'fs';
 
-// This is an offline snippet generation tool.
+// Purpose: Convert YAML-formatted snippets file to JSON.
+// Much easier to add/edit snippets in YAML, but ultimately VS Code needs it in JSON.
+// Run this from the vscode-styra root directory.
 //
-// Usage:
-// (1) Install ts-node (npm install -g ts-node)
-// (2) npm run snippets:build:common
+// Usage: npm run snippets:build:common
 
 type ArbitraryJson = Record<string, unknown>;
 
