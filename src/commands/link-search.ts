@@ -3,10 +3,10 @@ import {generatePickList, shouldResume, StepType, validateNoop} from './utility'
 import {ICommand, ReturnValue} from '../lib/types';
 import {info, infoDiagram} from '../lib/output-pane';
 import {MultiStepInput} from '../external/multi-step-input';
-import {QuickPickItem} from 'vscode';
+import {QuickPickItem} from '../lib/vscode-api';
 
 interface State {
-  searchTypeRaw: QuickPickItem;
+  _searchByTitle: QuickPickItem;
   searchByTitle: boolean;
   searchTerm: string;
   format: QuickPickItem;
@@ -34,12 +34,7 @@ export class LinkSearch implements ICommand {
   async run(): Promise<ReturnValue> {
 
     const state = await this.collectInputs();
-
-    const styraArgs = [
-      'link',
-      'rules',
-      'search',
-    ];
+    const styraArgs = ['link', 'rules', 'search'];
     if (state.searchByTitle) {
       styraArgs.push(state.searchTerm);
     } else {
@@ -60,17 +55,17 @@ export class LinkSearch implements ICommand {
   }
 
   private async pickSearchType(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
-    state.searchTypeRaw = await input.showQuickPick({
+    state._searchByTitle = await input.showQuickPick({
       ignoreFocusOut: true,
       title: this.title,
       step: 1,
       totalSteps: this.totalSteps,
       placeholder: 'Select what to search',
       items: generatePickList(['snippet title (partials OK)', 'snippet id (exact match)']),
-      activeItem: state.searchTypeRaw,
+      activeItem: state._searchByTitle,
       shouldResume,
     });
-    state.searchByTitle = state.searchTypeRaw.label === 'snippet title (partials OK)';
+    state.searchByTitle = state._searchByTitle.label === 'snippet title (partials OK)';
     return (input: MultiStepInput) => this.inputSearchTerm(input, state);
   }
 
