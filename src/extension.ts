@@ -4,6 +4,7 @@ import {Executor} from './commands/executor';
 import {ICommand} from './lib/types';
 import {IDE} from './lib/vscode-api';
 import {infoDebug, outputChannel} from './lib/output-pane';
+import {LinkBundleUpdate} from './commands/link-bundle-update';
 import {LinkConfigGit} from './commands/link-config-git';
 import {LinkInit} from './commands/link-init';
 import {LinkSearch} from './commands/link-search';
@@ -29,11 +30,12 @@ export async function activate(context: vscode.ExtensionContext): Promise<IMemen
 
   // commands come from package.json::contribute.commands
   const styraCommands: { [key: string]: ICommand } = {
-    'styra.link.init': new LinkInit(),
+    'styra.link.bundle-update': new LinkBundleUpdate(),
     'styra.link.config-git': new LinkConfigGit(),
+    'styra.link.init': new LinkInit(),
+    'styra.link.search': new LinkSearch(),
     'styra.link.test': new LinkTest(),
     'styra.link.validate-decisions': new LinkValidateDecisions(),
-    'styra.link.search': new LinkSearch(),
   };
   infoDebug(`Registering ${Object.keys(styraCommands).length} commands`);
 

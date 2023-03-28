@@ -24,12 +24,20 @@
   "contributes": {
     "commands": [
       {
-        "command": "styra.link.init",
-        "title": "Styra Link: Initialize..."
+        "command": "styra.link.bundle-update",
+        "title": "Styra Link: Bundle Update..."
       },
       {
         "command": "styra.link.config-git",
         "title": "Styra Link: Configure Git..."
+      },
+      {
+        "command": "styra.link.init",
+        "title": "Styra Link: Initialize..."
+      },
+      {
+        "command": "styra.link.search",
+        "title": "Styra Link: Search..."
       },
       {
         "command": "styra.link.test",
@@ -38,10 +46,6 @@
       {
         "command": "styra.link.validate-decisions",
         "title": "Styra Link: Validate Decisions"
-      },
-      {
-        "command": "styra.link.search",
-        "title": "Styra Link: Search..."
       }
     ],
     "configuration": {
