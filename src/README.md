@@ -96,7 +96,7 @@ To generate a build for testing and code review (i.e. a build before going publi
 
 | File | Action |
 | ---- | ------ |
-| /README.md | Add one-line command (`name`, `description`) to `## Features` section. |
+| /README.md | Add one-line command (`name`, `description`) to `## Commands` section. |
 | /README.md | Add any new VSCode settings to `## Extension Settings` section if needed. |
 | /CHANGELOG.md | Add to (or create) an `### Added` section and mention the new command. |
 | /package.json | Add command object (`name`, `key`) to `contributes.commands` section. |
@@ -115,7 +115,7 @@ Start your new command with this template.  You will need to:
 
 ``` typescript
 import { CommandRunner } from '../lib/command-runner';
-import { ICommand } from '../lib/types';
+import {ICommand, ReturnValue} from '../lib/types';
 import { info } from '../lib/outputPane';
 
 export class Link<CMD> implements ICommand {
