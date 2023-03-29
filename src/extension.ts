@@ -9,6 +9,7 @@ import {LinkConfigGit} from './commands/link-config-git';
 import {LinkInit} from './commands/link-init';
 import {LinkSearch} from './commands/link-search';
 import {LinkTest} from './commands/link-test';
+import {LinkValidateCompliance} from './commands/link-validate-compliance';
 import {LinkValidateDecisions} from './commands/link-validate-decisions';
 import {LocalStorageService} from './lib/local-storage-service';
 import {SnippetInstaller} from './lib/snippet-installer';
@@ -35,6 +36,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IMemen
     'styra.link.init': new LinkInit(),
     'styra.link.search': new LinkSearch(),
     'styra.link.test': new LinkTest(),
+    'styra.link.validate-compliance': new LinkValidateCompliance(),
     'styra.link.validate-decisions': new LinkValidateDecisions(),
   };
   infoDebug(`Registering ${Object.keys(styraCommands).length} commands`);
