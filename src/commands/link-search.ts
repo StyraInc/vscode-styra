@@ -38,9 +38,9 @@ export class LinkSearch implements ICommand {
     if (state.searchByTitle) {
       styraArgs.push(state.searchTerm);
     } else {
-      styraArgs.push('-r', state.searchTerm);
+      styraArgs.push('--rule', state.searchTerm);
     }
-    styraArgs.push('-o', state.format.label.toLowerCase());
+    styraArgs.push('--output', state.format.label.toLowerCase());
 
     const result = await new CommandRunner().runStyraCmd(styraArgs);
     info(result);
