@@ -88,9 +88,11 @@ To generate a build for testing and code review (i.e. a build before going publi
    The `major.minor.patch` _must_ be higher than the latest released version;
    otherwise, VS Code will NOT install your local version
    (even though it WILL show your new version number. Aargh!)
-   So if you have released `25.14.7`, use `25.14.7-next-A` for your new release candidate.
+   So if you have released `25.14.7`, use `25.14.8-next.0` for your new release candidate.
 2. Run `npm run package`.
-3. Provide the resultant package (`vscode-styra-n.n.n-next-A.vsix`) to interested parties.
+3. Provide the resultant package (`vscode-styra-n.n.n-next.N.vsix`) to interested parties
+   by editing the latest release (e.g. `https://github.com/StyraInc/vscode-styra/releases/tag/v25.14.7`)
+   and attaching the package there.
 
 ## Adding a New Command
 
