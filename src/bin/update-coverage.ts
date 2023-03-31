@@ -12,7 +12,7 @@ const BADGE_TEMPLATE = 'https://img.shields.io/badge/Coverage-<coverage>%25-<col
 
 enum Threshold {
   Critical = 50,
-  Warning = 75
+  Warning = 70
 }
 
 function updateCoverageValue(filePath:string, regexp: RegExp, newURL: string) {
