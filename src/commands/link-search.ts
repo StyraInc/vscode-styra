@@ -4,6 +4,7 @@ import {ICommand, ReturnValue} from '../lib/types';
 import {IDE, QuickPickItem} from '../lib/vscode-api';
 import {info, infoDiagram} from '../lib/output-pane';
 import {MultiStepInput} from '../external/multi-step-input';
+import {Setting} from '../lib/ide-settings';
 
 interface State {
   _searchByTitle: QuickPickItem;
@@ -40,7 +41,7 @@ export class LinkSearch implements ICommand {
     } else {
       styraArgs.push('--rule', state.searchTerm);
     }
-    const outputFormat = IDE.getConfigValue<string>('styra', 'outputFormat');
+    const outputFormat = IDE.getConfigValue<string>('styra', Setting.Format);
     if (outputFormat) {
       styraArgs.push('--output', outputFormat.toLowerCase());
     }

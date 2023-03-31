@@ -13,6 +13,7 @@ import {IDE} from './vscode-api';
 import {info, infoDebug, infoFromUserAction, infoInput, teeError, teeInfo} from './output-pane';
 import {LocalStorageService, Workspace} from './local-storage-service';
 import {MultiStepInput} from '../external/multi-step-input';
+import {Setting} from './ide-settings';
 import {shouldResume, validateNoop} from '../commands/utility';
 import {VersionType} from './types';
 
@@ -77,7 +78,7 @@ export class StyraInstall {
   static async checkForUpdates(): Promise<void> {
     const localStorage = LocalStorageService.instance;
     const last = localStorage.getValue<string>(Workspace.UpdateCheckDate);
-    const interval = IDE.getConfigValue<number>('styra', 'checkUpdateInterval') ?? 1;
+    const interval = IDE.getConfigValue<number>('styra', Setting.UpdateInterval) ?? 1;
     const currentDate = new Date(Date.now());
 
     // run check periodically based on user preference in VSCode settings

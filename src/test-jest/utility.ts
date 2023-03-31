@@ -1,4 +1,5 @@
 import {outputChannel} from '../lib/output-pane';
+import {Setting} from '../lib/ide-settings';
 
 export class OutputPaneSpy {
   private spyAppendLine = jest.spyOn(outputChannel, 'appendLine');
@@ -24,9 +25,9 @@ export function mockVSCodeSettings(options: SettingMockOptions = defaultSettingM
   return jest.fn().mockImplementation(
     (path, key) => {
       switch (key) {
-        case 'outputFormat':
+        case Setting.Format:
           return options.outputFormat;
-        case 'diagnosticOutput':
+        case Setting.Diagnostic:
           return options.diagnosticOutput;
       }
     });
