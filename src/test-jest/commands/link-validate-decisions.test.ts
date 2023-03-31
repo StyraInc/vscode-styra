@@ -43,4 +43,23 @@ describe('LinkValidateDecisions', () => {
     });
   });
 
+  [
+    [true, 'with diagnostic output'],
+    [false, 'without diagnostic output']
+  ].forEach(([diagnosticOutput, description]) => {
+    test(`invokes CLI command ${description}`, async () => {
+
+      IDE.getConfigValue = mockVSCodeSettings({diagnosticOutput: diagnosticOutput as boolean});
+
+      await new LinkValidateDecisions().run();
+
+      expect(runnerMock).toHaveBeenCalledWith(
+        'styra',
+        diagnosticOutput ?
+          expect.arrayContaining(['--debug']) : expect.not.arrayContaining(['--debug']),
+        expect.anything()
+      );
+    });
+  });
+
 });
