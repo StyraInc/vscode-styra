@@ -1,6 +1,7 @@
 import {CommandRunner} from '../../lib/command-runner';
 import {IDE} from '../../lib/vscode-api';
 import {LinkSearch} from '../../commands/link-search';
+import {mockVSCodeSettings} from '../utility';
 import {MultiStepInput} from '../../external/multi-step-input';
 
 describe('LinkSearch', () => {
@@ -8,15 +9,14 @@ describe('LinkSearch', () => {
   let runnerMock: jest.Mock;
 
   beforeEach(() => {
-    IDE.getConfigValue = jest.fn().mockReturnValue(true); // getConfigValue('styra', 'debug')
+    IDE.getConfigValue = mockVSCodeSettings();
+    MultiStepInput.prototype.showQuickPick = quickPickMock();
+    MultiStepInput.prototype.showInputBox = inputBoxMock();
     runnerMock = jest.fn().mockResolvedValue('');
     CommandRunner.prototype.runShellCmd = runnerMock;
   });
 
   test('invokes base link CLI command', async () => {
-
-    MultiStepInput.prototype.showQuickPick = quickPickMock();
-    MultiStepInput.prototype.showInputBox = inputBoxMock();
 
     await new LinkSearch().run();
 
@@ -70,8 +70,7 @@ describe('LinkSearch', () => {
   ].forEach((format) => {
     test(`invokes CLI command with ${format} format`, async () => {
 
-      MultiStepInput.prototype.showQuickPick = quickPickMock({format});
-      MultiStepInput.prototype.showInputBox = inputBoxMock();
+      IDE.getConfigValue = mockVSCodeSettings(format);
 
       await new LinkSearch().run();
 
@@ -84,7 +83,6 @@ describe('LinkSearch', () => {
   });
 
   type InputMockOptions = {
-    format?: string;
     searchByTitle?: boolean;
   }
 
@@ -93,7 +91,7 @@ describe('LinkSearch', () => {
   const quickPickMock = (options?: InputMockOptions) =>
     _inputMock(false, {searchByTitle: true, ...options});
 
-  const _inputMock = (isInputBox: boolean, options: InputMockOptions = {searchByTitle: true, format: 'table'}) =>
+  const _inputMock = (isInputBox: boolean, options: InputMockOptions = {searchByTitle: true}) =>
     jest.fn().mockImplementation(
       ({prompt, placeholder}: { prompt: string, placeholder: string }) => {
         let result: string;
@@ -108,12 +106,10 @@ describe('LinkSearch', () => {
           case 'Enter exact rule ID to search for':
             result = 'rule-id';
             break;
-          case 'Select output format':
-            result = options.format ?? '';
-            break;
           default:
             result = 'UNKNOWN'; // should never happen
         }
         return isInputBox ? result : {label: result};
       });
+
 });
