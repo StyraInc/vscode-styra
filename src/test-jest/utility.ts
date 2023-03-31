@@ -14,14 +14,20 @@ export function mockType(mock: unknown): jest.Mock {
   return mock as unknown as jest.Mock;
 }
 
-export function mockVSCodeSettings(format = 'table'): jest.Mock {
+type SettingMockOptions = {
+  outputFormat?: string;
+  diagnosticOutput?: boolean;
+}
+
+const defaultSettingMockOptions = {outputFormat: 'table', diagnosticOutput: true};
+export function mockVSCodeSettings(options: SettingMockOptions = defaultSettingMockOptions): jest.Mock {
   return jest.fn().mockImplementation(
     (path, key) => {
       switch (key) {
         case 'outputFormat':
-          return format;
+          return options.outputFormat;
         case 'diagnosticOutput':
-          return true;
+          return options.diagnosticOutput;
       }
     });
 }

@@ -67,16 +67,16 @@ describe('LinkSearch', () => {
   ['table',
     'JSON',
     'YAML'
-  ].forEach((format) => {
-    test(`invokes CLI command with ${format} format`, async () => {
+  ].forEach((outputFormat) => {
+    test(`invokes CLI command with ${outputFormat} format`, async () => {
 
-      IDE.getConfigValue = mockVSCodeSettings(format);
+      IDE.getConfigValue = mockVSCodeSettings({outputFormat});
 
       await new LinkSearch().run();
 
       expect(runnerMock).toHaveBeenCalledWith(
         'styra',
-        expect.arrayContaining(['link', 'rules', 'search', 'title-part', '--output', format.toLowerCase()]),
+        expect.arrayContaining(['link', 'rules', 'search', 'title-part', '--output', outputFormat.toLowerCase()]),
         expect.anything()
       );
     });

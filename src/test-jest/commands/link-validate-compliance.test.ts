@@ -59,15 +59,15 @@ describe('LinkValidateCompliance', () => {
     'table',
     'JSON',
     'YAML',
-  ].forEach((format) => {
-    test(`invokes CLI command with ${format} format`, async () => {
-      IDE.getConfigValue = mockVSCodeSettings(format);
+  ].forEach((outputFormat) => {
+    test(`invokes CLI command with ${outputFormat} format`, async () => {
+      IDE.getConfigValue = mockVSCodeSettings({outputFormat});
 
       await new LinkValidateCompliance().run();
 
       expect(runnerMock).toHaveBeenCalledWith(
         'styra',
-        expect.arrayContaining(['link', 'validate', 'compliance', '--output', format.toLowerCase()]),
+        expect.arrayContaining(['link', 'validate', 'compliance', '--output', outputFormat.toLowerCase()]),
         expect.anything()
       );
     });
