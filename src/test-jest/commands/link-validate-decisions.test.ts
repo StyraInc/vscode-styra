@@ -1,6 +1,7 @@
 import {CommandRunner} from '../../lib/command-runner';
 import {IDE} from '../../lib/vscode-api';
 import {LinkValidateDecisions} from '../../commands/link-validate-decisions';
+import {mockVSCodeSettings} from '../utility';
 
 describe('LinkValidateDecisions', () => {
 
@@ -14,7 +15,7 @@ describe('LinkValidateDecisions', () => {
 
   test('invokes base link CLI command', async () => {
 
-    IDE.getConfigValue = configMock();
+    IDE.getConfigValue = mockVSCodeSettings();
 
     await new LinkValidateDecisions().run();
 
@@ -31,7 +32,7 @@ describe('LinkValidateDecisions', () => {
   ].forEach((format) => {
     test(`invokes CLI command with ${format} format`, async () => {
 
-      IDE.getConfigValue = configMock(format);
+      IDE.getConfigValue = mockVSCodeSettings(format);
       await new LinkValidateDecisions().run();
 
       expect(runnerMock).toHaveBeenCalledWith(
@@ -41,15 +42,5 @@ describe('LinkValidateDecisions', () => {
       );
     });
   });
-
-  const configMock = (format = 'table') => jest.fn().mockImplementation(
-    (path, key) => {
-      switch (key) {
-        case 'outputFormat':
-          return format;
-        case 'diagnosticOutput':
-          return true;
-      }
-    });
 
 });

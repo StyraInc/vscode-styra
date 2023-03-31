@@ -10,8 +10,18 @@ export class OutputPaneSpy {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function mockType(mock: unknown): jest.MockInstance<any, any> {
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return mock as unknown as jest.MockInstance<any, any>;
+export function mockType(mock: unknown): jest.Mock {
+  return mock as unknown as jest.Mock;
+}
+
+export function mockVSCodeSettings(format = 'table'): jest.Mock {
+  return jest.fn().mockImplementation(
+    (path, key) => {
+      switch (key) {
+        case 'outputFormat':
+          return format;
+        case 'diagnosticOutput':
+          return true;
+      }
+    });
 }
