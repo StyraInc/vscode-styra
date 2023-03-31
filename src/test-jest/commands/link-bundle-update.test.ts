@@ -1,6 +1,7 @@
 import {CommandRunner} from '../../lib/command-runner';
 import {IDE} from '../../lib/vscode-api';
 import {LinkBundleUpdate} from '../../commands/link-bundle-update';
+import {mockVSCodeSettings} from '../utility';
 import {MultiStepInput} from '../../external/multi-step-input';
 
 describe('LinkBundleUpdate', () => {
@@ -8,7 +9,7 @@ describe('LinkBundleUpdate', () => {
   let runnerMock: jest.Mock;
 
   beforeEach(() => {
-    IDE.getConfigValue = jest.fn().mockReturnValue(true); // getConfigValue('styra', 'debug')
+    IDE.getConfigValue = mockVSCodeSettings();
     runnerMock = jest.fn().mockResolvedValue('');
     CommandRunner.prototype.runShellCmd = runnerMock;
   });

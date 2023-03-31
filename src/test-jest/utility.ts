@@ -18,9 +18,15 @@ export function mockType(mock: unknown): jest.Mock {
 type SettingMockOptions = {
   outputFormat?: string;
   diagnosticOutput?: boolean;
+  checkUpdateInterval?: number;
 }
 
-const defaultSettingMockOptions = {outputFormat: 'table', diagnosticOutput: true};
+const defaultSettingMockOptions: SettingMockOptions = {
+  outputFormat: 'table',
+  diagnosticOutput: false,
+  checkUpdateInterval: 0
+};
+
 export function mockVSCodeSettings(options: SettingMockOptions = defaultSettingMockOptions): jest.Mock {
   return jest.fn().mockImplementation(
     (path, key) => {
@@ -29,6 +35,8 @@ export function mockVSCodeSettings(options: SettingMockOptions = defaultSettingM
           return options.outputFormat;
         case Setting.Diagnostic:
           return options.diagnosticOutput;
+        case Setting.UpdateInterval:
+          return options.checkUpdateInterval;
       }
     });
 }

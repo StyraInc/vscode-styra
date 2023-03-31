@@ -2,6 +2,7 @@ import {CommandRunner} from '../../lib/command-runner';
 import {footnoteMsg} from '../../lib/output-pane';
 import {IDE} from '../../lib/vscode-api';
 import {LinkConfigGit} from '../../commands/link-config-git';
+import {mockVSCodeSettings} from '../utility';
 import {MultiStepInput} from '../../external/multi-step-input';
 import {ReturnValue} from '../../lib/types';
 
@@ -10,7 +11,7 @@ describe('LinkConfigGit', () => {
   let runnerMock: jest.Mock;
 
   beforeEach(() => {
-    IDE.getConfigValue = jest.fn().mockReturnValue(false); // getConfigValue('styra', 'debug')
+    IDE.getConfigValue = mockVSCodeSettings();
 
     // most types do not care about the return value; setting up for the one that does
     runnerMock = jest.fn().mockResolvedValue('git@dummyUrlHere.git');

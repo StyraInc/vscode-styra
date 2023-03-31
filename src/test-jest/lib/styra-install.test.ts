@@ -5,7 +5,7 @@ import {CommandRunner} from '../../lib/command-runner';
 import {DAS} from '../../lib/das-query';
 import {IDE} from '../../lib/vscode-api';
 import {LocalStorageService, Workspace} from '../../lib/local-storage-service';
-import {OutputPaneSpy} from '../utility';
+import {mockVSCodeSettings, OutputPaneSpy} from '../utility';
 import {StyraInstall} from '../../lib/styra-install';
 
 // copied from local-storage-service.test.ts; importing it fails!?!
@@ -37,6 +37,7 @@ describe('StyraInstall', () => {
     // eslint-disable-next-line dot-notation
     StyraInstall['installStyra'] = jest.fn().mockResolvedValue('');
     StyraInstall.styraCmdExists = jest.fn().mockResolvedValue(false);
+    IDE.getConfigValue = mockVSCodeSettings();
   });
 
   describe('checkWorkspace', () => {
@@ -69,7 +70,7 @@ describe('StyraInstall', () => {
 
       test(`yields ${expected} when ${description}`, async () => {
         StyraInstall.styraCmdExists = jest.fn().mockResolvedValue(expected);
-        IDE.getConfigValue = jest.fn().mockReturnValue(true); // getConfigValue('styra', 'debug')
+        IDE.getConfigValue = mockVSCodeSettings({diagnosticOutput: true});
 
         expect(await StyraInstall.checkCliInstallation()).toBe(expected as boolean);
 
@@ -109,7 +110,6 @@ describe('StyraInstall', () => {
 
       test(`checked date is advanced to today when ${description}`, async () => {
         DAS.runQuery = jest.fn().mockResolvedValue({cliVersion: '1.2.4'});
-        IDE.getConfigValue = jest.fn().mockReturnValue(undefined);
         CommandRunner.prototype.runShellCmd = jest.fn().mockResolvedValue('1.2.3');
         const storageMgr = LocalStorageService.instance;
         const storage = new TestMemento();
@@ -129,7 +129,6 @@ describe('StyraInstall', () => {
       const available = '1.2.4';
       DAS.runQuery = jest.fn().mockResolvedValue({cliVersion: available});
       CommandRunner.prototype.runShellCmd = jest.fn().mockResolvedValue(installed);
-      IDE.getConfigValue = jest.fn().mockReturnValue(undefined);
       const showInfoMock = jest.fn().mockReturnValue(undefined);
       IDE.showInformationMessageModal = showInfoMock;
 
@@ -155,7 +154,7 @@ describe('StyraInstall', () => {
         const storage = new TestMemento();
         storageMgr.storage = storage;
         storageMgr.setValue<string>(Workspace.UpdateCheckDate, lastCheckedDate as string);
-        IDE.getConfigValue = jest.fn().mockReturnValue(interval);
+        IDE.getConfigValue = mockVSCodeSettings({checkUpdateInterval: interval as number});
         // from https://codewithhugo.com/mocking-the-current-date-in-jest-tests/
         global.Date.now = jest.fn().mockReturnValue(currentDate);
 
@@ -182,7 +181,6 @@ describe('StyraInstall', () => {
         test(`prompts for install when ${description}`, async () => {
           DAS.runQuery = jest.fn().mockResolvedValue({cliVersion: available});
           CommandRunner.prototype.runShellCmd = jest.fn().mockResolvedValue(installed);
-          IDE.getConfigValue = jest.fn().mockReturnValue(undefined);
           IDE.showInformationMessageModal = jest.fn().mockReturnValue(choice);
 
           await StyraInstall.checkForUpdates();

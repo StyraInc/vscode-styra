@@ -2,6 +2,7 @@ import {CommandRunner} from '../../lib/command-runner';
 import {generatePickList} from '../../commands/utility';
 import {IDE} from '../../lib/vscode-api';
 import {LinkInit} from '../../commands/link-init';
+import {mockVSCodeSettings} from '../utility';
 import {MultiStepInput} from '../../external/multi-step-input';
 import {SnippetInstaller} from '../../lib/snippet-installer';
 
@@ -10,7 +11,7 @@ describe('LinkInit', () => {
   let runnerMock: jest.Mock;
 
   beforeEach(() => {
-    IDE.getConfigValue = jest.fn().mockReturnValue(true); // getConfigValue('styra', 'debug')
+    IDE.getConfigValue = mockVSCodeSettings();
     SnippetInstaller.prototype.addSnippetsToProject = jest.fn();
 
     // most types do not care about the return value; setting up for the one that does

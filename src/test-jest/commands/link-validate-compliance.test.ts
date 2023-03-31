@@ -10,7 +10,6 @@ describe('LinkValidateCompliance', () => {
   const spy = new OutputPaneSpy();
 
   beforeEach(() => {
-    IDE.getConfigValue = jest.fn().mockReturnValue(true); // getConfigValue('styra', 'debug')
     IDE.showWarningMessage = jest.fn();
     runnerMock = jest.fn().mockResolvedValue('');
     CommandRunner.prototype.runShellCmd = runnerMock;
