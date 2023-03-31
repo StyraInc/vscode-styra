@@ -26,7 +26,7 @@ for the latest footnote in the Styra output pane to provide further context on w
 * `Styra Link: Initialize...` — create (or connect to) a system in DAS.
 * `Styra Link: Search...` — find available library rules for the current Styra Link project.
 * `Styra Link: Test` — run your unit tests using the latest authored policies.
-* `Styra Link: Validate Compliance...` — check for compliance violations against your latest authored polices for supported systems.
+* `Styra Link: Validate Compliance` — check for compliance violations against your latest authored polices for supported systems.
 * `Styra Link: Validate Decisions` — replay prior decisions against your latest authored polices to see how decisions will change.
 
 ## Editing Rego Files

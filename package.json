@@ -45,7 +45,7 @@
       },
       {
         "command": "styra.link.validate-compliance",
-        "title": "Styra Link: Validate Compliance..."
+        "title": "Styra Link: Validate Compliance"
       },
       {
         "command": "styra.link.validate-decisions",
