@@ -63,7 +63,13 @@
           "description": "How often to check for updates to the Styra CLI (in days)",
           "default": 1
         },
-        "styra.diagnosticOutput": {
+        "styra.diagnosticLimit": {
+          "type": "number",
+          "minimum": -1,
+          "description": "Length limit of diagnostic output (use -1 for no limit)",
+          "default": 120
+        },
+         "styra.diagnosticOutput": {
           "type": "boolean",
           "description": "Reveal API calls and other diagnostics in output pane",
           "default": false

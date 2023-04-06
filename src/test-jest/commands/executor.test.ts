@@ -1,6 +1,7 @@
 import {Executor} from '../../commands/executor';
 import {ICommand, ReturnValue} from '../../lib/types';
-import {mockType, OutputPaneSpy} from '../utility';
+import {IDE} from '../../lib/vscode-api';
+import {mockType, mockVSCodeSettings, OutputPaneSpy} from '../utility';
 import {outputChannel} from '../../lib/output-pane';
 import {StyraInstall} from '../../lib/styra-install';
 
@@ -25,6 +26,7 @@ describe('Executor', () => {
   const spyAppendLine = jest.spyOn(outputChannel, 'appendLine');
   Executor.checkStartup = jest.fn();
   StyraInstall.styraCmdExists = jest.fn().mockResolvedValue(true);
+  IDE.getConfigValue = mockVSCodeSettings();
 
   [
     [true, 'CONTINUES'],

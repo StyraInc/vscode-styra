@@ -36,6 +36,10 @@ export function infoFromUserAction(msg: string): void {
 // Use this to report debug-level messages
 export function infoDebug(msg: string): void {
   if (IDE.getConfigValue<boolean>('styra', Setting.Diagnostic)) {
+    const limit = IDE.getConfigValue<number>('styra', Setting.DiagnosticLimit) ?? -1;
+    if (limit !== -1 && msg.length > limit) {
+      msg = msg.substring(0, limit) + '...';
+    }
     info(`[DEBUG]: ${msg}`);
   }
 }
