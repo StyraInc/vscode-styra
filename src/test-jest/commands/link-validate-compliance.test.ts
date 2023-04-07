@@ -1,8 +1,7 @@
 import {CommandRunner} from '../../lib/command-runner';
 import {IDE} from '../../lib/vscode-api';
 import {LinkValidateCompliance} from '../../commands/link-validate-compliance';
-import {MultiStepInput} from '../../external/multi-step-input';
-import {OutputPaneSpy} from '../utility';
+import {mockVSCodeSettings, OutputPaneSpy} from '../utility';
 import {ProjectConfigData, StyraConfig} from '../../lib/styra-config';
 
 describe('LinkValidateCompliance', () => {
@@ -11,17 +10,15 @@ describe('LinkValidateCompliance', () => {
   const spy = new OutputPaneSpy();
 
   beforeEach(() => {
-    IDE.getConfigValue = jest.fn().mockReturnValue(true); // getConfigValue('styra', 'debug')
     IDE.showWarningMessage = jest.fn();
     runnerMock = jest.fn().mockResolvedValue('');
     CommandRunner.prototype.runShellCmd = runnerMock;
     StyraConfig.getProjectConfig = jest.fn().mockResolvedValue(
       {projectType: 'kubernetes', name: 'my_project'} as ProjectConfigData);
+    IDE.getConfigValue = mockVSCodeSettings();
   });
 
   test('invokes base link CLI command', async () => {
-
-    MultiStepInput.prototype.showQuickPick = quickPickMock();
 
     await new LinkValidateCompliance().run();
 
@@ -33,7 +30,6 @@ describe('LinkValidateCompliance', () => {
   });
 
   test('when system is kubernetes, runs the command', async () => {
-    MultiStepInput.prototype.showQuickPick = quickPickMock();
 
     await new LinkValidateCompliance().run();
 
@@ -41,7 +37,6 @@ describe('LinkValidateCompliance', () => {
   });
 
   test('when system is non-kubernetes, aborts', async () => {
-    MultiStepInput.prototype.showQuickPick = quickPickMock();
     StyraConfig.getProjectConfig = jest.fn().mockResolvedValue(
       {projectType: 'terraform', name: 'my_project'} as ProjectConfigData);
 
@@ -51,7 +46,6 @@ describe('LinkValidateCompliance', () => {
   });
 
   test('when system is non-kubernetes, informs user', async () => {
-    MultiStepInput.prototype.showQuickPick = quickPickMock();
     StyraConfig.getProjectConfig = jest.fn().mockResolvedValue(
       {projectType: 'terraform', name: 'my_project'} as ProjectConfigData);
 
@@ -64,35 +58,37 @@ describe('LinkValidateCompliance', () => {
     'table',
     'JSON',
     'YAML',
-  ].forEach((format) => {
-    test(`invokes CLI command with ${format} format`, async () => {
-
-      MultiStepInput.prototype.showQuickPick = quickPickMock(format);
+  ].forEach((outputFormat) => {
+    test(`invokes CLI command with ${outputFormat} format`, async () => {
+      IDE.getConfigValue = mockVSCodeSettings({outputFormat});
 
       await new LinkValidateCompliance().run();
 
       expect(runnerMock).toHaveBeenCalledWith(
         'styra',
-        expect.arrayContaining(['link', 'validate', 'compliance', '--output', format.toLowerCase()]),
+        expect.arrayContaining(['link', 'validate', 'compliance', '--output', outputFormat.toLowerCase()]),
         expect.anything()
       );
     });
   });
 
-  const quickPickMock = (format = 'table') => _inputMock(false, format);
+  [
+    [true, 'with diagnostic output'],
+    [false, 'without diagnostic output']
+  ].forEach(([diagnosticOutput, description]) => {
+    test(`invokes CLI command ${description}`, async () => {
 
-  const _inputMock = (isInputBox: boolean, format: string) =>
-    jest.fn().mockImplementation(
-      ({prompt, placeholder}: { prompt: string, placeholder: string }) => {
-        let result: string;
-        const target = (isInputBox ? prompt : placeholder).replace(/\s*\(.*\)/, ''); // ignore trailing parenthetical, if any
-        switch (target) {
-          case 'Select output format':
-            result = format;
-            break;
-          default:
-            result = 'UNKNOWN'; // should never happen
-        }
-        return isInputBox ? result : {label: result};
-      });
+      IDE.getConfigValue = mockVSCodeSettings({diagnosticOutput: diagnosticOutput as boolean});
+
+      await new LinkValidateCompliance().run();
+
+      expect(runnerMock).toHaveBeenCalledWith(
+        'styra',
+        diagnosticOutput ?
+          expect.arrayContaining(['--debug']) : expect.not.arrayContaining(['--debug']),
+        expect.anything()
+      );
+    });
+  });
+
 });

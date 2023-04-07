@@ -1,9 +1,10 @@
 import {CommandRunner} from '../lib/command-runner';
 import {generatePickList, shouldResume, StepType, validateNoop} from './utility';
 import {ICommand, ReturnValue} from '../lib/types';
+import {IDE, QuickPickItem} from '../lib/vscode-api';
 import {info, infoDiagram} from '../lib/output-pane';
 import {MultiStepInput} from '../external/multi-step-input';
-import {QuickPickItem} from '../lib/vscode-api';
+import {Setting} from '../lib/ide-settings';
 
 interface State {
   _searchByTitle: QuickPickItem;
@@ -15,18 +16,18 @@ interface State {
 export class LinkSearch implements ICommand {
 
   title = 'Styra Link Snippets Search';
-  totalSteps = 3;
+  totalSteps = 2;
   // For complex editing, just copy the lines here and paste into https://asciiflow.com/#/
   flow = `
                    ┌───────────────────────┐
-           ┌──────►│ Full or Partial Title ├────┐                 Table
-     Title │       └───────────────────────┘    │               ┌───────┐
-           │                                    │               │       │
-┌┐     ┌───┴─────────┐                          │   ┌────────┐  │ JSON  ▼   ┌┐
-│┼────►│ Search Type │                          ├──►│ Format ├──┼──────────►├│
-└┘     └───┬─────────┘                          │   └────────┘  │       ▲   └┘
-           │                                    │               │ YAML  │
-        ID │       ┌───────────────────────┐    │               └───────┘
+           ┌──────►│ Full or Partial Title ├────┐
+     Title │       └───────────────────────┘    │
+           │                                    │
+┌┐     ┌───┴─────────┐                          │   ┌┐
+│┼────►│ Search Type │                          ├──►├│
+└┘     └───┬─────────┘                          │   └┘
+           │                                    │
+        ID │       ┌───────────────────────┐    │
            └──────►│ Exact snippet ID      ├────┘
                    └───────────────────────┘
 `;
@@ -38,9 +39,12 @@ export class LinkSearch implements ICommand {
     if (state.searchByTitle) {
       styraArgs.push(state.searchTerm);
     } else {
-      styraArgs.push('-r', state.searchTerm);
+      styraArgs.push('--rule', state.searchTerm);
     }
-    styraArgs.push('-o', state.format.label.toLowerCase());
+    const outputFormat = IDE.getConfigValue<string>('styra', Setting.Format);
+    if (outputFormat) {
+      styraArgs.push('--output', outputFormat.toLowerCase());
+    }
 
     const result = await new CommandRunner().runStyraCmd(styraArgs);
     info(result);
@@ -69,7 +73,7 @@ export class LinkSearch implements ICommand {
     return (input: MultiStepInput) => this.inputSearchTerm(input, state);
   }
 
-  private async inputSearchTerm(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
+  private async inputSearchTerm(input: MultiStepInput, state: Partial<State>): Promise<void> {
     state.searchTerm = await input.showInputBox({
       ignoreFocusOut: true,
       title: this.title,
@@ -78,20 +82,6 @@ export class LinkSearch implements ICommand {
       value: state.searchTerm ?? '',
       prompt: `Enter ${state.searchByTitle ? 'portion of a snippet title' : 'exact rule ID'} to search for`,
       validate: validateNoop,
-      shouldResume,
-    });
-    return (input: MultiStepInput) => this.pickOutputFormat(input, state);
-  }
-
-  private async pickOutputFormat(input: MultiStepInput, state: Partial<State>): Promise<void> {
-    state.format = await input.showQuickPick({
-      ignoreFocusOut: true,
-      title: this.title,
-      step: 3,
-      totalSteps: this.totalSteps,
-      placeholder: 'Select output format',
-      items: generatePickList(['table', 'JSON', 'YAML']),
-      activeItem: state.format,
       shouldResume,
     });
   }

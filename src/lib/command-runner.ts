@@ -5,6 +5,7 @@ import shellEscape = require('shell-escape');
 import {IDE} from './vscode-api';
 import {info, infoDebug, teeError} from './output-pane';
 import {LocalStorageService, Workspace} from './local-storage-service';
+import {Setting} from './ide-settings';
 import {STYRA_CLI_CMD, StyraInstall} from './styra-install';
 
 type CommandRunnerOptions = {
@@ -65,7 +66,7 @@ export class CommandRunner {
   // so in that case the diagnostic lines will NOT be prefixed with `[DEBUG]`.
   // Bug? Feature? You decide :-).
   private async runWithOptionalDebug(args: string[], options?: CommandRunnerOptions): Promise<string> {
-    if (IDE.getConfigValue<boolean>('styra', 'debug') ?? false) {
+    if (IDE.getConfigValue<boolean>('styra', Setting.Diagnostic) ?? false) {
       args.push('--debug');
       let result = (await this.runShellCmd(STYRA_CLI_CMD, args, options)).split('\n');
       result.filter(this.isDebugLine).forEach(infoDebug);

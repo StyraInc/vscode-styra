@@ -45,7 +45,7 @@
       },
       {
         "command": "styra.link.validate-compliance",
-        "title": "Styra Link: Validate Compliance..."
+        "title": "Styra Link: Validate Compliance"
       },
       {
         "command": "styra.link.validate-decisions",
@@ -60,15 +60,23 @@
           "type": "number",
           "minimum": 0,
           "maximum": 30,
-          "title": "Check Update Interval",
           "description": "How often to check for updates to the Styra CLI (in days)",
           "default": 1
         },
-        "styra.debug": {
+        "styra.diagnosticOutput": {
           "type": "boolean",
-          "title": "Diagnostic Details",
-          "description": "Reveals API calls in output pane",
+          "description": "Reveal API calls and other diagnostics in output pane",
           "default": false
+        },
+        "styra.outputFormat": {
+          "type": "string",
+          "enum": [
+            "table",
+            "json",
+            "yaml"
+          ],
+          "description": "Choose the output format for your extension.",
+          "default": "table"
         }
       }
     },

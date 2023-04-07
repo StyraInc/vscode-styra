@@ -1,4 +1,5 @@
 import {outputChannel} from '../lib/output-pane';
+import {Setting} from '../lib/ide-settings';
 
 export class OutputPaneSpy {
   private spyAppendLine = jest.spyOn(outputChannel, 'appendLine');
@@ -10,8 +11,32 @@ export class OutputPaneSpy {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function mockType(mock: unknown): jest.MockInstance<any, any> {
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return mock as unknown as jest.MockInstance<any, any>;
+export function mockType(mock: unknown): jest.Mock {
+  return mock as unknown as jest.Mock;
+}
+
+type SettingMockOptions = {
+  outputFormat?: string;
+  diagnosticOutput?: boolean;
+  checkUpdateInterval?: number;
+}
+
+const defaultSettingMockOptions: SettingMockOptions = {
+  outputFormat: 'table',
+  diagnosticOutput: false,
+  checkUpdateInterval: 0
+};
+
+export function mockVSCodeSettings(options: SettingMockOptions = defaultSettingMockOptions): jest.Mock {
+  return jest.fn().mockImplementation(
+    (path, key) => {
+      switch (key) {
+        case Setting.Format:
+          return options.outputFormat;
+        case Setting.Diagnostic:
+          return options.diagnosticOutput;
+        case Setting.UpdateInterval:
+          return options.checkUpdateInterval;
+      }
+    });
 }

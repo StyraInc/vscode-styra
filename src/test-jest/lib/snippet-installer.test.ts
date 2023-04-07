@@ -2,7 +2,7 @@
 
 import * as fs from 'fs';
 import {IDE} from '../../lib/vscode-api';
-import {OutputPaneSpy} from '../utility';
+import {mockVSCodeSettings, OutputPaneSpy} from '../utility';
 import {ProjectConfigData, StyraConfig} from '../../lib/styra-config';
 import {SnippetInstaller} from '../../lib/snippet-installer';
 
@@ -19,7 +19,7 @@ describe('SnippetInstaller', () => {
     // But it is better than not having the tests at all.
     IDE.getExtension = jest.fn().mockReturnValue({extensionPath: '/ext/root/dir'});
     IDE.projectDir = jest.fn().mockReturnValue('/my/project/dir');
-    IDE.getConfigValue = jest.fn().mockReturnValue(true); // getConfigValue('styra', 'debug')
+    IDE.getConfigValue = mockVSCodeSettings({diagnosticOutput: true});
     StyraConfig.getProjectConfig = jest.fn().mockResolvedValue(
       {projectType: 'kubernetes', name: 'my_project'} as ProjectConfigData);
 

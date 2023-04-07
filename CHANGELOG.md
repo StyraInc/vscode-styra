@@ -9,9 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- `Styra Link: Validate Compliance...` command added.
+### Added
+
+- `Styra Link: Validate Compliance` command added.
 - `Styra Link: Bundle Update` command added.
+- Added support for different output formats to `Styra Link: Test` and `Styra Link: Validate Decisions` commands.
 - Info badges added to top of extension's home page in VS Code.
+
+### Changed
+
+- Renamed VS Code setting from 'Debug' to 'Diagnostic Output'
 
 ## [1.0.1] - 2023-03-16
 

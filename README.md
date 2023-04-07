@@ -1,7 +1,7 @@
 <!-- markdownlint-disable MD041 -->
 [![Apache License](https://img.shields.io/badge/license-Apache%202.0-orange.svg?style=flat-square)](https://www.apache.org/licenses/LICENSE-2.0)
 ![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/Styra.vscode-styra?style=flat-square)
-![Coverage](https://img.shields.io/badge/Coverage-59%25-yellow)
+![Coverage](https://img.shields.io/badge/Coverage-70%25-brightgreen)
 <!-- https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/adding-a-workflow-status-badge -->
 <!-- wait until the repo is public for this one:
 ![CI status](https://github.com/StyraInc/vscode-styra/actions/workflows/main.yaml/badge.svg)
@@ -26,7 +26,7 @@ for the latest footnote in the Styra output pane to provide further context on w
 * `Styra Link: Initialize...` — create (or connect to) a system in DAS.
 * `Styra Link: Search...` — find available library rules for the current Styra Link project.
 * `Styra Link: Test` — run your unit tests using the latest authored policies.
-* `Styra Link: Validate Compliance...` — check for compliance violations against your latest authored polices for supported systems.
+* `Styra Link: Validate Compliance` — check for compliance violations against your latest authored polices for supported systems.
 * `Styra Link: Validate Decisions` — replay prior decisions against your latest authored polices to see how decisions will change.
 
 ## Editing Rego Files
@@ -52,7 +52,8 @@ All of these start with "rego" as the trigger, so just type that into a rego fil
 | Setting | Default | Description |
 | --- | --- | --- |
 | `Styra > Check Update Interval` | 1 | How often to check for updates to the Styra CLI (in days). |
-| `Styra > Debug` | false | Reveal diagnostic details (including API calls) in the Styra output pane. |
+| `Styra > Diagnostic Output` | false | Reveal API calls and other diagnostic details in the output pane. |
+| `Styra > Output Format` | table | Selects the output format for commands that return data. |
 
 ## Known Issues
 

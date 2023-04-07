@@ -3,8 +3,8 @@ import * as fspromises from 'fs/promises';
 import {CommandRunner} from '../../lib/command-runner';
 import {DASConfigData, ProjectConfigData, StyraConfig} from '../../lib/styra-config';
 import {IDE} from '../../lib/vscode-api';
+import {mockVSCodeSettings, OutputPaneSpy} from '../utility';
 import {MultiStepInput} from '../../external/multi-step-input';
-import {OutputPaneSpy} from '../utility';
 
 describe('StyraConfig', () => {
 
@@ -14,7 +14,7 @@ describe('StyraConfig', () => {
 
     test('returns true when already configured', async () => {
       jest.spyOn(fs, 'existsSync').mockReturnValue(true);
-      IDE.getConfigValue = jest.fn().mockReturnValue(true); // getConfigValue('styra', 'debug')
+      IDE.getConfigValue = mockVSCodeSettings({diagnosticOutput: true});
 
       expect(await StyraConfig.checkCliConfiguration()).toBe(true);
 
