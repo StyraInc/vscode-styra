@@ -127,12 +127,12 @@
     "lint:fix": "eslint --fix src --ext ts",
     "pretest-vscode": "npm run compile && npm run lint",
     "test-vscode": "node ./out/test/runTest.js",
-    "test": "jest; ts-node src/bin/update-coverage.ts",
+    "test": "jest; ts-node src/scripts/update-coverage.ts",
     "test:ci": "jest --collectCoverage false",
     "test:verbose": "jest --verbose",
     "test:watch": "jest --watch",
     "watch": "tsc -watch -p ./",
-    "snippets:build:common": "ts-node src/bin/yaml2json.ts",
+    "snippets:build:common": "ts-node src/scripts/yaml2json.ts",
     "view-coverage": "open coverage/index.html"
   },
   "devDependencies": {
