@@ -11,7 +11,11 @@ module.exports = {
     '!src/external/**',
   ],
   // reference: https://istanbul.js.org/docs/advanced/alternative-reporters/
-  coverageReporters: ['text', 'lcov', 'json-summary'],
+  coverageReporters: [
+    'text',        // displays coverage per file on console
+    'html',        // generates HTML report in coverage/index.html
+    'json-summary' // outputs results as JSON to coverage/coverage-summary.json'
+  ],
   preset: 'ts-jest',
   testEnvironment: 'node',
   resetMocks: true,

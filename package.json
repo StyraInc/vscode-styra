@@ -133,7 +133,7 @@
     "test:watch": "jest --watch",
     "watch": "tsc -watch -p ./",
     "snippets:build:common": "ts-node src/bin/yaml2json.ts",
-    "view-coverage": "open coverage/lcov-report/index.html "
+    "view-coverage": "open coverage/index.html"
   },
   "devDependencies": {
     "@babel/core": "^7.20.12",
