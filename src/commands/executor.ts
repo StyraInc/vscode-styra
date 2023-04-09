@@ -16,6 +16,8 @@ export class Executor {
     if (!await StyraInstall.styraCmdExists()) {
       info(`"${STYRA_CLI_CMD}" not found; aborting ${command.title}`);
     }
+    // Deliberately delay the official start of a command until here;
+    // that way, any diagnostic output from the above pre-flight steps are nicely separated.
     this.StorageManager.setValue(Workspace.CmdName, command.title);
     this.announce(command.title);
 
