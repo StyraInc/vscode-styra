@@ -3,7 +3,7 @@
 
 #set -x
 
-git --no-pager log -n 5
+git --no-pager log -n 2
 
 gitfmt="format:%s%n%n%b"
 commit="HEAD"
@@ -37,10 +37,24 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-printf "Check commit has a Jira issue #.\n"
-git log $commit --skip=$skip -1 --format=$gitfmt | tail -1 | grep -q -E "STY-|sty-|SUPPORT-|support-|PLAT-|plat-|PLA-|pla-"
+git_author=$(git show -s --format='%ae' $commit)
+case $git_author in
+  *@styra.com)
+    issue_pattern="STY-|SUPPORT-|PLAT-|PLA-"
+    issue_msg="last line must follow format 'STY-'"
+    ;;
+  *)
+    issue_pattern="ISSUE:\s*[0-9]+"
+    issue_msg="last line must follow format 'ISSUE: nnn' where 'nnn' is the issue number"
+    ;;
+esac
+
+printf "Check commit has an issue number.\n"
+git log $commit --skip=$skip -1 --format=$gitfmt | tail -1 | grep -i -q -E $issue_pattern
 if [ $? -ne 0 ]; then
-  printf "\n\nERROR: Commit format: Jira issue expected\n"
-  printf '\t last line must follow format `STY-`\n\n\n'
+  printf "\n\nERROR: Commit format: issue expected\n"
+  printf '\t%s\n\n\n' "$issue_msg"
   exit 1
 fi
+
+printf "All checks pass\n"
