@@ -37,7 +37,7 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-git_author=$(git show -s --format='%ae' $commit)
+git_author=$(git log $commit --skip=$skip -1 --format='%ae')
 case $git_author in
   *@styra.com)
     issue_pattern="STY-|SUPPORT-|PLAT-|PLA-"
