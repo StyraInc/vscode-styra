@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Create a report to help us improve
-title: '\[bug] '
+title: '[bug] '
 labels: 'bug'
 assignees: ''
 
@@ -29,9 +29,9 @@ If applicable, add screenshots to help explain your problem.
 
 **Environment:**
 
-- OS: \[e.g. macOS, Windows, linux]
-- Browser \[e.g. chrome, safari]
-- Version \[e.g. 22]
+- OS: [e.g. macOS, Windows, linux]
+- Browser [e.g. chrome, safari]
+- Version [e.g. 22]
 
 <!--
 **Smartphone (please complete the following information):**
