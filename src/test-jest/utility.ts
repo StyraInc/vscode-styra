@@ -18,12 +18,15 @@ export function mockType(mock: unknown): jest.Mock {
 type SettingMockOptions = {
   outputFormat?: string;
   diagnosticOutput?: boolean;
+  diagnosticLimit?: number;
   checkUpdateInterval?: number;
 }
 
+// defaults should match contributes.configuration.properties from package.json
 const defaultSettingMockOptions: SettingMockOptions = {
   outputFormat: 'table',
   diagnosticOutput: false,
+  diagnosticLimit: 120,
   checkUpdateInterval: 0
 };
 
@@ -35,6 +38,8 @@ export function mockVSCodeSettings(options: SettingMockOptions = defaultSettingM
           return options.outputFormat;
         case Setting.Diagnostic:
           return options.diagnosticOutput;
+        case Setting.DiagnosticLimit:
+          return options.diagnosticLimit;
         case Setting.UpdateInterval:
           return options.checkUpdateInterval;
       }
