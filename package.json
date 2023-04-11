@@ -1,11 +1,12 @@
 {
   "name": "vscode-styra",
   "displayName": "Styra",
+  "homepage": "https://www.styra.com/styra-das/",
   "icon": "styra-icon.png",
   "description": "A VSCode extension for the Styra CLI",
   "repository": {
     "type": "git",
-    "url": "https://github.com/styraInc/vscode-styra/"
+    "url": "https://github.com/StyraInc/vscode-styra.git"
   },
   "publisher": "styra",
   "version": "1.1.0",
@@ -14,6 +15,7 @@
     "vscode": "^1.74.0"
   },
   "categories": [
+    "Programming Languages",
     "Other",
     "Snippets"
   ],
@@ -127,13 +129,13 @@
     "lint:fix": "eslint --fix src --ext ts",
     "pretest-vscode": "npm run compile && npm run lint",
     "test-vscode": "node ./out/test/runTest.js",
-    "test": "jest; ts-node src/bin/update-coverage.ts",
+    "test": "jest; ts-node src/scripts/update-coverage.ts",
     "test:ci": "jest --collectCoverage false",
     "test:verbose": "jest --verbose",
     "test:watch": "jest --watch",
     "watch": "tsc -watch -p ./",
-    "snippets:build:common": "ts-node src/bin/yaml2json.ts",
-    "view-coverage": "open coverage/lcov-report/index.html "
+    "snippets:build:common": "ts-node src/scripts/yaml2json.ts",
+    "view-coverage": "open coverage/index.html"
   },
   "devDependencies": {
     "@babel/core": "^7.20.12",

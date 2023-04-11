@@ -7,7 +7,7 @@
 	"configurations": [
 		{
 			"name": "Snippet Builder",
-			"program": "${workspaceFolder}/src/bin/build-snippets.ts",
+			"program": "${workspaceFolder}/src/scripts/build-snippets.ts",
 			"cwd": "${workspaceFolder}/../demo-repo",
 			"preLaunchTask": "npm: compile",
 			"request": "launch",

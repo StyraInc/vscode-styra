@@ -47,3 +47,24 @@ jobs:
 
     - run: npm install
     - run: npm run check-licenses
+
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm install
+      - run: npm install -g ts-node
+
+      - name: Move current file
+        run: mv snippets/styra-common.json snippets/styra-common.json.LAST
+
+      - name: Regenerate JSON file from YAML source
+        run: ts-node src/scripts/yaml2json.ts
+
+      - name: Compare files
+        run: diff snippets/styra-common.json snippets/styra-common.json.LAST

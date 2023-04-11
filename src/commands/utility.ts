@@ -15,7 +15,7 @@ export function shouldResume(): Promise<boolean> {
   return new Promise<boolean>((_resolve, _reject) => {
 
     const cmd = LocalStorageService.instance.getValue<string>(Workspace.CmdName);
-    infoFromUserAction(`Escape pressed: ${cmd} terminated`);
+    infoFromUserAction(`Escape pressed: ${cmd ?? 'command'} terminated`);
   });
 }
 

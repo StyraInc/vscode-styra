@@ -3,7 +3,7 @@ import * as fs from 'fs';
 // Purpose: Update the code coverage badge in the README.md file.
 // Run this from the vscode-styra root directory.
 
-// Usage: ts-node src/bin/update-coverage.ts
+// Usage: ts-node src/scripts/update-coverage.ts
 
 const COVERAGE_FILE = 'coverage/coverage-summary.json';
 const README_FILE = 'README.md';

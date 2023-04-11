@@ -80,7 +80,7 @@ export class LinkSearch implements ICommand {
       step: 2,
       totalSteps: this.totalSteps,
       value: state.searchTerm ?? '',
-      prompt: `Enter ${state.searchByTitle ? 'portion of a snippet title' : 'exact rule ID'} to search for`,
+      prompt: `Enter ${state.searchByTitle ? 'portion of a snippet title' : 'exact rule ID'} to search for (case sensitive)`,
       validate: validateNoop,
       shouldResume,
     });

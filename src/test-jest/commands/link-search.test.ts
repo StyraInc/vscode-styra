@@ -28,8 +28,8 @@ describe('LinkSearch', () => {
   });
 
   [
-    ['title', 'title-part', 'Enter portion of a snippet title to search for'],
-    ['id', 'rule-id', 'Enter exact rule ID to search for'],
+    ['title', 'title-part', 'Enter portion of a snippet title to search for (case sensitive)'],
+    ['id', 'rule-id', 'Enter exact rule ID to search for (case sensitive)'],
   ].forEach(([type, value, prompt]) => {
     const options = {searchByTitle: type === 'title'};
 

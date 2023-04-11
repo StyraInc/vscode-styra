@@ -8,7 +8,7 @@ import {runStyraCmd} from '../lib-sans-vscode/command-runner';
 //       VSCode: "Styra Link: Initialize..."
 // (2) Run this from that styra link project's root directory,
 //     redirecting output to overwrite the kubernetes.json file in the vscode-styra project. Example:
-//       ts-node ../vscode-styra/src/bin/build-snippets.ts > ../vscode-styra/snippets/kubernetes.json
+//       ts-node ../vscode-styra/src/scripts/build-snippets.ts > ../vscode-styra/snippets/kubernetes.json
 //     Note that this will take 6 minutes to run, which is fine for now since it is done offline.
 
 type InputSnippetType = {
