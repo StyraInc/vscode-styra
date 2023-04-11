@@ -40,8 +40,8 @@ fi
 git_author=$(git log $commit --skip=$skip -1 --format='%ae')
 case $git_author in
   *@styra.com)
-    issue_pattern="STY-|SUPPORT-|PLAT-|PLA-"
-    issue_msg="last line must follow format 'STY-'"
+    issue_pattern="STY-|SUPPORT-|PLAT-|PLA-|ISSUE:"
+    issue_msg="last line must follow format 'STY-' (or 'ISSUE:' if not an internal task)"
     ;;
   *)
     issue_pattern="ISSUE:\s*[0-9]+"
