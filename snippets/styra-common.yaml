@@ -30,6 +30,7 @@ Styra Link intro:
     #    Rego Language https://www.openpolicyagent.org/docs/latest/policy-reference/
     #    Rego Playground https://play.openpolicyagent.org/
     #    Styra DAS https://docs.styra.com/das
+    #    Styra on Slack https://styracommunity.slack.com
 
 Conjunction of rules:
   prefix: rego_ex_CONDITION_AND

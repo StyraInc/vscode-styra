@@ -61,6 +61,13 @@ All of these start with "rego" as the trigger, so just type that into a rego fil
 | `Styra > Diagnostic Output` | false | Reveal API calls and other diagnostic details in the output pane. |
 | `Styra > Output Format` | table | Selects the output format for commands that return data. |
 
+## Feedback
+
+We are always interested in your feedback, issue reports, and feature requests!
+Please connect with us on the `#vscode` channel on [Slack](https://styracommunity.slack.com)
+or on [Discussions](https://github.com/StyraInc/vscode-styra/discussions)
+or [Issues](https://github.com/StyraInc/vscode-styra/issues) in the GitHub repository.
+
 ## Known Issues
 
 None
