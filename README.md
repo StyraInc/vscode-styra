@@ -57,6 +57,7 @@ All of these start with "rego" as the trigger, so just type that into a rego fil
 | Setting | Default | Description |
 | --- | --- | --- |
 | `Styra > Check Update Interval` | 1 | How often to check for updates to the Styra CLI (in days). |
+| `Styra > Diagnostic Limit` | 120 | Length limit of diagnostic output (use -1 for no limit). |
 | `Styra > Diagnostic Output` | false | Reveal API calls and other diagnostic details in the output pane. |
 | `Styra > Output Format` | table | Selects the output format for commands that return data. |
 
