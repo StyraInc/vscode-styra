@@ -1,10 +1,15 @@
 <!-- markdownlint-disable MD041 -->
-[![Apache License](https://img.shields.io/badge/license-Apache%202.0-orange.svg?style=flat-square)](https://www.apache.org/licenses/LICENSE-2.0)
-![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/Styra.vscode-styra?style=flat-square)
+[![slack](https://img.shields.io/badge/slack-styra-24b6e0.svg?logo=slack)](https://styracommunity.slack.com/)
+[![Apache License](https://img.shields.io/badge/license-Apache%202.0-orange.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/Styra.vscode-styra?color=24b6e0)
 ![Coverage](https://img.shields.io/badge/Coverage-70%25-brightgreen)
-<!-- https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/adding-a-workflow-status-badge -->
-<!-- wait until the repo is public for this one:
-![CI status](https://github.com/StyraInc/vscode-styra/actions/workflows/main.yaml/badge.svg)
+[![CI status](https://github.com/StyraInc/vscode-styra/actions/workflows/main.yaml/badge.svg)](https://github.com/StyraInc/vscode-styra/actions/workflows/main.yaml)
+[![closed PRs](https://img.shields.io/github/issues-pr-closed-raw/StyraInc/vscode-styra)](https://github.com/StyraInc/vscode-styra/pulls?q=is%3Apr+is%3Aclosed)
+<!--
+  Notes for above:
+  24b6e0 is Styra blue!
+  Slack: https://github.com/brigadecore/brigade-foundations/pull/17/files
+  CI status: https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/adding-a-workflow-status-badge
 -->
 
 # Styra DAS for Visual Studio Code
