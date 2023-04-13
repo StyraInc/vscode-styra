@@ -1,10 +1,10 @@
 import {CommandRunner} from '../lib/command-runner';
 import {generatePickList, shouldResume, StepType, validateNoop} from './utility';
+import {getSetting, Setting} from '../lib/ide-settings';
 import {ICommand, ReturnValue} from '../lib/types';
-import {IDE, QuickPickItem} from '../lib/vscode-api';
 import {info, infoDiagram} from '../lib/output-pane';
 import {MultiStepInput} from '../external/multi-step-input';
-import {Setting} from '../lib/ide-settings';
+import {QuickPickItem} from '../lib/vscode-api';
 
 interface State {
   _searchByTitle: QuickPickItem;
@@ -41,7 +41,7 @@ export class LinkSearch implements ICommand {
     } else {
       styraArgs.push('--rule', state.searchTerm);
     }
-    const outputFormat = IDE.getConfigValue<string>('styra', Setting.Format);
+    const outputFormat = getSetting<string>(Setting.Format);
     if (outputFormat) {
       styraArgs.push('--output', outputFormat.toLowerCase());
     }

@@ -1,5 +1,5 @@
 import {outputChannel} from '../lib/output-pane';
-import {Setting} from '../lib/ide-settings';
+import {Setting, settingDefaults} from '../lib/ide-settings';
 
 export class OutputPaneSpy {
   private spyAppendLine = jest.spyOn(outputChannel, 'appendLine');
@@ -22,26 +22,18 @@ type SettingMockOptions = {
   checkUpdateInterval?: number;
 }
 
-// defaults should match contributes.configuration.properties from package.json
-const defaultSettingMockOptions: SettingMockOptions = {
-  outputFormat: 'table',
-  diagnosticOutput: false,
-  diagnosticLimit: 120,
-  checkUpdateInterval: 0
-};
-
-export function mockVSCodeSettings(options: SettingMockOptions = defaultSettingMockOptions): jest.Mock {
+export function mockVSCodeSettings(options: SettingMockOptions = {}): jest.Mock {
   return jest.fn().mockImplementation(
-    (path, key) => {
+    (_path, key: string) => {
       switch (key) {
         case Setting.Format:
-          return options.outputFormat;
+          return options.outputFormat ?? settingDefaults[key];
         case Setting.Diagnostic:
-          return options.diagnosticOutput;
+          return options.diagnosticOutput ?? settingDefaults[key];
         case Setting.DiagnosticLimit:
-          return options.diagnosticLimit;
+          return options.diagnosticLimit ?? settingDefaults[key];
         case Setting.UpdateInterval:
-          return options.checkUpdateInterval;
+          return options.checkUpdateInterval ?? settingDefaults[key];
       }
     });
 }

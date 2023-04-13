@@ -1,5 +1,5 @@
+import {getSetting, Setting} from './ide-settings';
 import {IDE} from './vscode-api';
-import {Setting} from './ide-settings';
 
 export const outputChannel = IDE.createOutputChannel('Styra');
 export const footnoteMsg = '(*) See output pane (*)';
@@ -38,8 +38,8 @@ export function infoFromUserAction(msg: string): void {
 
 // Use this to report debug-level messages
 export function infoDebug(msg: string): void {
-  if (IDE.getConfigValue<boolean>('styra', Setting.Diagnostic)) {
-    const limit = IDE.getConfigValue<number>('styra', Setting.DiagnosticLimit) ?? -1;
+  if (getSetting<boolean>(Setting.Diagnostic)) {
+    const limit = getSetting<number>(Setting.DiagnosticLimit);
     if (limit !== -1 && msg.length > limit) {
       msg = msg.substring(0, limit) + '...';
     }
