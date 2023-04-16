@@ -1,5 +1,8 @@
 # Standalone Utilities
 
+Commands in this folder are standalone utilities
+for various bookkeeping activities associated with the extension.
+
 ## Prerequisites
 
 ### ts-node
