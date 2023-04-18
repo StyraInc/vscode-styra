@@ -14,8 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added VS Code setting `Diagnostic Limit` to limit length of diagnostic lines in output pane.
 - Added CONTRIBUTING.md to repository in preparation for going public.
 - Added issue templates for community members to more easily participate.
-- Removed restriction on commit formatting to make it less arduous for community members.
 - Additional info badges to top of extension's home page in VS Code (Slack, CI status, PR count)
+
+### Changed
+
+- Updated `Styra Link: Config Git` to no longer use deprecated argument
+- Removed restriction on commit formatting to make it less arduous for community members.
 
 ## [1.1.0] - 2023-04-06
 
