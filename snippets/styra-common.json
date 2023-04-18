@@ -37,6 +37,7 @@
   },
   "Conjunction of rules": {
     "prefix": "rego_ex_CONDITION_AND",
+    "description": "Determine whether all conditions are satisfied",
     "scope": "rego",
     "body": [
       "###########################################################################################",
