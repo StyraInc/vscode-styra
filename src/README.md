@@ -21,15 +21,18 @@ What you should see:
 2. In the Terminal window you should see a new task launched: `npm esbuild-watch` with some nominal output.
 3. A new VSCode window opens ("Extension Development Host").
 
-The Styra extension how acts almost exactly as if you had installed it through normal means, with a couple exceptions:
+The Styra extension in the new window acts almost exactly as if you had installed it through normal means, with a couple exceptions:
 (a) You will not find it listed in the "Extensions" pane (unless you previously installed it like a normal extension!).
 (b) Since VSCode is built with Electron, you can open the same DevTools panel in VSCode that you are familiar with from Chrome!
 Use `Help > Toggle Developer Tools` or the shortcut `⌥ + ⌘ + I`.
 
-Get friendly with the `Console` tab of the Developer Tools. Just like in Chrome, any `console.log` statements in your code will send there—NOT to the standard VSCode "Debug Console"! Also any exceptions that your code throws will appear there.
+Get friendly with the `Console` tab of the Developer Tools.
+Just like in Chrome, any `console.log` statements in your code will emit there—NOT to the standard VSCode "Debug Console"!
+Also any exceptions that your code throws will appear there.
 
 While you will find local storage and session storage under the Developer Tools "Application" tab just like Chrome,
-that is NOT where VSCode local storage persists. Rather it is stored via the Memento API (see <https://stackoverflow.com/a/51822055>).
+that is NOT where VSCode local storage persists.
+Rather it is stored via the Memento API (see <https://stackoverflow.com/a/51822055>).
 You can use the VSCode "Memento Explorer" extension to view and modify that local storage. See extension.ts for details.
 
 ## Unit Tests

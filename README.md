@@ -1,10 +1,15 @@
 <!-- markdownlint-disable MD041 -->
-[![Apache License](https://img.shields.io/badge/license-Apache%202.0-orange.svg?style=flat-square)](https://www.apache.org/licenses/LICENSE-2.0)
-![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/Styra.vscode-styra?style=flat-square)
-![Coverage](https://img.shields.io/badge/Coverage-70%25-brightgreen)
-<!-- https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/adding-a-workflow-status-badge -->
-<!-- wait until the repo is public for this one:
-![CI status](https://github.com/StyraInc/vscode-styra/actions/workflows/main.yaml/badge.svg)
+[![slack](https://img.shields.io/badge/slack-styra-24b6e0.svg?logo=slack)](https://styracommunity.slack.com/)
+[![Apache License](https://img.shields.io/badge/license-Apache%202.0-orange.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+[![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/Styra.vscode-styra?color=24b6e0)](#)
+[![Coverage](https://img.shields.io/badge/Coverage-70%25-brightgreen)](#)
+[![CI status](https://github.com/StyraInc/vscode-styra/actions/workflows/main.yaml/badge.svg)](https://github.com/StyraInc/vscode-styra/actions/workflows/main.yaml)
+[![closed PRs](https://img.shields.io/github/issues-pr-closed-raw/StyraInc/vscode-styra)](https://github.com/StyraInc/vscode-styra/pulls?q=is%3Apr+is%3Aclosed)
+<!--
+  Notes for above:
+  24b6e0 is Styra blue!
+  Slack: https://github.com/brigadecore/brigade-foundations/pull/17/files
+  CI status: https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/adding-a-workflow-status-badge
 -->
 
 # Styra DAS for Visual Studio Code
@@ -52,8 +57,16 @@ All of these start with "rego" as the trigger, so just type that into a rego fil
 | Setting | Default | Description |
 | --- | --- | --- |
 | `Styra > Check Update Interval` | 1 | How often to check for updates to the Styra CLI (in days). |
+| `Styra > Diagnostic Limit` | 120 | Length limit of diagnostic output (use -1 for no limit). |
 | `Styra > Diagnostic Output` | false | Reveal API calls and other diagnostic details in the output pane. |
 | `Styra > Output Format` | table | Selects the output format for commands that return data. |
+
+## Feedback
+
+We are always interested in your feedback, issue reports, and feature requests!
+Please connect with us on the `#vscode` channel on [Slack](https://styracommunity.slack.com)
+or on [Discussions](https://github.com/StyraInc/vscode-styra/discussions)
+or [Issues](https://github.com/StyraInc/vscode-styra/issues) in the GitHub repository.
 
 ## Known Issues
 

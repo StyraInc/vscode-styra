@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added CONTRIBUTING.md to repository in preparation for going public.
 - Added issue templates for community members to more easily participate.
 - Removed restriction on commit formatting to make it less arduous for community members.
+- Additional info badges to top of extension's home page in VS Code (Slack, CI status, PR count)
 
 ## [1.1.0] - 2023-04-06
 
