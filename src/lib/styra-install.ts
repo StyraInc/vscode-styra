@@ -91,8 +91,8 @@ export class StyraInstall {
           await StyraInstall.promptForInstall(
             `has an update available (installed=${installedVersion}, available=${available.cliVersion})`, 'update');
         }
-      } catch ({message}) {
-        teeError(message as string);
+      } catch (err) {
+        teeError((err as Error).message);
       }
     }
   }
