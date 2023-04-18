@@ -19,7 +19,7 @@ jobs:
       with:
         node-version: '18'
 
-    - run: npm install
+    - run: npm ci
     - run: npm run test
     - run: git diff --exit-code README.md
 
@@ -33,7 +33,7 @@ jobs:
       with:
         node-version: '18'
 
-    - run: npm install
+    - run: npm ci
     - run: npm run lint
 
   license:
@@ -46,7 +46,7 @@ jobs:
       with:
         node-version: '18'
 
-    - run: npm install
+    - run: npm ci
     - run: npm run check-licenses
 
   stale:
@@ -58,7 +58,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-      - run: npm install
+      - run: npm ci
 
       - name: Regenerate JSON file from YAML source
         run: npx ts-node src/scripts/yaml2json.ts
