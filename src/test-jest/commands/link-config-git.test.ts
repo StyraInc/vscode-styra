@@ -28,7 +28,7 @@ describe('LinkConfigGit', () => {
 
     expect(runnerMock).toHaveBeenCalledWith(
       'styra',
-      expect.arrayContaining(['link', 'config', 'git']),
+      expect.arrayContaining(['link', 'config', 'git', '--repository']),
       expect.anything()
     );
   });

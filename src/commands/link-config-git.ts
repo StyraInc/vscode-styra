@@ -74,6 +74,7 @@ export class LinkConfigGit implements ICommand {
       'link',
       'config',
       'git',
+      '--repository',
       state.url,
       `--${state.syncStyleType.label}`,
       state.syncStyleValue,
