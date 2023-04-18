@@ -30,7 +30,7 @@ export class Executor {
       }
     } catch (err) {
       // using `err` arg instead of `{message}` as it is easier to grab the stack trace on occasion
-      teeError((err as Error).message as string);
+      teeError((err as Error).message);
       info(`====> ${command.title} failed`);
     }
     this.StorageManager.setValue<string>(Workspace.CmdName, '');

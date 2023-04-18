@@ -1,8 +1,7 @@
 import {CommandRunner} from '../lib/command-runner';
+import {getSetting, Setting} from '../lib/ide-settings';
 import {ICommand, ReturnValue} from '../lib/types';
-import {IDE} from '../lib/vscode-api';
 import {info, teeWarning} from '../lib/output-pane';
-import {Setting} from '../lib/ide-settings';
 import {StyraConfig} from '../lib/styra-config';
 
 export class LinkValidateCompliance implements ICommand {
@@ -17,7 +16,7 @@ export class LinkValidateCompliance implements ICommand {
     }
 
     const styraArgs = ['link', 'validate', 'compliance'];
-    const outputFormat = IDE.getConfigValue<string>('styra', Setting.Format);
+    const outputFormat = getSetting<string>(Setting.Format);
     if (outputFormat) {
       styraArgs.push('--output', outputFormat.toLowerCase());
     }

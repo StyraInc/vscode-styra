@@ -27,7 +27,7 @@ const defaultSettingMockOptions: SettingMockOptions = {
   outputFormat: 'table',
   diagnosticOutput: false,
   diagnosticLimit: 120,
-  checkUpdateInterval: 0
+  checkUpdateInterval: 1
 };
 
 export function mockVSCodeSettings(options: SettingMockOptions = defaultSettingMockOptions): jest.Mock {
