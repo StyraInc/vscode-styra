@@ -55,7 +55,6 @@ On the command-line, you can run Jest tests in a few ways (per scripts in packag
 3. CHANGELOG.md: Update release tag at bottom for `unreleased`.
 4. README.md: Run `npm test` which has a by-product of updating the code coverage badge stored in this file.
 5. .vscodeignore: After you build the VSIX package, review its contents (it is just a zip file), then come back here and add exclusionary items, as appropriate (then rebuild the VSIX again).
-6. Post a pull request with the above changes. Title should be "release: n.n.n" and description should be "Bookkeeping for release n.n.n.".
 
 ## Publish to VSCode marketplace
 
@@ -74,12 +73,12 @@ This `vsce publish` command:
 - adds a local commit with these version updates
 - generates a matching version git tag
 
-Thus, you need to:
+Final steps:
 
-- Push the commit (updating package*.json) to github via a standard PR.
-- Push the new tag to github (example: `git push origin v1.0.1`)
-
-Finally, be sure to post notice of the release in the `#proj-link` channel.
+- Create a pull request with the above changes (CHANGELOG, README, .vscodeignore, and package*.json). Title should be "release: n.n.n" and description should be "Bookkeeping for release n.n.n.".
+- Push the new tag to github (example: `git push origin v5.25.0`)
+- Post notice of the release in the `#proj-link` channel.
+- Post notice of the release in the Styra Community Slack, `#vscode` channel.
 
 ## Package for testing/code review only
 

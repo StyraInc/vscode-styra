@@ -9,16 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- None
+
+## [1.2.0] - 2023-04-19
+
 ### Added
 
 - Added VS Code setting `Diagnostic Limit` to limit length of diagnostic lines in output pane.
 - Added CONTRIBUTING.md to repository in preparation for going public.
 - Added issue templates for community members to more easily participate.
-- Additional info badges to top of extension's home page in VS Code (Slack, CI status, PR count)
+- Additional info badges to top of home page in VS Code (Slack, CI status, PR count).
 
 ### Changed
 
-- Updated `Styra Link: Config Git` to no longer use deprecated argument
+- Updated `Styra Link: Config Git` to no longer use deprecated argument.
 - Removed restriction on commit formatting to make it less arduous for community members.
 
 ## [1.1.0] - 2023-04-06
@@ -129,7 +133,8 @@ whether there is anything to overwrite, then asks that first, mirroring the CLI 
 - `Styra Link: Config Git` command added.
 
 <!-- Be sure to add an entry here for each release! -->
-[unreleased]: https://github.com/StyraInc/vscode-styra/compare/v1.1.0...HEAD
+[unreleased]: https://github.com/StyraInc/vscode-styra/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/StyraInc/vscode-styra/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/StyraInc/vscode-styra/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/StyraInc/vscode-styra/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/StyraInc/vscode-styra/compare/v0.0.6-alpha...v1.0.0
