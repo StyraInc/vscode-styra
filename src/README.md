@@ -75,8 +75,11 @@ This `vsce publish` command:
 
 Final steps:
 
+- The created tag is now on the branch, though, and we want it on main. So delete it with, e.g., `git tag -d v1.2.0`.
 - Create a pull request with the above changes (CHANGELOG, README, .vscodeignore, and package*.json). Title should be "release: n.n.n" and description should be "Bookkeeping for release n.n.n.".
-- Push the new tag to github (example: `git push origin v5.25.0`)
+- Merge that PR to main, then on main recreate the tag, e.g.:
+  `git tag -a v1.2.0 -m "release 1.2.0"`
+- Push the new tag to github (example: `git push origin v1.2.0`)
 - Post notice of the release in the `#proj-link` channel.
 - Post notice of the release in the Styra Community Slack, `#vscode` channel.
 
