@@ -9,7 +9,7 @@
     "url": "https://github.com/StyraInc/vscode-styra.git"
   },
   "publisher": "styra",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "engines": {
     "vscode": "^1.74.0"
