@@ -24,7 +24,7 @@ export class LinkConfigGit implements ICommand {
 
   title = 'Styra Link Config Git';
   step = {total: 0, delta: 0};
-  existingGitConfigURL = ''
+  existingGitConfigURL = '';
   // For complex editing, just copy the lines here and paste into https://asciiflow.com/#/
   flow = `
                           Exit  ┌┐                    ───

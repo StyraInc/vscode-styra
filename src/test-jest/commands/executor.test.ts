@@ -7,17 +7,17 @@ import {StyraInstall} from '../../lib/styra-install';
 
 class MockCompletedCommand implements ICommand {
   run = () => Promise.resolve(ReturnValue.Completed);
-  title = 'MockCommand'
+  title = 'MockCommand';
 }
 
 class MockTerminatedCommand implements ICommand {
   run = () => Promise.resolve(ReturnValue.TerminatedByUser);
-  title = 'MockCommand'
+  title = 'MockCommand';
 }
 
 class MockFailedCommand implements ICommand {
   run = () => Promise.reject('threw an error');
-  title = 'MockCommand'
+  title = 'MockCommand';
 }
 
 describe('Executor', () => {
