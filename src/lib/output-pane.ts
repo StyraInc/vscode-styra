@@ -40,10 +40,9 @@ export function infoFromUserAction(msg: string): void {
 export function infoDebug(msg: string): void {
   if (getSetting<boolean>(Setting.Diagnostic)) {
     const limit = getSetting<number>(Setting.DiagnosticLimit);
-    if (limit !== -1 && msg.length > limit) {
-      msg = msg.substring(0, limit) + '...';
-    }
-    info(`[DEBUG]: ${msg}`);
+    const outputMsg = (limit !== -1 && msg.length > limit) ?
+      msg.substring(0, limit) + '...' : msg;
+    info(`[DEBUG]: ${outputMsg}`);
   }
 }
 
