@@ -11,18 +11,21 @@
   "publisher": "styra",
   "version": "1.2.0",
   "private": true,
+  "main": "./out/main.js",
   "engines": {
     "vscode": "^1.74.0"
   },
   "categories": [
-    "Programming Languages",
     "Other",
-    "Snippets"
+    "Snippets",
+    "Visualization"
+  ],
+  "extensionDependencies": [
+    "tsandall.opa"
   ],
   "activationEvents": [
     "workspaceContains:.styra/config"
   ],
-  "main": "./out/main.js",
   "contributes": {
     "commands": [
       {
@@ -88,26 +91,7 @@
         }
       }
     },
-    "languages": [
-      {
-        "id": "rego",
-        "aliases": [
-          "Rego",
-          "rego"
-        ],
-        "extensions": [
-          ".rego"
-        ],
-        "configuration": "./language-configuration.json"
-      }
-    ],
-    "grammars": [
-      {
-        "language": "rego",
-        "scopeName": "source.rego",
-        "path": "./syntaxes/Rego.tmLanguage"
-      }
-    ],
+    "languages": [],
     "snippets": [
       {
         "language": "rego",
@@ -159,7 +143,6 @@
     "eslint-plugin-sort-imports-es6-autofix": "^0.6.0",
     "glob": "^7.1.7",
     "jest": "^29.3.1",
-    "js-yaml": "^4.1.0",
     "ts-jest": "^29.0.5",
     "ts-node": "^10.9.1",
     "typescript": "^4.3.2",
