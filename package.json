@@ -93,10 +93,6 @@
     },
     "languages": [],
     "snippets": [
-      {
-        "language": "rego",
-        "path": "./snippets/styra-common.json"
-      }
     ]
   },
   "scripts": {
