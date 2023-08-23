@@ -45,6 +45,7 @@ type PreviewEnvironment = {
 type PreviewSettings = {
     url: string,
     roots: string[],
+    prefix: string,
     options: PreviewOption[],
     ignores: string[],
     ca: string,
@@ -58,7 +59,8 @@ function previewSettings(editor?: vscode.TextEditor, workspace?: readonly vscode
   const config = vscode.workspace.getConfiguration('eopa');
   return {
     url: config.get<string>('url', 'http://localhost:8181'),
-    roots: expandPathsStandard(config.get<string[]>('roots', []), editor, workspace),
+    roots: expandPathsStandard(vscode.workspace.getConfiguration('opa').get<string[]>('roots', []), editor, workspace),
+    prefix: config.get<string>('preview.prefix', ''),
     options: config.get<PreviewOption[]>('preview.arguments', []),
     ignores: config.get<string[]>('preview.ignore', ['**/.git*']),
     ca: expandPathStandard(config.get<string>('auth.clientCertCA', ''), editor, workspace),
@@ -93,7 +95,7 @@ async function runPreviewPackage(args: PreviewEnvironment) {
     const input = await utils.findInput(args.fs, args.editor, args.workspace);
     let filesAndData: FilesAndData | undefined;
     if (vscode.workspace.workspaceFolders) {
-      filesAndData = await utils.rootsFilesAndData(args.fs, args.settings.roots, args.settings.ignores);
+      filesAndData = await utils.rootsFilesAndData(args.fs, args.settings.roots, args.settings.prefix, args.settings.ignores);
     }
 
     const request = new PreviewBuilder(args.settings.url)
@@ -116,7 +118,7 @@ async function runPreviewFile(args: PreviewEnvironment) {
   try {
     const path = utils.pathFromEditor(args.editor);
     const input = await utils.findInput(args.fs, args.editor, args.workspace);
-    const filesAndData = utils.singleFileContent(args.editor);
+    const filesAndData = utils.singleFileContent(args.editor, args.settings.roots, args.settings.prefix);
 
     const request = new PreviewBuilder(args.settings.url)
             .path(path)
@@ -141,7 +143,7 @@ async function runPreviewSelection(args: PreviewEnvironment) {
     const selection = utils.getEditorSelection(args.editor);
     let filesAndData: FilesAndData | undefined;
     if (vscode.workspace.workspaceFolders) {
-      filesAndData = await utils.rootsFilesAndData(args.fs, args.settings.roots, args.settings.ignores);
+      filesAndData = await utils.rootsFilesAndData(args.fs, args.settings.roots, args.settings.prefix, args.settings.ignores);
     }
 
     const request = new PreviewBuilder(args.settings.url)

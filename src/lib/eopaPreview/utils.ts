@@ -2,7 +2,7 @@ import * as https from 'https';
 import * as vscode from 'vscode';
 import * as yaml from 'js-yaml';
 import {AuthProvider} from './Preview';
-import {dirname, join} from 'path';
+import {basename, dirname, join, sep} from 'path';
 import {EnvironmentError} from './errors';
 import {FilesAndData, fsFilesAndData} from './FilesAndData';
 import {TLSAuth, TokenAuth} from './auth';
@@ -96,8 +96,8 @@ export function reportError(e: unknown) {
   console.log('Unknown error', e); // eslint-disable-line no-console
 }
 
-export async function rootsFilesAndData(fs: vscode.FileSystem, roots: string[], ignore: string[]): Promise<FilesAndData> {
-  let allFilesAndData = new FilesAndData({}, {});
+export async function rootsFilesAndData(fs: vscode.FileSystem, roots: string[], prefix: string, ignore: string[]): Promise<FilesAndData> {
+  let allFilesAndData = new FilesAndData({}, {}).setPrefix(prefix);
   for (const root of roots) {
     const rootFilesAndData = await fsFilesAndData(fs, vscode.Uri.parse(root), '', ignore);
     allFilesAndData = allFilesAndData.combine(rootFilesAndData);
@@ -106,14 +106,27 @@ export async function rootsFilesAndData(fs: vscode.FileSystem, roots: string[], 
   return allFilesAndData;
 }
 
-export function singleFileContent(editor?: vscode.TextEditor): FilesAndData {
+export function singleFileContent(editor: vscode.TextEditor|undefined, roots: string[], prefix: string): FilesAndData {
   if (editor === undefined) {
     throw new EnvironmentError('No active editor.');
   }
   const contents = editor.document.getText();
-  // TODO: determine how to deal with roots and path mapping.
-  const name = editor.document.fileName;
-  return new FilesAndData({[name]: contents}, {});
+  const absPath = editor.document.fileName;
+  let name = basename(absPath);
+  // Try to find a root this file belongs
+  for (const root of roots) {
+    const rootUri = vscode.Uri.parse(root);
+    if (absPath.startsWith(rootUri.path)) {
+      name = absPath.substring(rootUri.path.length);
+      // Depending on how the root was defined, we may still have a path separator prefix
+      // and we don't want that.
+      if (name.startsWith(sep)) {
+        name = name.substring(1);
+      }
+      break;
+    }
+  }
+  return new FilesAndData({[name]: contents}, {}).setPrefix(prefix);
 }
 
 /**

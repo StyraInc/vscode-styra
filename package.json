@@ -135,16 +135,10 @@
           "description": "The URL where the OPA API can be accessed",
           "order": 0
         },
-        "eopa.roots": {
-          "type": "array",
-          "description": "List of paths to load as bundles for policy and data. Defaults to [\"${workspaceFolder}\"]",
-          "items": {
-            "type": "string"
-          },
-          "default": [
-            "${workspaceFolder}"
-          ],
-          "uniqueItems": true,
+        "eopa.preview.prefix": {
+          "type": "string",
+          "default": "",
+          "description": "Add a prefix to all paths when mapping files for the Preview API",
           "order": 1
         },
         "eopa.preview.arguments": {

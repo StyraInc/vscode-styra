@@ -11,19 +11,26 @@ type Data = {[path: string]:any}; // eslint-disable-line @typescript-eslint/no-e
  * FilesAndData holds a set of rego files and data objects for a preview
  */
 export class FilesAndData {
-  files: Files;
-  data: Data;
+  _files: Files;
+  _data: Data;
+  _prefix: string;
 
   constructor(files: Files, data: Data) {
-    this.files = files;
-    this.data = data;
+    this._files = files;
+    this._data = data;
+    this._prefix = '';
   }
 
   combine(source: FilesAndData): FilesAndData {
-    const files = Object.assign({}, this.files, source.files);
-    const data = Object.assign({}, this.data, source.data);
+    const files = Object.assign({}, this._files, source._files);
+    const data = Object.assign({}, this._data, source._data);
 
-    return new FilesAndData(files, data);
+    return new FilesAndData(files, data).setPrefix(this._prefix);
+  }
+
+  setPrefix(prefix: string): FilesAndData {
+    this._prefix = prefix;
+    return this;
   }
 
   hasData(): boolean {
@@ -32,6 +39,19 @@ export class FilesAndData {
 
   hasFiles(): boolean {
     return Object.keys(this.files).length > 0;
+  }
+
+  get data(): Data {
+    return this._data;
+  }
+
+  get files(): Files {
+    const files: Files = {};
+    for (const file in this._files) {
+      files[join(this._prefix, file)] = this._files[file];
+    }
+
+    return files;
   }
 
   addData(path: string[], data: unknown) {
@@ -52,7 +72,7 @@ export class FilesAndData {
   }
 
   addFile(path: string, value: string) {
-    this.files[path] = value;
+    this._files[path] = value;
   }
 }
 
@@ -61,7 +81,8 @@ export class FilesAndData {
  *
  * @param fs The VS Code file system implementation
  * @param root The root file URI to start searching for files to add in the file system
- * @param prefix Any prefix path to add to the file when adding it to the current files and data
+ * @param prefix The prefix to prepend to the final Fils
+ * @param fsPrefix Any prefix path to add to the file when adding it to the current files and data
  * @param ignored Any file or directory names to ignore when searching the file system
  * @returns A promise containing a FilesAndData object with all found files and data from the initial root.
  */
