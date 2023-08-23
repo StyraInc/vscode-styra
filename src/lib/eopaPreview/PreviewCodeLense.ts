@@ -6,12 +6,14 @@ import * as vscode from 'vscode';
 export class PreviewCodeLense implements vscode.CodeLensProvider {
 
   private enabled: boolean;
+  private hasDefaultQuery: boolean;
   private codeLenses: vscode.CodeLens[] = [];
   private _onDidChangeCodeLenses: vscode.EventEmitter<void> = new vscode.EventEmitter<void>();
   public readonly onDidChangeCodeLenses: vscode.Event<void> = this._onDidChangeCodeLenses.event;
 
-  constructor(enabled: boolean) {
+  constructor(enabled: boolean, hasDefaultQuery: boolean) {
     this.enabled = enabled;
+    this.hasDefaultQuery = hasDefaultQuery;
   }
 
   public setEnabled(enabled: boolean) {
@@ -19,6 +21,14 @@ export class PreviewCodeLense implements vscode.CodeLensProvider {
       return;
     }
     this.enabled = enabled;
+    this._onDidChangeCodeLenses.fire();
+  }
+
+  public setHasDefaultQuery(hasDefaultQuery: boolean) {
+    if (hasDefaultQuery === this.hasDefaultQuery) {
+      return;
+    }
+    this.hasDefaultQuery = hasDefaultQuery;
     this._onDidChangeCodeLenses.fire();
   }
 
@@ -30,13 +40,15 @@ export class PreviewCodeLense implements vscode.CodeLensProvider {
 
     const topOfDocument = new vscode.Range(0, 0, 0, 0);
     this.codeLenses.push(new vscode.CodeLens(topOfDocument, {
-      title: 'preview package',
-      command: 'eopa.preview.package',
+      title: 'Run Preview',
+      command: 'eopa.preview.default',
     }));
-    this.codeLenses.push(new vscode.CodeLens(topOfDocument, {
-      title: 'preview file',
-      command: 'eopa.preview.file',
-    }));
+    if (this.hasDefaultQuery) {
+      this.codeLenses.push(new vscode.CodeLens(topOfDocument, {
+        title: 'Run Package Preview',
+        command: 'eopa.preview.package',
+      }));
+    }
     return this.codeLenses;
   }
 }

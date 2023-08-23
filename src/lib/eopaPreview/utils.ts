@@ -1,16 +1,80 @@
 import * as https from 'https';
 import * as vscode from 'vscode';
 import * as yaml from 'js-yaml';
-import {AuthProvider} from './Preview';
+import {AuthProvider, PreviewOption} from './Preview';
 import {basename, dirname, join, sep} from 'path';
 import {EnvironmentError} from './errors';
+import {expandPathsStandard, expandPathStandard} from './pathVars';
 import {FilesAndData, fsFilesAndData} from './FilesAndData';
 import {TLSAuth, TokenAuth} from './auth';
 
+export type PreviewEnvironment = {
+  settings: PreviewSettings,
+  fs: vscode.FileSystem,
+  editor?: vscode.TextEditor,
+  window?: vscode.WindowState,
+  workspace?: readonly vscode.WorkspaceFolder[],
+  secrets: vscode.SecretStorage,
+};
+export type PreviewSettings = {
+  url: string,
+  defaultQuery: string,
+  roots: string[],
+  prefix: string,
+  options: PreviewOption[],
+  strategy: FileStrategy,
+  ignores: string[],
+  ca: string,
+  allowUnauthorized: boolean,
+  authType: AuthType,
+  clientCert: string,
+  clientKey: string,
+};
 export type Parser = (data: string) => (object|undefined);
 export type AuthType = 'none' | 'bearer' | 'tls';
+export type FileStrategy = 'all' | 'file';
 
 const packageRegex = /package ([a-zA-Z_].+)(?! )$/s;
+
+export function previewSettings(editor?: vscode.TextEditor, workspace?: readonly vscode.WorkspaceFolder[]): PreviewSettings {
+  const config = vscode.workspace.getConfiguration('eopa');
+  return {
+    url: config.get<string>('url', 'http://localhost:8181'),
+    defaultQuery: config.get<string>('preview.defaultQuery', ''),
+    roots: expandPathsStandard(vscode.workspace.getConfiguration('opa').get<string[]>('roots', []), editor, workspace),
+    prefix: config.get<string>('preview.prefix', ''),
+    options: config.get<PreviewOption[]>('preview.arguments', []),
+    strategy: config.get<FileStrategy>('preview.strategy', 'all'),
+    ignores: config.get<string[]>('preview.ignore', ['**/.git*']),
+    ca: expandPathStandard(config.get<string>('auth.clientCertCA', ''), editor, workspace),
+    allowUnauthorized: config.get<boolean>('auth.allowUnauthorizedTLS', false),
+    authType: config.get<AuthType>('auth.type', 'none'),
+    clientCert: expandPathStandard(config.get<string>('auth.clientCertPem', ''), editor, workspace),
+    clientKey: expandPathStandard(config.get<string>('auth.clientKeyPem', ''), editor, workspace),
+  };
+}
+
+export function previewEnvironment(context: vscode.ExtensionContext): PreviewEnvironment {
+  const editor = vscode.window.activeTextEditor;
+  const workspace = vscode.workspace.workspaceFolders;
+  const fs = vscode.workspace.fs;
+
+  return {
+    settings: previewSettings(editor, workspace),
+    editor,
+    workspace,
+    fs,
+    secrets: context.secrets
+  };
+}
+
+export function previewCodeLenseEnabled(): boolean {
+  return vscode.workspace.getConfiguration('eopa').get<boolean>('preview.codeLense', true);
+}
+
+export function hasDefaultQuery(): boolean {
+  return vscode.workspace.getConfiguration('eopa').get<string>('preview.defaultQuery', '') !== '';
+}
 
 /**
  * Check whether a document is Rego or not in a case-insensitive way
@@ -94,6 +158,20 @@ export function reportError(e: unknown) {
   }
   vscode.window.showErrorMessage('Unknown error. See development console for details.');
   console.log('Unknown error', e); // eslint-disable-line no-console
+}
+
+export async function getFilesAndData(args: PreviewEnvironment): Promise<FilesAndData> {
+  let strategy = args.settings.strategy;
+  if (!args.workspace) {
+    vscode.window.showWarningMessage('No active workspace, using single file strategy. Open a workspace to use other strategies');
+    strategy = 'file';
+  }
+  switch (strategy) {
+    case 'file':
+      return singleFileContent(args.editor, args.settings.roots, args.settings.prefix);
+    default:
+      return rootsFilesAndData(args.fs, args.settings.roots, args.settings.prefix, args.settings.ignores);
+  }
 }
 
 export async function rootsFilesAndData(fs: vscode.FileSystem, roots: string[], prefix: string, ignore: string[]): Promise<FilesAndData> {

@@ -30,12 +30,12 @@
   "contributes": {
     "commands": [
       {
-        "command": "eopa.preview.package",
-        "title": "Enterprise OPA: Preview Package"
+        "command": "eopa.preview.default",
+        "title": "Enterprise OPA: Preview"
       },
       {
-        "command": "eopa.preview.file",
-        "title": "Enterprise OPA: Preview File"
+        "command": "eopa.preview.package",
+        "title": "Enterprise OPA: Preview Package"
       },
       {
         "command": "eopa.preview.selection",
@@ -82,12 +82,12 @@
       "editor/context": [
         {
           "when": "resourceLangId == rego",
-          "command": "eopa.preview.package",
+          "command": "eopa.preview.default",
           "group": "z_commands"
         },
         {
           "when": "resourceLangId == rego",
-          "command": "eopa.preview.file",
+          "command": "eopa.preview.package",
           "group": "z_commands"
         },
         {
@@ -135,11 +135,17 @@
           "description": "The URL where the OPA API can be accessed",
           "order": 0
         },
+        "eopa.preview.defaultQuery": {
+          "type": "string",
+          "default": "",
+          "description": "Define the default query to run for 'Enterprise OPA: Preview'",
+          "order": 2
+        },
         "eopa.preview.prefix": {
           "type": "string",
           "default": "",
           "description": "Add a prefix to all paths when mapping files for the Preview API",
-          "order": 1
+          "order": 3
         },
         "eopa.preview.arguments": {
           "type": "array",
@@ -164,7 +170,21 @@
             ]
           },
           "uniqueItems": true,
-          "order": 2
+          "order": 4
+        },
+        "eopa.preview.strategy": {
+          "type": "string",
+          "enum": [
+            "all",
+            "file"
+          ],
+          "enumDescriptions": [
+            "Send all valid files in the Preview API request, except those excluded through the preview ignores",
+            "Send only the currently edited file to the Preview API request"
+          ],
+          "default": "all",
+          "description": "Choose what files get sent in Enterprise OPA preview requests",
+          "order": 5
         },
         "eopa.preview.ignore": {
           "type": "array",
@@ -176,25 +196,25 @@
             "**/.git*"
           ],
           "uniqueItems": true,
-          "order": 3
+          "order": 6
         },
         "eopa.preview.codeLense": {
           "type": "boolean",
           "description": "Enable CodeLens support for executing package and file previews",
           "default": true,
-          "order": 4
+          "order": 7
         },
         "eopa.auth.clientCertCA": {
           "type": "string",
           "default": "",
           "description": "The path to a custom certificate authority PEM certificate to use when validating TLS connections (accepts basic path variables such as ${workspaceFolder})",
-          "order": 5
+          "order": 8
         },
         "eopa.auth.allowUnauthorizedTLS": {
           "type": "boolean",
           "default": false,
           "description": "Allow TLS connections that do not come from the system defined certificate authorities, or the pinned certificate authority if defined.",
-          "order": 6
+          "order": 9
         },
         "eopa.auth.type": {
           "type": "string",
@@ -210,19 +230,19 @@
           ],
           "default": "none",
           "description": "The authentication method to use when connecting to an Enterprise OPA API",
-          "order": 7
+          "order": 10
         },
         "eopa.auth.clientCertPem": {
           "type": "string",
           "default": "",
           "description": "The path to the client certificate PEM file to use when performing TLS authentication (accepts basic path variables such as ${workspaceFolder})",
-          "order": 8
+          "order": 11
         },
         "eopa.auth.clientKeyPem": {
           "type": "string",
           "default": "",
           "description": "The path to the client certificate key file to use when performing TLS authentication (accepts basic path variables such as ${workspaceFolder})",
-          "order": 9
+          "order": 12
         }
       }
     },
