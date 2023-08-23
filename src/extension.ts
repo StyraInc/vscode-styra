@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 
+import {activate as eopaPreview} from './commands/eopa-preview';
 import {Executor} from './commands/executor';
 import {ICommand} from './lib/types';
 import {IDE} from './lib/vscode-api';
@@ -28,6 +29,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<IMemen
   outputChannel.show(true);
   infoDebug('Styra extension active!');
   LocalStorageService.instance.storage = context.workspaceState;
+
+  // Init preview functionality
+  // TODO: Consolidate coding style for Link and Preview
+  await eopaPreview(context);
 
   // commands come from package.json::contribute.commands
   const styraCommands: { [key: string]: ICommand } = {

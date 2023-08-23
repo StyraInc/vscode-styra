@@ -24,10 +24,31 @@
     "tsandall.opa"
   ],
   "activationEvents": [
-    "workspaceContains:.styra/config"
+    "workspaceContains:.styra/config",
+    "onLanguage:rego"
   ],
   "contributes": {
     "commands": [
+      {
+        "command": "eopa.preview.package",
+        "title": "Enterprise OPA: Preview Package"
+      },
+      {
+        "command": "eopa.preview.file",
+        "title": "Enterprise OPA: Preview File"
+      },
+      {
+        "command": "eopa.preview.selection",
+        "title": "Enterprise OPA: Preview Selection"
+      },
+      {
+        "command": "eopa.preview.setToken",
+        "title": "Enterprise OPA: Set Token"
+      },
+      {
+        "command": "eopa.preview.inspectToken",
+        "title": "Enterprise OPA: Inspect Token"
+      },
       {
         "command": "styra.link.bundle-update",
         "title": "Styra Link: Bundle Update..."
@@ -57,9 +78,28 @@
         "title": "Styra Link: Validate Decisions"
       }
     ],
+    "menus": {
+      "editor/context": [
+        {
+          "when": "resourceLangId == rego",
+          "command": "eopa.preview.package",
+          "group": "z_commands"
+        },
+        {
+          "when": "resourceLangId == rego",
+          "command": "eopa.preview.file",
+          "group": "z_commands"
+        },
+        {
+          "when": "resourceLangId == rego && editorHasSelection",
+          "command": "eopa.preview.selection",
+          "group": "z_commands"
+        }
+      ]
+    },
     "configuration": {
       "type": "object",
-      "title": "Styra DAS Configuration",
+      "title": "Styra Configuration",
       "properties": {
         "styra.checkUpdateInterval": {
           "type": "number",
@@ -88,11 +128,116 @@
           ],
           "description": "Choose the output format for your extension.",
           "default": "table"
+        },
+        "eopa.url": {
+          "type": "string",
+          "default": "http://localhost:8181",
+          "description": "The URL where the OPA API can be accessed",
+          "order": 0
+        },
+        "eopa.roots": {
+          "type": "array",
+          "description": "List of paths to load as bundles for policy and data. Defaults to [\"${workspaceFolder}\"]",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "${workspaceFolder}"
+          ],
+          "uniqueItems": true,
+          "order": 1
+        },
+        "eopa.preview.arguments": {
+          "type": "array",
+          "description": "Arguments which control the behavior of preview requests",
+          "items": {
+            "type": "string",
+            "enum": [
+              "instrument",
+              "print",
+              "provenance",
+              "sandbox",
+              "strict",
+              "strict-builtin-errors"
+            ],
+            "enumDescriptions": [
+              "Include extended metrics in preview returns for more in depth debugging",
+              "Include output generated with print() in preview returns",
+              "Include provenance data in preview returns",
+              "Exclude existing policies and data when evaluating a preview request",
+              "Compile previewed rego modules in strict mode",
+              "Return an error in the event an error is generated from a built-in function"
+            ]
+          },
+          "uniqueItems": true,
+          "order": 2
+        },
+        "eopa.preview.ignore": {
+          "type": "array",
+          "description": "A list of glob style patterns to exclude when including files in previews",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "**/.git*"
+          ],
+          "uniqueItems": true,
+          "order": 3
+        },
+        "eopa.preview.codeLense": {
+          "type": "boolean",
+          "description": "Enable CodeLens support for executing package and file previews",
+          "default": true,
+          "order": 4
+        },
+        "eopa.auth.clientCertCA": {
+          "type": "string",
+          "default": "",
+          "description": "The path to a custom certificate authority PEM certificate to use when validating TLS connections (accepts basic path variables such as ${workspaceFolder})",
+          "order": 5
+        },
+        "eopa.auth.allowUnauthorizedTLS": {
+          "type": "boolean",
+          "default": false,
+          "description": "Allow TLS connections that do not come from the system defined certificate authorities, or the pinned certificate authority if defined.",
+          "order": 6
+        },
+        "eopa.auth.type": {
+          "type": "string",
+          "enum": [
+            "none",
+            "bearer",
+            "tls"
+          ],
+          "enumDescriptions": [
+            "No authentication when connecting to Enterprise OPA",
+            "Send the stored bearer token when connecting to Enterprise OPA (set using the 'Enterprise OPA: Set Token' command)",
+            "Provide the configured TLS client certificate when connecting to Enterprise OPA."
+          ],
+          "default": "none",
+          "description": "The authentication method to use when connecting to an Enterprise OPA API",
+          "order": 7
+        },
+        "eopa.auth.clientCertPem": {
+          "type": "string",
+          "default": "",
+          "description": "The path to the client certificate PEM file to use when performing TLS authentication (accepts basic path variables such as ${workspaceFolder})",
+          "order": 8
+        },
+        "eopa.auth.clientKeyPem": {
+          "type": "string",
+          "default": "",
+          "description": "The path to the client certificate key file to use when performing TLS authentication (accepts basic path variables such as ${workspaceFolder})",
+          "order": 9
         }
       }
     },
     "languages": [],
     "snippets": [
+      {
+        "language": "rego",
+        "path": "./snippets/styra-common.json"
+      }
     ]
   },
   "scripts": {
@@ -127,7 +272,8 @@
     "@types/jest": "^29.2.5",
     "@types/js-yaml": "^4.0.5",
     "@types/node": "14.x",
-    "@types/node-fetch": "^2.5.12",
+    "@types/node-fetch": "^2.6.4",
+    "@types/picomatch": "^2.3.0",
     "@types/semver": "^7.3.13",
     "@types/shell-escape": "^0.2.1",
     "@types/vscode": "^1.71.0",
@@ -147,8 +293,10 @@
   "dependencies": {
     "command-exists": "^1.2.9",
     "fs-extra": "^10.0.0",
+    "js-yaml": "^4.1.0",
     "move-file": "^2.1.0",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^2.6.13",
+    "picomatch": "^2.3.1",
     "semver": "^7.3.8",
     "shell-escape": "^0.2.0"
   }
