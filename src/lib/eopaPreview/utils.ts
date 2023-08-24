@@ -34,7 +34,7 @@ export type Parser = (data: string) => (object|undefined);
 export type AuthType = 'none' | 'bearer' | 'tls';
 export type FileStrategy = 'all' | 'file';
 
-const packageRegex = /package ([a-zA-Z_].+)(?! )$/s;
+const packageRegex = /package ([a-zA-Z_].*)(?! )$/s;
 
 export function previewSettings(editor?: vscode.TextEditor, workspace?: readonly vscode.WorkspaceFolder[]): PreviewSettings {
   const config = vscode.workspace.getConfiguration('eopa');

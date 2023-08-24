@@ -16,7 +16,6 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('eopa.preview.package', () => runPreviewPackage(utils.previewEnvironment(context))),
     vscode.commands.registerCommand('eopa.preview.selection', () => runPreviewSelection(utils.previewEnvironment(context))),
     vscode.commands.registerCommand('eopa.preview.setToken', () => runSetToken(utils.previewEnvironment(context))),
-    vscode.commands.registerCommand('eopa.preview.inspectToken', () => runInspectToken(utils.previewEnvironment(context))),
     vscode.languages.registerCodeLensProvider({language: 'rego'}, previewLens),
     vscode.workspace.onDidChangeConfiguration(async (e: vscode.ConfigurationChangeEvent) => {
       if (!e.affectsConfiguration('eopa')) {
@@ -79,13 +78,4 @@ async function runSetToken(args: utils.PreviewEnvironment) {
   }
   await args.secrets.store('authToken', token);
   vscode.window.showInformationMessage('Token stored successfully.');
-}
-
-async function runInspectToken(args: utils.PreviewEnvironment) {
-  const token = await args.secrets.get('authToken');
-  if (!token) {
-    vscode.window.showInformationMessage('No token set. Use the "Enterprise OPA: Set Token" command');
-    return;
-  }
-  utils.reportResult(`Your access token is set to: ${token}`, eopaPreviewChannel);
 }

@@ -46,10 +46,6 @@
         "title": "Enterprise OPA: Set Token"
       },
       {
-        "command": "eopa.preview.inspectToken",
-        "title": "Enterprise OPA: Inspect Token"
-      },
-      {
         "command": "styra.link.bundle-update",
         "title": "Styra Link: Bundle Update..."
       },

@@ -137,7 +137,7 @@ export class PreviewRequest {
     }
     if (this.args.input !== undefined) {
       body.input = this.args.input;
-            Object.assign(headers, {"Content-Type": "application/json"}) //eslint-disable-line
+      Object.assign(headers, {'Content-Type': 'application/json'});
     }
     if (this.args.filesAndData !== undefined) {
       if (this.args.filesAndData.hasData()) {

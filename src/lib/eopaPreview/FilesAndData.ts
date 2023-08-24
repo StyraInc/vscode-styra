@@ -1,5 +1,5 @@
 import * as yaml from 'js-yaml';
-import {ArgumentError} from './errors';
+import {ArgumentError, FileError} from './errors';
 import {extname, join, sep} from 'path';
 import {FileSystem, FileType, Uri} from 'vscode';
 import globMatch = require('picomatch');
@@ -96,37 +96,44 @@ export async function fsFilesAndData(fs: FileSystem, root: Uri, prefix: string, 
     if (ignoreMatcher(join(prefix, item[0]))) {
       continue;
     }
-    switch (item[1]) {
-      case FileType.File:
-        if (item[0].toLowerCase() === 'data.yaml') {
-          await addData(item[0], yaml.load);
-          continue;
-        } else if (item[0].toLowerCase() === 'data.json') {
-          await addData(item[0], JSON.parse);
-          continue;
-        } else if (extname(item[0]).toLowerCase() !== '.rego') {
-          continue;
-        }
-        {
-          const fileUri = root.with({path: join(root.path, item[0])});
-          const text = await fs.readFile(fileUri);
-          filesAndData.addFile(prefix + item[0], text.toString());
-        }
-        break;
-      case FileType.Directory:
-        {
-          const dirUri = root.with({path: join(root.path, item[0])});
-          const sub = await fsFilesAndData(fs, dirUri, prefix + item[0] + '/', ignored);
-          filesAndData = filesAndData.combine(sub);
-        }
-        break;
+    try {
+      switch (item[1]) {
+        case FileType.File:
+          if (item[0].toLowerCase() === 'data.yaml') {
+            await addData(item[0], yaml.load);
+            continue;
+          } else if (item[0].toLowerCase() === 'data.json') {
+            await addData(item[0], JSON.parse);
+            continue;
+          } else if (extname(item[0]).toLowerCase() !== '.rego') {
+            continue;
+          }
+          {
+            const fileUri = root.with({path: join(root.path, item[0])});
+            const text = await fs.readFile(fileUri);
+            filesAndData.addFile(prefix + item[0], text.toString());
+          }
+          break;
+        case FileType.Directory:
+          {
+            const dirUri = root.with({path: join(root.path, item[0])});
+            const sub = await fsFilesAndData(fs, dirUri, prefix + item[0] + '/', ignored);
+            filesAndData = filesAndData.combine(sub);
+          }
+          break;
+      }
+    } catch (e: unknown) {
+      if (!(e instanceof FileError) && e instanceof Error) {
+        throw new FileError(e, join(root.path, item[0]));
+      }
+      throw e;
     }
   }
   return filesAndData;
 }
 
 /**
- * Creates a function which will add data from a files to the data object at the specified data path
+ * Creates a function which will add data from a file to the data object at the specified data path
  *
  * The function returned takes a parser, allowing support for multiple types of files.
  *
