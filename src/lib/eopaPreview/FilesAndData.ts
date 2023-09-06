@@ -144,15 +144,15 @@ export async function fsFilesAndData(fs: FileSystem, root: Uri, prefix: string, 
  * @returns A function which when given a file name and a parser will read and parse the data adding it to the data in FilesAndData at the dataPath
  */
 function fsDataAdder(fs: FileSystem, filesAndData: FilesAndData, root: Uri, dataPath: string): (name: string, parser: (data: string) => unknown) => Promise<void> {
-  let _dataPath = dataPath;
   return async (name: string, parser: (data: string) => unknown) => {
     const fileUri = root.with({path: join(root.path, name)});
     const text = await fs.readFile(fileUri);
     const data = parser(text.toString());
-    if (_dataPath.endsWith(sep)) {
-      _dataPath = _dataPath.substring(0, dataPath.length - 1);
-    }
     const pathParts = dataPath.split(sep);
+    // often the last item is empty, if so, remove it
+    if (pathParts[pathParts.length - 1] === '') {
+      pathParts.pop();
+    }
     filesAndData.addData(pathParts, data);
   };
 }

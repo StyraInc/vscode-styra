@@ -142,6 +142,10 @@ export function getPackagePath(path: string): string {
   return _path;
 }
 
+export function formatResults(results: object): string {
+  return JSON.stringify(results, undefined, '  ');
+}
+
 /**
  * Reports a result to the Enterprise OPA Preview pane
  */
@@ -177,7 +181,8 @@ export async function getFilesAndData(args: PreviewEnvironment): Promise<FilesAn
 export async function rootsFilesAndData(fs: vscode.FileSystem, roots: string[], prefix: string, ignore: string[]): Promise<FilesAndData> {
   let allFilesAndData = new FilesAndData({}, {}).setPrefix(prefix);
   for (const root of roots) {
-    const rootFilesAndData = await fsFilesAndData(fs, vscode.Uri.parse(root), '', ignore);
+    const f = vscode.Uri.parse(root);
+    const rootFilesAndData = await fsFilesAndData(fs, f, '', ignore);
     allFilesAndData = allFilesAndData.combine(rootFilesAndData);
   }
 
@@ -229,7 +234,7 @@ export async function findInput(fs: vscode.FileSystem, editor?: vscode.TextEdito
   searchPaths.push({path: vscode.Uri.file(join(activeDir, 'input.json')), parser: JSON.parse});
   searchPaths.push({path: vscode.Uri.file(join(activeDir, 'input.yaml')), parser: parseYaml});
 
-  if (workspace !== undefined && workspace.length > 1) {
+  if (workspace !== undefined && workspace.length > 0) {
     const root = workspace[0].uri;
     searchPaths.push({path: root.with({path: join(root.path, 'input.json')}), parser: JSON.parse});
     searchPaths.push({path: root.with({path: join(root.path, 'input.yaml')}), parser: parseYaml});

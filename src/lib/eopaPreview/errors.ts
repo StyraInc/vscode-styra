@@ -7,13 +7,9 @@ export class FileError extends Error {
   path: string;
 
   constructor(e: Error, path: string) {
-    super(e.message);
+    super(`Error in ${path}: ${e.message}`);
     this.original = e;
     this.path = path;
-  }
-
-  get message() {
-    return `Error in ${this.path}: ${this.original.message}`;
   }
 
   get cause() {
@@ -22,9 +18,5 @@ export class FileError extends Error {
 
   get name() {
     return `Error in ${this.path}: ${this.original.name}`;
-  }
-
-  get stack() {
-    return this.original.stack;
   }
 }

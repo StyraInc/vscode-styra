@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 /**
  * PreviewCodeLense
  */
-export class PreviewCodeLense implements vscode.CodeLensProvider {
+export class PreviewCodeLens implements vscode.CodeLensProvider {
 
   private enabled: boolean;
   private hasDefaultQuery: boolean;

@@ -12,9 +12,10 @@ export function expandPathsStandard(paths: string[], editor?: vscode.TextEditor,
 }
 
 export function pathVarMapper(pathVars: PathVarProcessors): (path: string) => string {
-  return (path: string): string => path.replace(/\${([a-zA-Z-_].+)}/g, (match: string, pathVar: string): string => {
+  return (path: string): string => path.replace(/\${([a-zA-Z-_].+?)}/g, (match: string, pathVar: string): string => {
     if (!pathVars[pathVar]) {
-      return match;
+      vscode.window.showWarningMessage(`$\{${pathVar}} path variable us unknown`);
+      return '';
     }
     return pathVars[pathVar]();
   });
@@ -30,7 +31,7 @@ function standardPathVars(editor?: vscode.TextEditor, workspace?: readonly vscod
       }
       return workspace[0].uri.toString();
     },
-    fileName: () => {
+    fileDirname: () => {
       if (editor === undefined) {
         // eslint-disable-next-line no-template-curly-in-string
         vscode.window.showWarningMessage('${fileDirname} variable configured in settings, but no document is active');

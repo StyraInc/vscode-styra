@@ -137,7 +137,6 @@ export class PreviewRequest {
     }
     if (this.args.input !== undefined) {
       body.input = this.args.input;
-      Object.assign(headers, {'Content-Type': 'application/json'});
     }
     if (this.args.filesAndData !== undefined) {
       if (this.args.filesAndData.hasData()) {
@@ -146,6 +145,10 @@ export class PreviewRequest {
       if (this.args.filesAndData.hasFiles()) {
         body.rego_modules = this.args.filesAndData.files;
       }
+    }
+
+    if (Object.keys(body).length > 0) {
+      Object.assign(headers, {'Content-Type': 'application/json'});
     }
 
     let sslConfiguredAgent: https.Agent | undefined;

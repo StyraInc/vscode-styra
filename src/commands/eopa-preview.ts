@@ -3,14 +3,14 @@
 import * as utils from '../lib/eopaPreview/utils';
 import * as vscode from 'vscode';
 import {PreviewBuilder} from '../lib/eopaPreview/Preview';
-import {PreviewCodeLense} from '../lib/eopaPreview/PreviewCodeLense';
+import {PreviewCodeLens} from '../lib/eopaPreview/PreviewCodeLens';
 
 export const eopaPreviewChannel = vscode.window.createOutputChannel('Enterprise OPA Preview');
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-  const previewLens = new PreviewCodeLense(utils.previewCodeLenseEnabled(), utils.hasDefaultQuery());
+  const previewLens = new PreviewCodeLens(utils.previewCodeLenseEnabled(), utils.hasDefaultQuery());
   const disposables: vscode.Disposable[] = [
     vscode.commands.registerCommand('eopa.preview.default', () => runPreviewDefault(utils.previewEnvironment(context))),
     vscode.commands.registerCommand('eopa.preview.package', () => runPreviewPackage(utils.previewEnvironment(context))),
@@ -31,19 +31,34 @@ export function activate(context: vscode.ExtensionContext) {
   disposables.map((d: vscode.Disposable) => context.subscriptions.push(d));
 }
 
-function runPreviewDefault(args: utils.PreviewEnvironment) {
+export function runPreviewDefault(args: utils.PreviewEnvironment) {
   if (!args.settings.defaultQuery) {
     return runPreviewPackage(args);
   }
   return runPreview(args, utils.getPackagePath(args.settings.defaultQuery), '');
 }
 
-function runPreviewPackage(args: utils.PreviewEnvironment) {
+export function runPreviewPackage(args: utils.PreviewEnvironment) {
   return runPreview(args, utils.pathFromEditor(args.editor), '');
 }
 
-function runPreviewSelection(args: utils.PreviewEnvironment) {
+export function runPreviewSelection(args: utils.PreviewEnvironment) {
   return runPreview(args, utils.pathFromEditor(args.editor), utils.getEditorSelection(args.editor));
+}
+
+export async function runSetToken(args: utils.PreviewEnvironment) {
+  const token = await vscode.window.showInputBox({
+    password: true,
+    placeHolder: '',
+    prompt: 'Enter your bearer token for token based authentication to Enterprise OPA instances',
+    title: 'Auth Token',
+  });
+  if (!token) {
+    vscode.window.showWarningMessage('Token not stored: no token provided.');
+    return;
+  }
+  await args.secrets.store('authToken', token);
+  vscode.window.showInformationMessage('Token stored successfully.');
 }
 
 async function runPreview(args: utils.PreviewEnvironment, path: string, query: string) {
@@ -59,23 +74,8 @@ async function runPreview(args: utils.PreviewEnvironment, path: string, query: s
       .build();
 
     const result = await request.run();
-    utils.reportResult(JSON.stringify(result, undefined, '  '), eopaPreviewChannel);
+    utils.reportResult(utils.formatResults(result), eopaPreviewChannel);
   } catch (e: unknown) {
     utils.reportError(e);
   }
-}
-
-async function runSetToken(args: utils.PreviewEnvironment) {
-  const token = await vscode.window.showInputBox({
-    password: true,
-    placeHolder: '',
-    prompt: 'Enter your bearer token for token based authentication to Enterprise OPA instances',
-    title: 'Auth Token',
-  });
-  if (!token) {
-    vscode.window.showWarningMessage('Token not stored: no token provided.');
-    return;
-  }
-  await args.secrets.store('authToken', token);
-  vscode.window.showInformationMessage('Token stored successfully.');
 }
