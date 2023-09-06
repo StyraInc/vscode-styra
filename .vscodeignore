@@ -20,4 +20,3 @@ out/**
 
 *.json
 !package.json
-!language-configuration.json
