@@ -1,4 +1,5 @@
 import * as https from 'https';
+import {APIError} from './errors';
 import {default as fetch} from 'node-fetch';
 import {FilesAndData} from './FilesAndData';
 import {posix} from 'path';
@@ -119,13 +120,15 @@ export class PreviewRequest {
   async run(): Promise<object> {
     const reqUrl = new URL(this.apiRoot.toString());
     reqUrl.pathname = posix.join(reqUrl.pathname, 'v0', 'preview', this.path);
+    let params = ['metrics'];
     if (this.args.options !== undefined) {
-      const searchParams = reqUrl.searchParams;
-      for (const option of this.args.options) {
-        searchParams.append(option, 'true');
-      }
-      reqUrl.search = searchParams.toString();
+      params = params.concat(this.args.options);
     }
+    const searchParams = reqUrl.searchParams;
+    for (const option of params) {
+      searchParams.append(option, 'true');
+    }
+    reqUrl.search = searchParams.toString();
 
     const headers: PreviewHeaders = {};
     const body: {[key: string]:any} = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -162,6 +165,11 @@ export class PreviewRequest {
       body: JSON.stringify(body),
       agent: sslConfiguredAgent,
     });
-    return await req.json();
+
+    const response = await req.json();
+    if (!req.ok) {
+      throw new APIError(req.status, response);
+    }
+    return response;
   }
 }
