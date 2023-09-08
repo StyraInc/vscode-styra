@@ -160,21 +160,20 @@ export function formatResults(results: object, selection:boolean, raw?: boolean)
   if (raw) {
     return JSON.stringify(results, null, 2);
   }
-  const r = results as {result: object, metrics: {[key: string]: number}, printed: string, provenance: object};
+  const r = results as {result: object, metrics: {[key: string]: number}, printed: string, provenance: {[key: string]: string | {[key: string]: object}}};
 
   let output = '';
 
   if (r.provenance) {
-    output += `PROVENANCE\n==========\n${JSON.stringify(r.provenance, null, 2)}\n\n`;
+    output += `PROVENANCE\n==========\n${getPrettyProvenance(r.provenance)}`;
   }
 
   if (r.metrics?.timer_query_compile_stage_resolve_refs_ns) {
     output += `METRICS\n=======\n${metricTables(r.metrics)}`;
-    // output += `METRICS\n=======\n${Object.keys(r.metrics).map((k: string) => formatMetric(k, r.metrics[k])).join('\n')}\n\n`;
   }
 
   if (r.printed) {
-    output += `PRINTED\n=======\n${r.printed}\n\n`;
+    output += `PRINTED\n=======\n${r.printed}\n`;
   }
 
   output += 'RESULT\n======\n';
@@ -351,6 +350,28 @@ export function getPrettyTime(ns: number): string {
     return milliseconds.toString() + 'ms';
   }
   return (ns / 1e3).toString() + 'µs';
+}
+
+function getPrettyProvenance(provenance: {[key: string]: string | {[key: string]: object}}): string {
+  let output = '';
+  Object.keys(provenance).forEach((k: string) => {
+    if (typeof provenance[k] !== 'string') {
+      return;
+    }
+    const niceKey = k.split('_').map((part: string) => part[0].toUpperCase() + part.substring(1)).join(' ');
+    output += `${niceKey}: ${provenance[k]}\n`;
+  });
+  output += '\n';
+
+  if (provenance.bundles && typeof provenance.bundles === 'object' && Object.keys(provenance.bundles).length > 0) {
+    const bundleData: Array<[string, string]> = [['Name', 'Revision']];
+    Object.keys(provenance.bundles).forEach((bundle) => {
+      const revision = (provenance.bundles as {[key: string]: {revision?: string}})[bundle].revision;
+      bundleData.push([bundle, revision || '']);
+    });
+    output += table(bundleData, {border: getBorderCharacters('norc'), columns: [{}, {width: 65, wrapWord: true}], header: {alignment: 'center', content: 'BUNDLES'}}) + '\n';
+  }
+  return output;
 }
 
 /**
