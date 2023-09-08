@@ -95,7 +95,7 @@
     },
     "configuration": {
       "type": "object",
-      "title": "Styra Configuration",
+      "title": "Styra",
       "properties": {
         "styra.checkUpdateInterval": {
           "type": "number",
@@ -312,6 +312,7 @@
     "node-fetch": "^2.6.13",
     "picomatch": "^2.3.1",
     "semver": "^7.3.8",
-    "shell-escape": "^0.2.0"
+    "shell-escape": "^0.2.0",
+    "table": "^6.8.1"
   }
 }

@@ -20,3 +20,21 @@ export class FileError extends Error {
     return `Error in ${this.path}: ${this.original.name}`;
   }
 }
+
+export class APIError extends Error {
+  body?: object;
+  responseCode: number;
+
+  constructor(responseCode: number, body?: object) {
+    const errBody = body as {message?: string, code: string};
+    if (body && errBody.message !== undefined && errBody.code !== undefined) {
+      super(`${errBody.code} (${responseCode}): ${errBody.message}`);
+    } else if (body && errBody.message !== undefined) {
+      super(`${responseCode}: ${errBody.message}`);
+    } else {
+      super(`General API error (${responseCode})`);
+    }
+    this.responseCode = responseCode;
+    this.body = body;
+  }
+}

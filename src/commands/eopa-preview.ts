@@ -74,7 +74,7 @@ async function runPreview(args: utils.PreviewEnvironment, path: string, query: s
       .build();
 
     const result = await request.run();
-    utils.reportResult(utils.formatResults(result), eopaPreviewChannel);
+    utils.reportResult(utils.formatResults(result, query !== ''), eopaPreviewChannel);
   } catch (e: unknown) {
     utils.reportError(e);
   }

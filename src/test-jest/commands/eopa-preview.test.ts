@@ -30,7 +30,7 @@ afterEach(() => {
 
 describe('EOPA Preview Commands', () => {
   test('eopa.preview.default runs with the default query', async () => {
-    const expectedUrl = 'http://example.com/v0/preview/some/package';
+    const expectedUrl = 'http://example.com/v0/preview/some/package?metrics=true';
     const expectedResult = {result: {}};
 
     const env = getTestEnv();
@@ -47,7 +47,7 @@ describe('EOPA Preview Commands', () => {
       throw env.reportedErrors.mock.calls[0][0];
     }
     // Check the expected results were reported
-    expect(env.reportedResult).lastCalledWith(utils.formatResults(expectedResult), expect.anything());
+    expect(env.reportedResult).lastCalledWith(utils.formatResults(expectedResult, false), expect.anything());
     // Check the http call had the expected parameters
     expect(fetchMock).toHaveFetched(expectedUrl, {
       headers: {'Content-Type': 'application/json'},
@@ -56,7 +56,7 @@ describe('EOPA Preview Commands', () => {
   });
 
   test('eopa.preview.default falls back to package preview when no default is specified', async () => {
-    const expectedUrl = 'http://example.com/v0/preview/test';
+    const expectedUrl = 'http://example.com/v0/preview/test?metrics=true';
     const expectedResult = {result: {hello: 'world'}};
 
     const env = getTestEnv();
@@ -72,7 +72,7 @@ describe('EOPA Preview Commands', () => {
       throw env.reportedErrors.mock.calls[0][0];
     }
     // Check the expected results were reported
-    expect(env.reportedResult).lastCalledWith(utils.formatResults(expectedResult), expect.anything());
+    expect(env.reportedResult).lastCalledWith(utils.formatResults(expectedResult, false), expect.anything());
     // Check the http call had the expected parameters
     expect(fetchMock).toHaveFetched(expectedUrl, {
       headers: {'Content-Type': 'application/json'},
@@ -82,7 +82,7 @@ describe('EOPA Preview Commands', () => {
   });
 
   test('eopa.preview.package runs', async () => {
-    const expectedUrl = 'http://example.com/v0/preview/test';
+    const expectedUrl = 'http://example.com/v0/preview/test?metrics=true';
     const expectedResult = {result: {hello: 'world'}};
 
     const env = getTestEnv();
@@ -98,7 +98,7 @@ describe('EOPA Preview Commands', () => {
       throw env.reportedErrors.mock.calls[0][0];
     }
     // Check the expected results were reported
-    expect(env.reportedResult).lastCalledWith(utils.formatResults(expectedResult), expect.anything());
+    expect(env.reportedResult).lastCalledWith(utils.formatResults(expectedResult, false), expect.anything());
     // Check the http call had the expected parameters
     expect(fetchMock).toHaveFetched(expectedUrl, {
       headers: {'Content-Type': 'application/json'},
@@ -107,8 +107,19 @@ describe('EOPA Preview Commands', () => {
   });
 
   test('eopa.preview.selection runs', async () => {
-    const expectedUrl = 'http://example.com/v0/preview/test';
-    const expectedResult = {result: {hello: 'world'}}; // TODO: MATCH ACTUAL RETURN SHAPE
+    const expectedUrl = 'http://example.com/v0/preview/test?metrics=true';
+    const expectedResult = {
+      result: {
+        bindings: {one: 'hi'},
+        expressions: [
+          {
+            location: {col: 5, row: 2},
+            text: 'one := "hi"',
+            value: true
+          }
+        ]
+      }
+    };
     const expectedRego = 'hello := "world"';
 
     const range = mock<vscode.Range>();
@@ -129,7 +140,7 @@ describe('EOPA Preview Commands', () => {
       throw env.reportedErrors.mock.calls[0][0];
     }
     // Check the expected results were reported
-    expect(env.reportedResult).lastCalledWith(utils.formatResults(expectedResult), expect.anything());
+    expect(env.reportedResult).lastCalledWith(utils.formatResults(expectedResult, true), expect.anything());
     // Check the http call had the expected parameters
     expect(fetchMock)
       .toHaveFetched(expectedUrl, {
@@ -154,7 +165,7 @@ describe('EOPA Preview Commands', () => {
     ['json', '{"data": true}'],
     ['yaml', 'data: true'],
   ])('finds %p input next to the current file', async (fileType: string, contents: string) => {
-    const expectedUrl = 'http://example.com/v0/preview/test';
+    const expectedUrl = 'http://example.com/v0/preview/test?metrics=true';
     const expectedResult = {result: {hello: 'world'}};
 
     const env = getTestEnv();
@@ -182,7 +193,7 @@ describe('EOPA Preview Commands', () => {
       throw env.reportedErrors.mock.calls[0][0];
     }
     // Check the expected results were reported
-    expect(env.reportedResult).lastCalledWith(utils.formatResults(expectedResult), expect.anything());
+    expect(env.reportedResult).lastCalledWith(utils.formatResults(expectedResult, false), expect.anything());
     // Check the http call had the expected parameters
     expect(fetchMock).toHaveFetched(expectedUrl, {
       headers: {'Content-Type': 'application/json'},
@@ -196,7 +207,7 @@ describe('EOPA Preview Commands', () => {
     ['/example/path/input.json', '{"data": true}'],
     ['/example/path/input.yaml', 'data: true'],
   ])('finds %p input file at the workspace root', async (inputPath: string, contents: string) => {
-    const expectedUrl = 'http://example.com/v0/preview/test';
+    const expectedUrl = 'http://example.com/v0/preview/test?metrics=true';
     const expectedResult = {result: {hello: 'world'}};
 
     const env = getTestEnv({editor: {document: {fileName: '/example/path/nested/example.rego', languageId: 'rego', lineCount: 1, uri: {fsPath: '/example/path/nested/example.rego'}}}});
@@ -233,7 +244,7 @@ describe('EOPA Preview Commands', () => {
       throw env.reportedErrors.mock.calls[0][0];
     }
     // Check the expected results were reported
-    expect(env.reportedResult).lastCalledWith(utils.formatResults(expectedResult), expect.anything());
+    expect(env.reportedResult).lastCalledWith(utils.formatResults(expectedResult, false), expect.anything());
     // Check the http call had the expected parameters
     expect(fetchMock).toHaveFetched(expectedUrl, {
       headers: {'Content-Type': 'application/json'},
@@ -242,7 +253,7 @@ describe('EOPA Preview Commands', () => {
   });
 
   test('collect files when run in a workspace', async () => {
-    const expectedUrl = 'http://example.com/v0/preview/test';
+    const expectedUrl = 'http://example.com/v0/preview/test?metrics=true';
     const expectedResult = {result: {hello: 'world'}};
 
     const env = getTestEnv();
@@ -269,7 +280,7 @@ describe('EOPA Preview Commands', () => {
       throw env.reportedErrors.mock.calls[0][0];
     }
     // Check the expected results were reported
-    expect(env.reportedResult).lastCalledWith(utils.formatResults(expectedResult), expect.anything());
+    expect(env.reportedResult).lastCalledWith(utils.formatResults(expectedResult, false), expect.anything());
     // Check the http call had the expected parameters
     expect(fetchMock).toHaveFetched(expectedUrl, {
       headers: {'Content-Type': 'application/json'},
@@ -278,7 +289,7 @@ describe('EOPA Preview Commands', () => {
   });
 
   test('only includes the current file when run in file mode', async () => {
-    const expectedUrl = 'http://example.com/v0/preview/test';
+    const expectedUrl = 'http://example.com/v0/preview/test?metrics=true';
     const expectedResult = {result: {hello: 'world'}};
 
     const env = getTestEnv();
@@ -306,7 +317,7 @@ describe('EOPA Preview Commands', () => {
       throw env.reportedErrors.mock.calls[0][0];
     }
     // Check the expected results were reported
-    expect(env.reportedResult).lastCalledWith(utils.formatResults(expectedResult), expect.anything());
+    expect(env.reportedResult).lastCalledWith(utils.formatResults(expectedResult, false), expect.anything());
     // Check the http call had the expected parameters
     expect(fetchMock).toHaveFetched(expectedUrl, {
       headers: {'Content-Type': 'application/json'},
@@ -315,7 +326,7 @@ describe('EOPA Preview Commands', () => {
   });
 
   test('does not include ignored files when run in a workspace', async () => {
-    const expectedUrl = 'http://example.com/v0/preview/test';
+    const expectedUrl = 'http://example.com/v0/preview/test?metrics=true';
     const expectedResult = {result: {hello: 'world'}};
 
     const env = getTestEnv();
@@ -342,7 +353,7 @@ describe('EOPA Preview Commands', () => {
       throw env.reportedErrors.mock.calls[0][0];
     }
     // Check the expected results were reported
-    expect(env.reportedResult).lastCalledWith(utils.formatResults(expectedResult), expect.anything());
+    expect(env.reportedResult).lastCalledWith(utils.formatResults(expectedResult, false), expect.anything());
     // Check the http call had the expected parameters
     expect(fetchMock).toHaveFetched(expectedUrl, {
       headers: {'Content-Type': 'application/json'},
@@ -351,7 +362,7 @@ describe('EOPA Preview Commands', () => {
   });
 
   test('collect data when run in a workspace', async () => {
-    const expectedUrl = 'http://example.com/v0/preview/test';
+    const expectedUrl = 'http://example.com/v0/preview/test?metrics=true';
     const expectedResult = {result: {hello: 'world'}};
 
     const env = getTestEnv();
@@ -382,7 +393,7 @@ describe('EOPA Preview Commands', () => {
       throw env.reportedErrors.mock.calls[0][0];
     }
     // Check the expected results were reported
-    expect(env.reportedResult).lastCalledWith(utils.formatResults(expectedResult), expect.anything());
+    expect(env.reportedResult).lastCalledWith(utils.formatResults(expectedResult, false), expect.anything());
     // Check the http call had the expected parameters
     expect(fetchMock).toHaveFetched(expectedUrl, {
       headers: {'Content-Type': 'application/json'},
@@ -401,7 +412,7 @@ describe('EOPA Preview Commands', () => {
     'strict',
     'strict-builtin-errors'
   ])('sends option %p when set', async (arg: string) => {
-    const expectedUrl = `http://example.com/v0/preview/test?${arg}=true`;
+    const expectedUrl = `http://example.com/v0/preview/test?metrics=true&${arg}=true`;
     const expectedResult = {result: {hello: 'world'}};
 
     const env = getTestEnv();
@@ -418,7 +429,7 @@ describe('EOPA Preview Commands', () => {
       throw env.reportedErrors.mock.calls[0][0];
     }
     // Check the expected results were reported
-    expect(env.reportedResult).lastCalledWith(utils.formatResults(expectedResult), expect.anything());
+    expect(env.reportedResult).lastCalledWith(utils.formatResults(expectedResult, false), expect.anything());
     // Check the http call had the expected parameters
     expect(fetchMock).toHaveFetched(expectedUrl, {
       headers: {'Content-Type': 'application/json'},
@@ -427,7 +438,7 @@ describe('EOPA Preview Commands', () => {
   });
 
   test('sends bearer token authorization header when set', async () => {
-    const expectedUrl = 'http://example.com/v0/preview/test';
+    const expectedUrl = 'http://example.com/v0/preview/test?metrics=true';
     const expectedResult = {result: {hello: 'world'}};
 
     const env = getTestEnv();
@@ -445,7 +456,7 @@ describe('EOPA Preview Commands', () => {
       throw env.reportedErrors.mock.calls[0][0];
     }
     // Check the expected results were reported
-    expect(env.reportedResult).lastCalledWith(utils.formatResults(expectedResult), expect.anything());
+    expect(env.reportedResult).lastCalledWith(utils.formatResults(expectedResult, false), expect.anything());
     // Check the http call had the expected parameters
     expect(fetchMock).toHaveFetched(expectedUrl, {
       headers: {Authorization: 'Bearer secret', 'Content-Type': 'application/json'},
@@ -454,7 +465,7 @@ describe('EOPA Preview Commands', () => {
   });
 
   test('sets up a TLS agent when TLS auth is configured', async () => {
-    const expectedUrl = 'http://example.com/v0/preview/test';
+    const expectedUrl = 'http://example.com/v0/preview/test?metrics=true';
     const expectedResult = {result: {hello: 'world'}};
     const expectedCert = 'Cert PEM file';
     const expectedKey = 'Key PEM file';
@@ -490,7 +501,7 @@ describe('EOPA Preview Commands', () => {
       throw env.reportedErrors.mock.calls[0][0];
     }
     // Check the expected results were reported
-    expect(env.reportedResult).lastCalledWith(utils.formatResults(expectedResult), expect.anything());
+    expect(env.reportedResult).lastCalledWith(utils.formatResults(expectedResult, false), expect.anything());
     // Check the http call had an agent defined
     // Note -- pulling out the call like this is not ideal, but the API does not provide a method for easily checking
     // the Agent setting, so this works around it.
@@ -507,7 +518,7 @@ describe('EOPA Preview Commands', () => {
   });
 
   test('sets up a TLS agent when a custom CA is configured', async () => {
-    const expectedUrl = 'http://example.com/v0/preview/test';
+    const expectedUrl = 'http://example.com/v0/preview/test?metrics=true';
     const expectedResult = {result: {hello: 'world'}};
     const expectedCACert = 'CA PEM file';
 
@@ -537,7 +548,7 @@ describe('EOPA Preview Commands', () => {
       throw env.reportedErrors.mock.calls[0][0];
     }
     // Check the expected results were reported
-    expect(env.reportedResult).lastCalledWith(utils.formatResults(expectedResult), expect.anything());
+    expect(env.reportedResult).lastCalledWith(utils.formatResults(expectedResult, false), expect.anything());
     // Check the http call had an agent defined
     // Note -- pulling out the call like this is not ideal, but the API does not provide a method for easily checking
     // the Agent setting, so this works around it.

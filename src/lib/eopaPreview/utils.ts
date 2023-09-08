@@ -6,6 +6,7 @@ import {basename, dirname, join, sep} from 'path';
 import {EnvironmentError} from './errors';
 import {expandPathsStandard, expandPathStandard} from './pathVars';
 import {FilesAndData, fsFilesAndData} from './FilesAndData';
+import {getBorderCharacters, table} from 'table';
 import {TLSAuth, TokenAuth} from './auth';
 
 export type PreviewEnvironment = {
@@ -33,6 +34,19 @@ export type PreviewSettings = {
 export type Parser = (data: string) => (object|undefined);
 export type AuthType = 'none' | 'bearer' | 'tls';
 export type FileStrategy = 'all' | 'file';
+
+export type Expression = {
+  location: {col: number, row: number},
+  text: string
+  value: unknown
+}
+export type Bindings = {
+  [key: string]: unknown
+}
+export type OpaResult = {
+  bindings?: Bindings
+  expressions?: Expression[]
+}
 
 const packageRegex = /package ([a-zA-Z_].*)(?! )$/s;
 
@@ -142,8 +156,201 @@ export function getPackagePath(path: string): string {
   return _path;
 }
 
-export function formatResults(results: object): string {
-  return JSON.stringify(results, undefined, '  ');
+export function formatResults(results: object, selection:boolean, raw?: boolean): string {
+  if (raw) {
+    return JSON.stringify(results, null, 2);
+  }
+  const r = results as {result: object, metrics: {[key: string]: number}, printed: string, provenance: object};
+
+  let output = '';
+
+  if (r.provenance) {
+    output += `PROVENANCE\n==========\n${JSON.stringify(r.provenance, null, 2)}\n\n`;
+  }
+
+  if (r.metrics?.timer_query_compile_stage_resolve_refs_ns) {
+    output += `METRICS\n=======\n${metricTables(r.metrics)}`;
+    // output += `METRICS\n=======\n${Object.keys(r.metrics).map((k: string) => formatMetric(k, r.metrics[k])).join('\n')}\n\n`;
+  }
+
+  if (r.printed) {
+    output += `PRINTED\n=======\n${r.printed}\n\n`;
+  }
+
+  output += 'RESULT\n======\n';
+  if (r.metrics?.timer_regovm_eval_ns) {
+    output += `# Evaluated in ${getPrettyTime(r.metrics.timer_regovm_eval_ns)}\n`;
+  }
+  output += `${formatOutput(r.result, selection)}`;
+
+  return output;
+}
+
+export function formatOutput(results: unknown, selection: boolean) {
+  if (results) {
+    if (selection) {
+      let selectionResults: OpaResult[] = [];
+      if (Array.isArray(results)) {
+        selectionResults = results;
+      } else {
+        selectionResults = [results];
+      }
+      const nResults = 1;
+
+      if (nResults > 0) {
+        const result = selectionResults[0];
+
+        if (!result.bindings) {
+          // No variables bound. We’re looking at stand-alone expressions that
+          // reference values.
+          if (
+            nResults === 1 &&
+            result.expressions &&
+            result.expressions.length === 1
+          ) {
+            // There’s one expression. Return the referenced value.
+            return JSON.stringify(result.expressions[0].value, null, 2);
+          }
+
+          // There are multiple expressions. Return a Rego rule body per
+          // expression.
+          return formatExpressionsOutput(selectionResults);
+        }
+      }
+
+      // Variables bound. We’re looking at a query. Return a Rego rule body per
+      // set of bindings (i.e., per result).
+      return formatQueryOutput(selectionResults);
+    } else if (typeof results === 'object') {
+      return JSON.stringify(results, null, 2);
+    }
+  }
+
+  return 'No Results found.';
+}
+
+function formatExpressionsOutput(results: OpaResult[]) {
+  const expressions = results.reduce((accumulator: Expression[], result: OpaResult) => {
+    if (result.expressions) {
+      result.expressions.forEach((x: Expression) => accumulator.push(x));
+    }
+
+    return accumulator;
+  }, []);
+
+  expressions.sort((a: Expression, b: Expression) => {
+    const rowDelta = a.location.row - b.location.row;
+    if (rowDelta === 0) {
+      return a.location.col - b.location.col;
+    }
+
+    return rowDelta;
+  });
+
+  const values = expressions.map((x, i) => {
+    const comment = `{\n  # Expression ${i + 1}`;
+    const expression = `\n  expression = ${JSON.stringify(x.text)}`;
+    const value = `\n  value = ${shiftRight(x.value)}\n}`;
+
+    return `${comment}${expression}${value}`;
+  });
+
+  const nExpressions = expressions.length;
+  const expressionsString = nExpressions === 1 ? 'value' : 'values';
+  const comment = `# Found ${nExpressions} ${expressionsString}`;
+  const head = 'values_by_expression[expression] = value';
+  const body = `${values.join(' ')}`;
+
+  return `${comment}\n${head} ${body}`;
+}
+
+function formatQueryOutput(results: OpaResult[]): string {
+  const keyBindings = results[0].bindings;
+  if (keyBindings === undefined) {
+    return 'No bindings found.';
+  }
+  const resultName = makeUniqueResultName(keyBindings);
+  const keys = Object.keys(keyBindings).filter((key) => !/^\$\d+$/.test(key));
+
+  const ruleBodies = results.map((result, index) => {
+    const bindings = result.bindings;
+    let expressions = '';
+    if (bindings !== undefined) {
+      expressions = keys
+        .map((name) => `  ${name} = ${shiftRight(bindings[name])}`)
+        .join('\n');
+    }
+
+    return `{\n  ${resultName} = "Result ${index + 1}"\n${expressions}\n}`;
+  });
+
+  const nResults = results.length;
+  const nResultsString = nResults === 1 ? 'result' : 'results';
+  const pairs = keys.map((x) => `"${x}":${x}`).join(',');
+  const comment = `# Found ${nResults} ${nResultsString}`;
+  const head = `variable_bindings_by_result[${resultName}] = {${pairs}}`;
+  const body = ruleBodies.join(' ');
+
+  return `${comment}\n${head} ${body}`;
+}
+
+function makeUniqueResultName(bindings?: Bindings) {
+  const baseName = 'result';
+  if (bindings === undefined) {
+    return baseName;
+  }
+
+  let name = baseName;
+  let count = 1;
+  while (name in bindings) {
+    name = new Array(++count).join('_') + baseName;
+  }
+
+  return name;
+}
+
+function shiftRight(object: unknown) {
+  return JSON.stringify(object, null, 2).split('\n').join('\n  ');
+}
+
+function metricTables(metrics: {[key: string]: number}): string {
+  let output = '';
+  const counts: Array<[string, string]> = [['Name', 'Number']];
+  const timers: Array<[string, string]> = [['Name', 'Time']];
+  Object.keys(metrics).forEach((k: string) => {
+    const keyParts = k.split('_');
+    const keyType = keyParts.shift();
+    switch (keyType) {
+      case 'counter':
+        counts.push([keyParts.join(' '), metrics[k].toString()]);
+        break;
+      case 'timer':
+        if (keyParts[keyParts.length - 1] === 'ns') {
+          keyParts.pop();
+        }
+        timers.push([keyParts.join(' '), getPrettyTime(metrics[k])]);
+        break;
+    }
+  });
+  if (counts.length > 1) {
+    output += table(counts, {border: getBorderCharacters('norc'), header: {alignment: 'center', content: 'COUNTERS'}}) + '\n';
+  }
+  if (timers.length > 1) {
+    output += table(timers, {border: getBorderCharacters('norc'), header: {alignment: 'center', content: 'TIMERS'}}) + '\n';
+  }
+  return output;
+}
+
+export function getPrettyTime(ns: number): string {
+  const seconds = ns / 1e9;
+  if (seconds >= 1) {
+    return seconds.toString() + 's';
+  }
+  const milliseconds = ns / 1e6;
+  if (milliseconds >= 1) {
+    return milliseconds.toString() + 'ms';
+  }
+  return (ns / 1e3).toString() + 'µs';
 }
 
 /**
