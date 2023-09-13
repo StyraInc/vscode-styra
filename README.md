@@ -12,19 +12,46 @@
   CI status: https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/adding-a-workflow-status-badge
 -->
 
-# Styra DAS for Visual Studio Code
+# Styra VS Code Tools
 
-**Styra Link** is a new way of working with [Styra DAS](https://www.styra.com/styra-das/).
-It allows you to create a new Styra DAS system or connect with an existing one.
-Once connected you can write, test, validate, and publish policy all within your normal development workflow.
-If you prefer the command line, that is where Styra Link started.
-But now, this extension also brings the capabilities of Styra Link right into VSCode to streamline your workflow!
+If you are using products from [Styra](https://www.styra.com), the creators of Open Policy Agent, to help you streamline and scale your authorization needs, then you need Styra VS Code Tools. This extension integrates features from Styra products directly with your VS Code editor.
 
-## Commands
+## Enterprise OPA: Preview
 
-Some of the commands execute immediately but those with a trailing ellipsis ask you to enter several inputs.
-Be on the lookout! When you see the footnote indicator next to the prompt `(*) See output pane (*)` look
-for the latest footnote in the Styra output pane to provide further context on what you need to supply.
+Ever wanted to know what impact your policy changes will have on your existing deployment without needing to deploy them? With the Enterprise OPA preview feature, you can see what decision will be made in the context of your live policy agent, all without effecting the current decisions it is making. With Styra VS Code Tools, you can run previews directly from VS Code using single-click Code Lens support, right-click contextual menus in Rego files, or via the command palette.
+
+### Commands
+
+* `Enterprise OPA: Preview` - Preview the default query with any locally authored updates
+* `Enterprise OPA: Preview Package` - Preview the package of the current file with any locally authored updates
+* `Enterprise OPA: Preview Selection` - Preview the currently selected text with any locally authored updates
+* `Enterprise OPA: Set Token` - Store the bearer token as a secret for use when authorizing Enterprise OPA preview requests
+
+
+### Settings
+
+| Setting | Default | Description |
+| --- | --- | --- |
+| `Opa > Roots` | [${workspaceFolder}] | Bundle roots to search when looking for Rego policies and data (inherited from the [Open Policy Agent extension](https://marketplace.visualstudio.com/items?itemName=tsandall.opa)). |
+| `Eopa > Url` | http://localhost:8181 | The URL where the Enterprise OPA HTTP API is accessible. |
+| `Eopa > Preview > Default&nbsp;Query` | | The default query to run when performing an **Enterprise OPA: Preview**. |
+| `Eopa > Preview > Prefix` | | A prefix to add to all policy paths when mapping for Enterprise OPA preview.  |
+| `Eopa > Preview > Arguments` | [] | Controls the behavior and features of Enterprise OPA preview calls. |
+| `Eopa > Preview > Strategy` | all | Determine which files to map for Enterprise OPA preview calls. |
+| `Eopa > Preview > Ignore` | [] | A set of glob patterns to omit when mapping for Enterprise OPA preview calls. |
+| `Eopa > Preview > Code Lense` | true | Enable or disable support for Enterprise OPA preview Code Lens. |
+| `Eopa > Auth > Type` | none | Determine what kind of authorization to use when connecting to the Enterprise OPA API |
+| `Eopa > Auth > Client Cert Pem` | | A file path to a PEM encoded client certificate used for TLS authentication. |
+ `Eopa > Auth > Client Key Pem` | | A file path to a PEM encoded client key used for TLS authentication. |
+| `Eopa > Auth > Client Cert CA` | | A file path to a PEM encoded custom certificate authority certificate to trust when connecting to Enterprise OPA. |
+| `Eopa > Auth > Allow Unauthorized TLS` | false | Whether or not to trust Enterprise OPA when the returned TLS certificate is from an unknown authority. |
+## Styra DAS: Link
+
+[Styra Link](https://docs.styra.com/das/reference/styra-link/) is an opinionated workflow for managing Styra DAS. You can write, test, validate, and publish policy all within your normal development workflow. Styra VS Code Tools brings the capabilities of Styra Link right into VS Code, streamlining your policy authoring process even further.
+
+### Commands
+
+Some of these commands execute immediately but those with a trailing ellipsis ask you to enter several inputs. When you see the footnote indicator next to the prompt `(*) See output pane (*)` look for the latest footnote in the Styra output pane to provide further context on what you need to supply.
 
 * `Styra Link: Bundle Update...` — update the local bundle with any current changes.
 * `Styra Link: Configure Git...` — configure Styra Link with a Git connection.
@@ -34,25 +61,7 @@ for the latest footnote in the Styra output pane to provide further context on w
 * `Styra Link: Validate Compliance` — check for compliance violations against your latest authored polices for supported systems.
 * `Styra Link: Validate Decisions` — replay prior decisions against your latest authored polices to see how decisions will change.
 
-## Editing Rego Files
-
-Rego is the authorization language of [Open Policy Agent](https://www.openpolicyagent.org/docs/latest/), or "OPA" for short.
-This extension provides syntax highlighting for rego files.
-In addition, we provide a wealth of ready-made policy snippets to jump start your rego journey.
-Note that whether you have any snippets depends on the system type of the DAS system
-that you have connected to your currently loaded VSCode project with Styra Link.
-For example, there are over 120 snippets defined for Kubernetes systems.
-
-In addition to the policy snippets, which vary based on the system type,
-there are a few general language snippets as well to aid you in getting up to speed with rego.
-All of these start with "rego" as the trigger, so just type that into a rego file and you will see a list of them.
-
-## Requirements
-
-* [Styra CLI](https://docs.styra.com/reference/cli/install-use-cli) executable (`styra`) must be installed on your `$PATH`.  If you do not have Styra CLI installed, the plugin will prompt you to install it when you run any command. Supports Windows, Mac, and Linux systems.
-* A [Styra DAS](https://www.styra.com/styra-das/) tenant; you can get one for free at our [Sign-up page](https://signup.styra.com); the VSCode plugin will check for this when you run any command; if not found, it will offer to take you to the same URL so you can get one. It only takes a moment!
-
-## Extension Settings
+### Settings
 
 | Setting | Default | Description |
 | --- | --- | --- |
@@ -61,13 +70,13 @@ All of these start with "rego" as the trigger, so just type that into a rego fil
 | `Styra > Diagnostic Output` | false | Reveal API calls and other diagnostic details in the output pane. |
 | `Styra > Output Format` | table | Selects the output format for commands that return data. |
 
-## Feedback
+### Requirements
 
-We are always interested in your feedback, issue reports, and feature requests!
-Please connect with us on the `#vscode` channel on [Slack](https://styracommunity.slack.com)
-or on [Discussions](https://github.com/StyraInc/vscode-styra/discussions)
-or [Issues](https://github.com/StyraInc/vscode-styra/issues) in the GitHub repository.
+* [Styra CLI](https://docs.styra.com/reference/cli/install-use-cli) executable (`styra`) must be installed on your `$PATH`.  If you do not have Styra CLI installed, the plugin will prompt you to install it when you run any Styra Link command.
+* A [Styra DAS](https://www.styra.com/styra-das/) tenant; you can get one for free at our [Sign-up page](https://signup.styra.com); the VSCode plugin will check for this when you run any command; if not found, it will offer to take you to the same URL so you can get one. It only takes a moment!
 
-## Known Issues
+## Rego Snippets
 
-None
+New to Rego? Styra VS Code Tools provides a wealth of ready-made policy snippets to jump start your Rego journey. Our general language snippets as well to aid you in getting up to speed with rego. All of these start with "rego" as the trigger, so just type that into a rego file and you will see a list of them.
+
+In addition to the general snippets, Styra VS Code Tools contains over 120 snippets defined for the Styra DAS Kubernetes system type.
