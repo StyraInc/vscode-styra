@@ -33,18 +33,18 @@ Ever wanted to know what impact your policy changes will have on your existing d
 | Setting | Default | Description |
 | --- | --- | --- |
 | `Opa > Roots` | [${workspaceFolder}] | Bundle roots to search when looking for Rego policies and data (inherited from the [Open Policy Agent extension](https://marketplace.visualstudio.com/items?itemName=tsandall.opa)). |
-| `Eopa > Url` | http://localhost:8181 | The URL where the Enterprise OPA HTTP API is accessible. |
-| `Eopa > Preview > Default&nbsp;Query` | | The default query to run when performing an **Enterprise OPA: Preview**. |
-| `Eopa > Preview > Prefix` | | A prefix to add to all policy paths when mapping for Enterprise OPA preview.  |
-| `Eopa > Preview > Arguments` | [] | Controls the behavior and features of Enterprise OPA preview calls. |
-| `Eopa > Preview > Strategy` | all | Determine which files to map for Enterprise OPA preview calls. |
-| `Eopa > Preview > Ignore` | [] | A set of glob patterns to omit when mapping for Enterprise OPA preview calls. |
-| `Eopa > Preview > Code Lense` | true | Enable or disable support for Enterprise OPA preview Code Lens. |
-| `Eopa > Auth > Type` | none | Determine what kind of authorization to use when connecting to the Enterprise OPA API |
-| `Eopa > Auth > Client Cert Pem` | | A file path to a PEM encoded client certificate used for TLS authentication. |
- `Eopa > Auth > Client Key Pem` | | A file path to a PEM encoded client key used for TLS authentication. |
-| `Eopa > Auth > Client Cert CA` | | A file path to a PEM encoded custom certificate authority certificate to trust when connecting to Enterprise OPA. |
-| `Eopa > Auth > Allow Unauthorized TLS` | false | Whether or not to trust Enterprise OPA when the returned TLS certificate is from an unknown authority. |
+| `Enterprise OPA > Url` | http://localhost:8181 | The URL where the Enterprise OPA HTTP API is accessible. |
+| `Enterprise OPA > Preview > Default Query` | | The default query to run when performing an **Enterprise OPA: Preview**. |
+| `Enterprise OPA > Preview > Prefix` | | A prefix to add to all policy paths when mapping for Enterprise OPA preview.  |
+| `Enterprise OPA > Preview > Arguments` | [] | Controls the behavior and features of Enterprise OPA preview calls. |
+| `Enterprise OPA > Preview > Strategy` | all | Determine which files to map for Enterprise OPA preview calls. |
+| `Enterprise OPA > Preview > Ignore` | [] | A set of glob patterns to omit when mapping for Enterprise OPA preview calls. |
+| `Enterprise OPA > Preview > Code Lens` | true | Enable or disable support for Enterprise OPA preview Code Lens links. |
+| `Enterprise OPA > Auth > Type` | none | Determine what kind of authorization to use when connecting to the Enterprise OPA API |
+| `Enterprise OPA > Auth > Client Cert Pem` | | A file path to a PEM encoded client certificate used for TLS authentication. |
+| `Enterprise OPA > Auth > Client Key Pem` | | A file path to a PEM encoded client key used for TLS authentication. |
+| `Enterprise OPA > Auth > Client Cert CA` | | A file path to a PEM encoded custom certificate authority certificate to trust when connecting to Enterprise OPA. |
+| `Enterprise OPA > Auth > Allow Unauthorized TLS` | false | Whether or not to trust Enterprise OPA when the returned TLS certificate is from an unknown authority. |
 ## Styra DAS: Link
 
 [Styra Link](https://docs.styra.com/das/reference/styra-link/) is an opinionated workflow for managing Styra DAS. You can write, test, validate, and publish policy all within your normal development workflow. Styra VS Code Tools brings the capabilities of Styra Link right into VS Code, streamlining your policy authoring process even further.

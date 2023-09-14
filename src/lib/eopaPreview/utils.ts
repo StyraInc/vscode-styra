@@ -51,7 +51,7 @@ export type OpaResult = {
 const packageRegex = /package ([a-zA-Z_].*)(?! )$/s;
 
 export function previewSettings(editor?: vscode.TextEditor, workspace?: readonly vscode.WorkspaceFolder[]): PreviewSettings {
-  const config = vscode.workspace.getConfiguration('eopa');
+  const config = vscode.workspace.getConfiguration('enterpriseOPA');
   return {
     url: config.get<string>('url', 'http://localhost:8181'),
     defaultQuery: config.get<string>('preview.defaultQuery', ''),
@@ -83,11 +83,11 @@ export function previewEnvironment(context: vscode.ExtensionContext): PreviewEnv
 }
 
 export function previewCodeLenseEnabled(): boolean {
-  return vscode.workspace.getConfiguration('eopa').get<boolean>('preview.codeLense', true);
+  return vscode.workspace.getConfiguration('enterpriseOPA').get<boolean>('preview.codeLens', true);
 }
 
 export function hasDefaultQuery(): boolean {
-  return vscode.workspace.getConfiguration('eopa').get<string>('preview.defaultQuery', '') !== '';
+  return vscode.workspace.getConfiguration('enterpriseOPA').get<string>('preview.defaultQuery', '') !== '';
 }
 
 /**

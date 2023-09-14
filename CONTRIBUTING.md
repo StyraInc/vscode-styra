@@ -6,7 +6,7 @@ All contributions to this project must be in [TypeScript](https://www.typescript
 
 ## New Contributors
 
-To get an overview of the project, read both the public-facing [README](https://github.com/StyraInc/vscode-styra) and the more detailed development [README](https://github.com/StyraInc/vscode-styra/tree/main/src) in `/src`.
+To get an overview of the project, read both the public-facing [README](https://github.com/StyraInc/vscode-styra) and the more detailed documentation at [our docs site](https://docs.styra.com/das/reference/vs-code-extension/).
 
 Once you are familiar with the project, follow these steps to get going:
 
@@ -123,6 +123,10 @@ To generate a build for testing and code review (i.e. a build before going publi
 | src/commands/Link`<CMD>`.ts | Implement the command in this new file using the template below.
 | src/lib/vscode-api.ts | Add any new needed vscode API calls in this conduit file. |
 | src/commands/utility.ts | Add any new common helper functions here. |
+
+Whenever you run a Styra Link command, before it even thinks about running a command, it goes through this startup protocol.
+
+![startup flow diagram](https://github.com/StyraInc/vscode-styra/blob/main/image/startup-flow.png)
 
 ### Template for new command
 
