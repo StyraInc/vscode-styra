@@ -21,7 +21,7 @@ Once you pull request has been reviewed and accepted, your changes are merged an
 
 ## Debugging
 
-You can easily launch and debug this extension within VSCode
+You can debug this extension within VSCode
 
 1. Open this project in VSCode.
 2. In the "Run and Debug" pane, choose the `Run Extension` mode from the dropdown at the top.
