@@ -166,10 +166,20 @@ export class PreviewRequest {
       agent: sslConfiguredAgent,
     });
 
-    const response = await req.json();
     if (!req.ok) {
-      throw new APIError(req.status, response);
+      let errResponse: object | undefined;
+      try {
+        errResponse = await req.json();
+      } catch {
+        // use a much nice message if the API endpoint 404s
+        if (req.status === 404) {
+          errResponse = {code: 'Not found', message: 'the preview API is missing or disabled'};
+        }
+      }
+      throw new APIError(req.status, errResponse);
     }
+
+    const response = await req.json();
     return response;
   }
 }
