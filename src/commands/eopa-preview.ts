@@ -18,7 +18,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('eopa.preview.setToken', () => runSetToken(utils.previewEnvironment(context))),
     vscode.languages.registerCodeLensProvider({language: 'rego'}, previewLens),
     vscode.workspace.onDidChangeConfiguration(async (e: vscode.ConfigurationChangeEvent) => {
-      if (!e.affectsConfiguration('eopa')) {
+      if (!e.affectsConfiguration('enterpriseOPA')) {
         return;
       }
       previewLens.setEnabled(utils.previewCodeLenseEnabled());
