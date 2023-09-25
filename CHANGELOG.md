@@ -11,6 +11,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - None
 
+## [2.0.0] - 2023-09-25
+
+### Added
+
+- Added support for Enterprise OPA preview configuration
+- Added support for executing Enterprise OPA previews via code-lense, menus, and commands
+- Added Enterprise OPA specific output pane for preview results 
+- Added SUPPORT.md for more standardized repo organization
+
+### Changed
+
+- Rego language support dropped as duplicate functionality
+- Updated to depend directly on the OPA extension
+- Renamed to Styra VS Code Tools to reflect the multi-product focus
+- Consolidated development README.md into CONTRIBUTING.md
+- Updated README.md to document the updated focus from just Styra DAS to DAS and Enterprise OPA
+
 ## [1.2.0] - 2023-04-19
 
 ### Added
@@ -133,7 +150,8 @@ whether there is anything to overwrite, then asks that first, mirroring the CLI 
 - `Styra Link: Config Git` command added.
 
 <!-- Be sure to add an entry here for each release! -->
-[unreleased]: https://github.com/StyraInc/vscode-styra/compare/v1.2.0...HEAD
+[unreleased]: https://github.com/StyraInc/vscode-styra/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/StyraInc/vscode-styra/compare/v1.2.0...2.0.0
 [1.2.0]: https://github.com/StyraInc/vscode-styra/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/StyraInc/vscode-styra/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/StyraInc/vscode-styra/compare/v1.0.0...v1.0.1
