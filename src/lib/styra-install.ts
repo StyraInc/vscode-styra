@@ -169,6 +169,10 @@ export class StyraInstall {
       await this.getBinary(url, tempFileLocation);
       info(`    Executable: ${this.ExeFile}`);
       fs.chmodSync(tempFileLocation, '755');
+      if (fs.statSync(tempFileLocation).size < 1_000_000) { // crude but effective for a bad URL
+        fs.unlinkSync(tempFileLocation); // delete the file
+        throw new Error(`Probably bad URL for downloading styra - ${url}`);
+      }
       if (this.isWindows()) {
         await moveFile(tempFileLocation, this.ExeFile);
         await this.adjustWindowsPath(this.ExePath);

@@ -9,7 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- None
+### Fixed
+
+- Check that downloaded CLI binary is sane instead of assuming it is. With a bad download URL
+  this caused a cryptic "Error spawn Unknown system error -8" message.
 
 ## [2.0.0] - 2023-09-25
 
