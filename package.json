@@ -12,7 +12,7 @@
     "url": "https://github.com/StyraInc/vscode-styra/issues"
   },
   "publisher": "styra",
-  "version": "2.0.0",
+  "version": "2.0.1-next.0",
   "private": true,
   "main": "./out/main.js",
   "engines": {
