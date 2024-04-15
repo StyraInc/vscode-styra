@@ -60,6 +60,14 @@ On the command-line, you can run Jest tests in a few ways (per scripts in packag
 - npm run test:verbose — run once and terminate; detail all tests.
 - npm run test:watch — run and stay alive; rerunning when you save files.
 
+Within VSCode, you could use the `vscode-jest` extension, but it seems to have problems.
+It runs the entire test suite OK, but then reports "Jest process "watch-tests" ended unexpectedly",
+so the watcher capability is somehow broken. This further causes the Test Explorer to be broken,
+showing only one line for the suite (no subtree of tests at all).
+
+A better choice is the `vscode-jest-runner` extension, that runs only on demand and does not use
+the Test Explorer. But it works, allowing both running AND debugging tests!
+
 ## Preparing a Release
 
 1. CHANGELOG.md: Add release to top of file, following "Keep a Changelog" conventions.
@@ -117,12 +125,19 @@ To generate a build for testing and code review (i.e. a build before going publi
 | ---- | ------ |
 | /README.md | Add one-line command (`name`, `description`) to `## Commands` section. |
 | /README.md | Add any new VSCode settings to `## Extension Settings` section if needed. |
+| package.json | Also add new VSCode settings to `contributes.configuration.properties` section. |
 | /CHANGELOG.md | Add to (or create) an `### Added` section and mention the new command. |
 | /package.json | Add command object (`name`, `key`) to `contributes.commands` section. |
 | src/extension.ts | Add `key` and new command object "new Link`<CMD>`()" to `styraCommands`. |
 | src/commands/Link`<CMD>`.ts | Implement the command in this new file using the template below.
 | src/lib/vscode-api.ts | Add any new needed vscode API calls in this conduit file. |
 | src/commands/utility.ts | Add any new common helper functions here. |
+
+(Yes, there is complete duplication of the settings in README.md and package.json,
+but I think it is worth it. The package.json settings are required by VSCode.
+But those only appear on the extension home page within VS Studio if you go to
+the Features >> Settings tab. Also putting them in the README makes them
+easily accessible viewing the home page of the repo.)
 
 Whenever you run a Styra Link command, before it even thinks about running a command, it goes through this startup protocol.
 
@@ -134,7 +149,7 @@ Start your new command with this template.  You will need to:
 
 1. Replace all instances of `<CMD>` with your command name.
 2. Replace `<OTHER_PARAMS>` with necessary params.
-3. Replace `<CODE>` with whatever you need to prepare <OTHER_PARAMS>.
+3. Replace other ALL_CAPITAL items as appropriate.
 
 ``` typescript
 import { CommandRunner } from '../lib/command-runner';
@@ -176,8 +191,14 @@ export class Link<CMD> implements ICommand {
     return state as State;
   } 
 
+  // step function names should be `pick...` if you are enumerating a set of choices
+  // or `input...` if you are providing a text box for typed input.
+  // Each step EXCEPT the final one returns `Promise<StepType>`;
+  // the final step returns `Promise<void>` and has NO return statement
+
   private async YOUR_FIRST_STEP_HERE(input: MultiStepInput, state: Partial<State>): Promise<StepType> {
     . . .
+    return (input: MultiStepInput) => this.YOUR_NEXT_STEP_HERE(input, state);
   } 
 
   . . .
