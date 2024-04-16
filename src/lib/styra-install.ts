@@ -147,8 +147,6 @@ export class StyraInstall {
   }
 
   private static async installStyra(): Promise<void> {
-    info(`    Platform: ${process.platform}`);
-    info(`    Architecture: ${process.arch}`);
 
     const tempFileLocation = path.join(os.homedir(), this.BinaryFile);
 
@@ -167,12 +165,10 @@ export class StyraInstall {
       cancellable: false
     }, async () => {
       await this.getBinary(url, tempFileLocation);
+      info(`    Platform: ${process.platform}`);
+      info(`    Architecture: ${process.arch}`);
       info(`    Executable: ${this.ExeFile}`);
       fs.chmodSync(tempFileLocation, '755');
-      if (fs.statSync(tempFileLocation).size < 1_000_000) { // crude but effective for a bad URL
-        fs.unlinkSync(tempFileLocation); // delete the file
-        throw new Error(`Probably bad URL for downloading styra - ${url}`);
-      }
       if (this.isWindows()) {
         await moveFile(tempFileLocation, this.ExeFile);
         await this.adjustWindowsPath(this.ExePath);
@@ -189,6 +185,12 @@ export class StyraInstall {
   private static async getBinary(url: string, tempFileLocation: string): Promise<void> {
     // adapted from https://stackoverflow.com/a/69290915
     const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(
+        response.status === 404 ? `Bad URL for downloading styra - ${url}`
+          : `Error attempting to downloading styra CLI: status = ${response.status}`);
+    }
+
     const writeStream = fse.createWriteStream(tempFileLocation, {
       autoClose: true,
       flags: 'w',
