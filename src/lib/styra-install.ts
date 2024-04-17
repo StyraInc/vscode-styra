@@ -45,12 +45,12 @@ export class StyraInstall {
   }
 
   static async checkCliInstallation(): Promise<boolean> {
-    if (await StyraInstall.styraCmdExists()) {
+    if (await this.styraCmdExists()) {
       infoDebug('Styra CLI is installed');
       return true;
     }
     info('Styra CLI is not installed');
-    return await StyraInstall.promptForInstall('is not installed', 'installation');
+    return await this.promptForInstall('is not installed', 'installation');
   }
 
   private static async promptForInstall(description: string, operation: string): Promise<boolean> {
@@ -60,13 +60,18 @@ export class StyraInstall {
       `Styra CLI ${description}. Would you like to install it now?`, 'Install');
 
     if (selection === 'Install') {
+      const tempFile = path.join(os.homedir(), this.BinaryFile);
       info('Installing Styra CLI. This may take a few minutes...');
-      let trials = 0;
+      try {
+        await this.downloadBinary(tempFile);
+      } catch (err) {
+        teeError(`CLI ${operation} failed: ${(err as Error).message}`);
+        return false;
+      }
       // eslint-disable-next-line no-constant-condition
       while (true) {
         try {
-          const tempFile = await this.installStyra(trials++);
-          await StyraInstall.installOnPath(tempFile);
+          await this.installOnPath(tempFile);
           teeInfo(`CLI ${operation} completed.`);
           return true;
         } catch (err) {
@@ -97,7 +102,7 @@ export class StyraInstall {
         const available = await DAS.runQuery('/v1/system/version') as VersionType;
         const installedVersion = await this.getInstalledCliVersion();
         if (compare(available.cliVersion, installedVersion) === 1) {
-          await StyraInstall.promptForInstall(
+          await this.promptForInstall(
             `has an update available (installed=${installedVersion}, available=${available.cliVersion})`, 'update');
         }
       } catch (err) {
@@ -111,7 +116,7 @@ export class StyraInstall {
       const versionInfo = await DAS.runQuery('/v1/system/version') as VersionType;
       infoDebug(`DAS release: ${versionInfo.release} `);
       infoDebug(`DAS edition: ${versionInfo.dasEdition} `);
-      const cliVersion = await StyraInstall.getInstalledCliVersion();
+      const cliVersion = await this.getInstalledCliVersion();
       infoDebug(`CLI version: ${cliVersion} `);
       if (cliVersion !== versionInfo.cliVersion) {
         infoDebug(`(Latest CLI version: ${versionInfo.cliVersion})`);
@@ -172,9 +177,8 @@ export class StyraInstall {
           : `${prefix}/linux/amd64/styra`;
   }
 
-  private static async installStyra(trials = 0): Promise<string> {
+  private static async downloadBinary(tempFileLocation: string): Promise<void> {
 
-    const tempFileLocation = path.join(os.homedir(), this.BinaryFile);
     const url = this.getDownloadUrl();
 
     await IDE.withProgress({
@@ -182,15 +186,12 @@ export class StyraInstall {
       title: 'Installing Styra CLI',
       cancellable: false
     }, async () => {
-      if (trials === 0) {
-        await this.getBinary(url, tempFileLocation);
-        info(`    Platform: ${process.platform}`);
-        info(`    Architecture: ${process.arch}`);
-        info(`    Executable: ${this.ExeFile}`);
-        fs.chmodSync(tempFileLocation, '755');
-      }
+      await this.getBinary(url, tempFileLocation);
+      info(`    Platform: ${process.platform}`);
+      info(`    Architecture: ${process.arch}`);
+      info(`    Executable: ${this.ExeFile}`);
+      fs.chmodSync(tempFileLocation, '755');
     });
-    return tempFileLocation;
   }
 
   private static async installOnPath(tempFileLocation: string) {
@@ -277,7 +278,7 @@ export class StyraInstall {
       value: state.pwd ?? '',
       prompt: `Enter admin password to install into ${STD_LINUX_INSTALL_DIR}`,
       validate: validateNoop,
-      shouldResume
+      shouldResume // TODO: override and delete temp file
     });
   }
 }

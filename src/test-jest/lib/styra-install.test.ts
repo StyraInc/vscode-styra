@@ -38,7 +38,7 @@ describe('StyraInstall', () => {
   }
 
   beforeEach(() => {
-    setPrivateMock('installStyra', jest.fn().mockResolvedValue(''));
+    setPrivateMock('downloadBinary', jest.fn().mockResolvedValue(''));
     setPrivateMock('installOnPath', jest.fn().mockResolvedValue(''));
     StyraInstall.styraCmdExists = jest.fn().mockResolvedValue(false);
     IDE.getConfigValue = mockVSCodeSettings();
@@ -95,9 +95,9 @@ describe('StyraInstall', () => {
       });
     });
 
-    test('returns true and succeeds if installStyra gets a bad pwd then a good pwd', async () => {
+    test('returns true and succeeds if get bad pwd then a good pwd', async () => {
       IDE.showInformationMessageModal = jest.fn().mockReturnValue('Install');
-      setPrivateMock('installStyra', jest.fn()
+      setPrivateMock('installOnPath', jest.fn()
         .mockRejectedValueOnce({message: 'Sorry, try again. Bad password'})
         .mockResolvedValueOnce(''));
 
@@ -106,9 +106,9 @@ describe('StyraInstall', () => {
       expect(spy.content).toMatch(/CLI installation completed/);
     });
 
-    test('returns false and fails if installStyra gets bad pwd, then some other error', async () => {
+    test('returns false and fails if get bad pwd, then some other error', async () => {
       IDE.showInformationMessageModal = jest.fn().mockReturnValue('Install');
-      setPrivateMock('installStyra', jest.fn()
+      setPrivateMock('installOnPath', jest.fn()
         .mockRejectedValueOnce({message: 'Sorry, try again. Bad password'})
         .mockRejectedValue({message: 'some error'}));
 
@@ -118,9 +118,9 @@ describe('StyraInstall', () => {
       expect(spy.content).toMatch(/some error/);
     });
 
-    test('returns false and fails if installStyra throws an error other than bad pwd', async () => {
+    test('returns false and fails if throws an error other than bad pwd', async () => {
       IDE.showInformationMessageModal = jest.fn().mockReturnValue('Install');
-      setPrivateMock('installStyra', jest.fn().mockRejectedValue({message: 'some error'}));
+      setPrivateMock('downloadBinary', jest.fn().mockRejectedValue({message: 'some error'}));
 
       expect(await StyraInstall.checkCliInstallation()).toBe(false);
       expect(spy.content).toMatch(/CLI installation failed/);
