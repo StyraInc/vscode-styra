@@ -33,9 +33,13 @@ describe('StyraInstall', () => {
 
   const spy = new OutputPaneSpy();
 
+  function setPrivateMock(functionName: string, mock: jest.Mock) {
+    (StyraInstall as any)[functionName] = mock;
+  }
+
   beforeEach(() => {
-    // eslint-disable-next-line dot-notation
-    StyraInstall['installStyra'] = jest.fn().mockResolvedValue('');
+    setPrivateMock('installStyra', jest.fn().mockResolvedValue(''));
+    setPrivateMock('installOnPath', jest.fn().mockResolvedValue(''));
     StyraInstall.styraCmdExists = jest.fn().mockResolvedValue(false);
     IDE.getConfigValue = mockVSCodeSettings();
   });
@@ -91,13 +95,36 @@ describe('StyraInstall', () => {
       });
     });
 
-    test('returns false if installStyra throws an error', async () => {
+    test('returns true and succeeds if installStyra gets a bad pwd then a good pwd', async () => {
       IDE.showInformationMessageModal = jest.fn().mockReturnValue('Install');
-      // eslint-disable-next-line dot-notation
-      StyraInstall['installStyra'] = jest.fn().mockRejectedValue('error');
+      setPrivateMock('installStyra', jest.fn()
+        .mockRejectedValueOnce({message: 'Sorry, try again. Bad password'})
+        .mockResolvedValueOnce(''));
+
+      expect(await StyraInstall.checkCliInstallation()).toBe(true);
+      expect(spy.content).toMatch(/invalid password/);
+      expect(spy.content).toMatch(/CLI installation completed/);
+    });
+
+    test('returns false and fails if installStyra gets bad pwd, then some other error', async () => {
+      IDE.showInformationMessageModal = jest.fn().mockReturnValue('Install');
+      setPrivateMock('installStyra', jest.fn()
+        .mockRejectedValueOnce({message: 'Sorry, try again. Bad password'})
+        .mockRejectedValue({message: 'some error'}));
+
+      expect(await StyraInstall.checkCliInstallation()).toBe(false);
+      expect(spy.content).toMatch(/invalid password/);
+      expect(spy.content).toMatch(/CLI installation failed/);
+      expect(spy.content).toMatch(/some error/);
+    });
+
+    test('returns false and fails if installStyra throws an error other than bad pwd', async () => {
+      IDE.showInformationMessageModal = jest.fn().mockReturnValue('Install');
+      setPrivateMock('installStyra', jest.fn().mockRejectedValue({message: 'some error'}));
 
       expect(await StyraInstall.checkCliInstallation()).toBe(false);
       expect(spy.content).toMatch(/CLI installation failed/);
+      expect(spy.content).toMatch(/some error/);
     });
   });
 
@@ -200,8 +227,7 @@ describe('StyraInstall', () => {
         DAS.runQuery = jest.fn().mockResolvedValue({cliVersion: available});
         CommandRunner.prototype.runShellCmd = jest.fn().mockResolvedValue(installed);
         const installMock = jest.fn();
-        // eslint-disable-next-line dot-notation
-        StyraInstall['promptForInstall'] = installMock;
+        setPrivateMock('promptForInstall', installMock);
 
         await StyraInstall.checkForUpdates();
 
@@ -221,8 +247,7 @@ describe('StyraInstall', () => {
         DAS.runQuery = jest.fn().mockImplementation(available);
         CommandRunner.prototype.runShellCmd = jest.fn().mockImplementation(installed);
         const installMock = jest.fn();
-        // eslint-disable-next-line dot-notation
-        StyraInstall['promptForInstall'] = installMock;
+        setPrivateMock('promptForInstall', installMock);
 
         await StyraInstall.checkForUpdates();
 

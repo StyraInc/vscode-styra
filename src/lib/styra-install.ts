@@ -61,13 +61,22 @@ export class StyraInstall {
 
     if (selection === 'Install') {
       info('Installing Styra CLI. This may take a few minutes...');
-      try {
-        await this.installStyra();
-        teeInfo(`CLI ${operation} completed.`);
-        return true;
-      } catch (err) {
-        teeError(`CLI ${operation} failed: ${err}`);
-        return false;
+      let trials = 0;
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        try {
+          const tempFile = await this.installStyra(trials++);
+          await StyraInstall.installOnPath(tempFile);
+          teeInfo(`CLI ${operation} completed.`);
+          return true;
+        } catch (err) {
+          if ((err as Error).message.includes('Sorry, try again')) {
+            info('invalid password; try again...');
+          } else {
+            teeError(`CLI ${operation} failed: ${(err as Error).message}`);
+            return false;
+          }
+        }
       }
     } else {
       infoFromUserAction(`CLI ${operation} cancelled`);
@@ -163,37 +172,44 @@ export class StyraInstall {
           : `${prefix}/linux/amd64/styra`;
   }
 
-  private static async installStyra(): Promise<void> {
+  private static async installStyra(trials = 0): Promise<string> {
 
     const tempFileLocation = path.join(os.homedir(), this.BinaryFile);
     const url = this.getDownloadUrl();
 
-    return await IDE.withProgress({
+    await IDE.withProgress({
       location: IDE.ProgressLocation.Notification,
       title: 'Installing Styra CLI',
       cancellable: false
     }, async () => {
-      await this.getBinary(url, tempFileLocation);
-      info(`    Platform: ${process.platform}`);
-      info(`    Architecture: ${process.arch}`);
-      info(`    Executable: ${this.ExeFile}`);
-      fs.chmodSync(tempFileLocation, '755');
-      if (this.isWindows()) {
-        await moveFile(tempFileLocation, this.ExeFile);
-        await this.adjustWindowsPath(this.ExePath);
-      } else {
-        const state = await this.collectInputs();
-        // see https://stackoverflow.com/q/39785436/115690 for ideas on running sudo
-        const args = ['-c', `echo ${state.pwd} | sudo -S bash -c 'mv ${tempFileLocation} ${this.ExeFile}'`];
-        // vital to run in quiet mode so password does not display
-        await new CommandRunner().runShellCmd('sh', args, {progressTitle: '', quiet: true});
+      if (trials === 0) {
+        await this.getBinary(url, tempFileLocation);
+        info(`    Platform: ${process.platform}`);
+        info(`    Architecture: ${process.arch}`);
+        info(`    Executable: ${this.ExeFile}`);
+        fs.chmodSync(tempFileLocation, '755');
       }
     });
+    return tempFileLocation;
+  }
+
+  private static async installOnPath(tempFileLocation: string) {
+    if (this.isWindows()) {
+      await moveFile(tempFileLocation, this.ExeFile);
+      await this.adjustWindowsPath(this.ExePath);
+    } else {
+      const state = await this.collectInputs();
+      // see https://stackoverflow.com/q/39785436/115690 for ideas on running sudo
+      const args = ['-c', `echo ${state.pwd} | sudo -S bash -c 'mv ${tempFileLocation} ${this.ExeFile}'`];
+      // vital to run in quiet mode so password does not display
+      await new CommandRunner().runShellCmd('sh', args, {progressTitle: '', quiet: true});
+    }
   }
 
   private static async getBinary(url: string, tempFileLocation: string): Promise<void> {
     // adapted from https://stackoverflow.com/a/69290915
     const response = await fetch(url);
+
     if (!response.ok) {
       throw new Error(
         response.status === 404 ? `Bad URL for downloading styra - ${url}`
