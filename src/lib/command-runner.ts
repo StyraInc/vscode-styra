@@ -100,7 +100,6 @@ export class CommandRunner {
     const possibleError = options?.possibleError ?? '';
     const quiet = options?.quiet ?? false;
     if (!StyraInstall.checkWorkspace()) {
-      teeError('Something is wrong! Did you forget to run checkWorkspace in your command?');
       return '';
     }
     const projectDir = IDE.projectDir();

@@ -25,8 +25,11 @@ describe('Executor', () => {
   const spy = new OutputPaneSpy();
   const spyAppendLine = jest.spyOn(outputChannel, 'appendLine');
   Executor.checkStartup = jest.fn();
-  StyraInstall.styraCmdExists = jest.fn().mockResolvedValue(true);
   IDE.getConfigValue = mockVSCodeSettings();
+
+  beforeEach(() => {
+    StyraInstall.styraCmdExists = jest.fn().mockResolvedValue(true);
+  });
 
   [
     [true, 'CONTINUES'],
