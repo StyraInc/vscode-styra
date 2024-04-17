@@ -146,18 +146,27 @@ export class StyraInstall {
     return styraPathInPath && styraExeExists;
   }
 
+  private static getDownloadUrl(): string {
+    // references:
+    //    https://nodejs.org/api/process.html#processarch
+    //    https://nodejs.org/api/process.html#processplatform
+    //    https://docs.styra.com/das/reference/cli (make sure stay in sync with this!)
+    const prefix = 'https://dl.styra.com/release/styra-cli/latest';
+    return process.platform === 'win32'
+      ? `${prefix}/windows/amd64/styra.exe`
+      : process.platform === 'darwin'
+        ? process.arch === 'arm64'
+          ? `${prefix}/darwin/arm64/styra`
+          : `${prefix}/darwin/amd64/styra` // otherwise target "x64"
+        : process.arch === 'arm64'
+          ? `${prefix}/linux/arm64/styra`
+          : `${prefix}/linux/amd64/styra`;
+  }
+
   private static async installStyra(): Promise<void> {
 
     const tempFileLocation = path.join(os.homedir(), this.BinaryFile);
-
-    const url =
-      process.platform === 'win32'
-        ? 'https://docs.styra.com/v1/docs/bin/windows/amd64/styra.exe'
-        : process.platform !== 'darwin'
-          ? 'https://docs.styra.com/v1/docs/bin/linux/amd64/styra'
-          : process.arch === 'arm64'
-            ? 'https://docs.styra.com/v1/docs/bin/darwin/arm64/styra'
-            : 'https://docs.styra.com/v1/docs/bin/darwin/amd64/styra'; // otherwise target "x64"
+    const url = this.getDownloadUrl();
 
     return await IDE.withProgress({
       location: IDE.ProgressLocation.Notification,
