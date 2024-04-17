@@ -151,15 +151,16 @@ export class StyraInstall {
     //    https://nodejs.org/api/process.html#processarch
     //    https://nodejs.org/api/process.html#processplatform
     //    https://docs.styra.com/das/reference/cli (make sure stay in sync with this!)
+    const prefix = 'https://dl.styra.com/release/styra-cli/latest';
     return process.platform === 'win32'
-      ? 'https://dl.styra.com/release/styra-cli/latest/windows/amd64/styra.exe'
+      ? `${prefix}/windows/amd64/styra.exe`
       : process.platform === 'darwin'
         ? process.arch === 'arm64'
-          ? 'https://dl.styra.com/release/styra-cli/latest/darwin/arm64/styra'
-          : 'https://dl.styra.com/release/styra-cli/latest/darwin/amd64/styra' // otherwise target "x64"
+          ? `${prefix}/darwin/arm64/styra`
+          : `${prefix}/darwin/amd64/styra` // otherwise target "x64"
         : process.arch === 'arm64'
-          ? 'https://dl.styra.com/release/styra-cli/latest/linux/arm64/styra'
-          : 'https://dl.styra.com/release/styra-cli/latest/linux/amd64/styra';
+          ? `${prefix}/linux/arm64/styra`
+          : `${prefix}/linux/amd64/styra`;
   }
 
   private static async installStyra(): Promise<void> {
