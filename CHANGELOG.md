@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   With a bad download URL this caused a cryptic "Error spawn Unknown system error -8" message.
 - Fixed download URLs for auto-installing Styra CLI.
 - Optimized vsix package, making the plugin binary 80% smaller!
+- Cancelling password entry during CLI install now aborts the progress bar, too.
+- Bad password during CLI install now reports a short, clean message instead of a cryptic, verbose one.
+- Password entry for CLI install now allows retries without re-downloading the CLI binary.
 
 ## [2.0.0] - 2023-09-25
 
