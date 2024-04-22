@@ -45,6 +45,7 @@ Ever wanted to know what impact your policy changes will have on your existing d
 | `Enterprise OPA > Auth > Client Key Pem` | | A file path to a PEM encoded client key used for TLS authentication. |
 | `Enterprise OPA > Auth > Client Cert CA` | | A file path to a PEM encoded custom certificate authority certificate to trust when connecting to Enterprise OPA. |
 | `Enterprise OPA > Auth > Allow Unauthorized TLS` | false | Whether or not to trust Enterprise OPA when the returned TLS certificate is from an unknown authority. |
+
 ## Styra DAS: Link
 
 [Styra Link](https://docs.styra.com/das/reference/styra-link/) is an opinionated workflow for managing Styra DAS. You can write, test, validate, and publish policy all within your normal development workflow. Styra VS Code Tools brings the capabilities of Styra Link right into VS Code, streamlining your policy authoring process even further.

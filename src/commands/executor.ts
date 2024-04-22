@@ -8,6 +8,7 @@ export class Executor {
 
   static StorageManager = LocalStorageService.instance;
 
+  // start of a user-initiated command (registered via extension.ts)
   static async run(command: ICommand): Promise<void> {
 
     if (!(await this.checkStartup())) {

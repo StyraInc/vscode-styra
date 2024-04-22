@@ -23,18 +23,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added support for Enterprise OPA preview configuration
-- Added support for executing Enterprise OPA previews via code-lense, menus, and commands
-- Added Enterprise OPA specific output pane for preview results 
-- Added SUPPORT.md for more standardized repo organization
+- Added support for Enterprise OPA preview configuration.
+- Added support for executing Enterprise OPA previews via code-lense, menus, and commands.
+- Added Enterprise OPA specific output pane for preview results .
+- Added SUPPORT.md for more standardized repo organization.
 
 ### Changed
 
-- Rego language support dropped as duplicate functionality
-- Updated to depend directly on the OPA extension
-- Renamed to Styra VS Code Tools to reflect the multi-product focus
-- Consolidated development README.md into CONTRIBUTING.md
-- Updated README.md to document the updated focus from just Styra DAS to DAS and Enterprise OPA
+- Rego language support dropped as duplicate functionality.
+- Updated to depend directly on the OPA extension.
+- Renamed to Styra VS Code Tools to reflect the multi-product focus.
+- Consolidated development README.md into CONTRIBUTING.md.
+- Updated README.md to document the updated focus from just Styra DAS to DAS and Enterprise OPA.
 
 ## [1.2.0] - 2023-04-19
 
