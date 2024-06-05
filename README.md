@@ -81,3 +81,8 @@ Some of these commands execute immediately but those with a trailing ellipsis as
 New to Rego? Styra VS Code Tools provides a wealth of ready-made policy snippets to jump start your Rego journey. Our general language snippets as well to aid you in getting up to speed with rego. All of these start with "rego" as the trigger, so just type that into a rego file and you will see a list of them.
 
 In addition to the general snippets, Styra VS Code Tools contains over 120 snippets defined for the Styra DAS Kubernetes system type.
+
+## Community
+
+For questions, discussions and announcements related to Styra products, services and open-source projects, please join
+the Styra community on [Slack](https://communityinviter.com/apps/styracommunity/signup)!
