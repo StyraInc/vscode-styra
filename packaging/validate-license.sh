@@ -15,12 +15,13 @@ IFS=$'\n\t'
 #     Output all license data as JSON.
 
 ALLOWED="Apache-2.0;Apache-Style;BSD;BSD*;BSD-2-Clause;BSD-3-Clause;CC0-1.0;CC-BY-3.0;CC-BY-4.0;CC-BY-SA-4.0;ISC;MIT;Python-2.0;Unlicense;WTFPL"
+# Need to include the current vscode-styra package, too
+EXCEPTIONS="vscode-styra@${npm_package_version};buffers@0.1.1;@tootallnate/once@1.1.2;tr46@0.0.3"
 
 license_checker() {
-  # Need to include the current vscode-styra package, too, since it does not have an "approved" license (since it is not open source).
   # Interesting read on using npm environment variables: https://www.twilio.com/blog/npm-scripts.
   # TODO: including some exceptions that should be cleaned up eventually
-  npx license-checker --onlyAllow "$ALLOWED" --excludePackages "vscode-styra@${npm_package_version};buffers@0.1.1;@tootallnate/once@1.1.2;tr46@0.0.3" "$@"
+  npx license-checker --onlyAllow "$ALLOWED" --excludePackages "$EXCEPTIONS" "$@"
 }
 
 option=${1:-} # default to empty string
