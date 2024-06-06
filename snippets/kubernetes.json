@@ -377,7 +377,7 @@
     },
     "Ingresses: Restrict Ingress with default Ingress-class.": {
         "prefix": "deny_ingress_with_default_or_no_ingress_class",
-        "description": "Ensure that every Ingress reource is created with an ingress-class other than the default eg. use annotation `kubernetes.io/ingress.class: nginx-internal`.",
+        "description": "Ensure that every Ingress resource is created with an ingress-class other than the default eg. use annotation `kubernetes.io/ingress.class: nginx-internal`.",
         "scope": "rego",
         "body": [
             "monitor[decision] {\n\tdata.library.v1.kubernetes.admission.network.v1.deny_ingress_with_default_or_no_ingress_class[message]\n\tdecision := {\n\t\t\"allowed\": false,\n\t\t\"message\": message,\n\t}\n}\n"

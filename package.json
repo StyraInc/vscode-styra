@@ -12,7 +12,7 @@
     "url": "https://github.com/StyraInc/vscode-styra/issues"
   },
   "publisher": "styra",
-  "version": "2.0.1-next.4",
+  "version": "2.0.1-next.5",
   "private": true,
   "main": "./out/main.js",
   "engines": {
@@ -258,7 +258,7 @@
     "esbuild": "npm run esbuild-base -- --sourcemap",
     "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
     "test-compile": "tsc -p ./",
-    "package": "vsce package --pre-release",
+    "package": "npx @vscode/vsce package --pre-release",
     "package:install": "code --install-extension vscode-styra-${npm_package_version}.vsix",
     "check-licenses": "./packaging/validate-license.sh",
     "compile": "tsc -p ./",
@@ -292,7 +292,6 @@
     "@types/vscode": "^1.71.0",
     "@typescript-eslint/eslint-plugin": "^5.59.5",
     "@typescript-eslint/parser": "^5.59.5",
-    "@vscode/vsce": "^2.25.0",
     "babel-jest": "^29.3.1",
     "esbuild": "^0.17.6",
     "eslint": "^8.40.0",
