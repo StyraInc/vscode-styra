@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2024-06-27
+
 ### Fixed
 
 - Check that downloaded CLI binary is an actual binary (not a 404 page) instead of assuming it is.
@@ -158,7 +160,8 @@ whether there is anything to overwrite, then asks that first, mirroring the CLI 
 - `Styra Link: Config Git` command added.
 
 <!-- Be sure to add an entry here for each release! -->
-[unreleased]: https://github.com/StyraInc/vscode-styra/compare/v2.0.0...HEAD
+[unreleased]: https://github.com/StyraInc/vscode-styra/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/StyraInc/vscode-styra/compare/v2.0.0...2.1.0
 [2.0.0]: https://github.com/StyraInc/vscode-styra/compare/v1.2.0...2.0.0
 [1.2.0]: https://github.com/StyraInc/vscode-styra/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/StyraInc/vscode-styra/compare/v1.0.1...v1.1.0

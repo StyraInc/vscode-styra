@@ -78,7 +78,7 @@ the Test Explorer. But it works, allowing both running AND debugging tests!
 
 ## Publish to VSCode marketplace
 
-Usually you just run `vsce publish minor`. The last arg may also be `major` or `patch`, as appropriate.
+Usually you just run `npx --yes @vscode/vsce publish minor`. The last arg may also be `major` or `patch`, as appropriate.
 Any of those choices will auto-increment your version number.
 You may also provide a fixed, specific version number if desired.
 That takes a minute or so to bundle and ship a new package off to the VSCode marketplace.
@@ -100,6 +100,7 @@ Final steps:
 - Merge that PR to main, then on main recreate the tag, e.g.:
   `git tag -a v1.2.0 -m "release 1.2.0"`
 - Push the new tag to github (example: `git push origin v1.2.0`)
+- Go to https://github.com/StyraInc/vscode-styra/releases and draft a new release (e.g. name here would be "V1.2.0").
 - Post notice of the release in the `#proj-link` channel.
 - Post notice of the release in the Styra Community Slack, `#vscode` channel.
 
